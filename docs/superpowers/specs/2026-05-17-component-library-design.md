@@ -89,6 +89,28 @@ Explicitly out of scope for this project:
   - `dts: true`; JSX automatic runtime.
   - Run `publint` + `attw` in CI to catch dual-consumer packaging bugs.
 
+**Alternatives considered:**
+
+- **bunchee** — equally first-class for RSC (zero-config automatic
+  client/server chunk split) and more proven on real-world RSC libraries.
+  Viable fallback; chosen against only because tsdown additionally provides
+  fast Oxc `isolatedDeclarations` DTS and built-in `publint`/`attw`, which
+  directly de-risk the RSC+Vite dual-consumer packaging requirement.
+- **tsup + `esbuild-plugin-preserve-directives` + `bundle:false`** — the
+  most battle-tested engine (esbuild), but `"use client"` preservation is
+  not zero-config and is historically fragile with code-splitting; tsup's
+  popularity is largely in the non-RSC library space. Rejected as the
+  default because correct per-module `"use client"` is a hard requirement
+  here, and leading with a bundler that treats it as a first-class
+  invariant is lower-risk. Remains a credible migration target if tsdown
+  (the youngest option) proves problematic.
+- **Vite library mode / unbuild / rslib** — all require manual,
+  non-directive-aware wiring (`rollup-preserve-directives` etc.) for RSC;
+  no advantage over tsdown/bunchee for this use case.
+
+The bundler choice is reversible: `unbundle: true` per-module ESM output is
+portable across tsdown/bunchee/tsup, so switching later is low-cost.
+
 ### 4.3 RSC strategy
 
 - Per-module `"use client"` **only** on interactive components (those
