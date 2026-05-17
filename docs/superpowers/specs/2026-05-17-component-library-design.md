@@ -20,6 +20,11 @@
   dist-tag during ironing-out; optional `pnpm pack` pre-check); `pkg.pr.new`
   deferred to post-Milestone-0. Cross-scale hardening deferred out of
   Milestone 0.
+- r5 — moved **Chromatic visual regression into Milestone 0 as a release
+  gate** (workflow-validation value is high even at one component, and it's
+  a historically painful integration best ironed out early in isolation);
+  knip `--production --strict`, the committed `.d.ts` API snapshot, and CI
+  sharding/tag-split remain deferred (pure coverage/scale, not workflow).
 
 ## 1. Purpose
 
@@ -69,7 +74,7 @@ Milestone 0.
 | React optimization | **Ship React-Compiler-compiled output** (compiler `target: '19'`) |
 | Package manager | **pnpm 11** + catalogs for framework-critical pins |
 | Lint / format | **ESLint flat config + Prettier**, optional **oxlint** fast pre-pass |
-| Quality bar | Unit + interaction tests, automated a11y (Milestone 0); visual regression + API-surface guard (post-Milestone-0 hardening) |
+| Quality bar | Unit + interaction tests, automated a11y, **visual regression (Chromatic + TurboSnap, release gate)** — all in Milestone 0; API-surface snapshot + dep-isolation post-Milestone-0 |
 | Release | Changesets + GitHub Actions, npm OIDC trusted publishing |
 
 ## 3. Non-Goals (YAGNI)
@@ -79,10 +84,12 @@ Explicitly out of scope for this project:
 - **Any component beyond Button before the Milestone 0 gate** (workflow
   loop friction-free + canonical component pattern agreed — see §8.5).
 - `pkg.pr.new` in the initial ironed loop (deferred; §10).
-- Cross-scale hardening (Chromatic visual-regression baselines, knip
-  `--production --strict` dep isolation, committed `.d.ts` API snapshot,
-  CI sharding / tag split) during Milestone 0 — low value at one component
-  and would slow the slice; introduced when scaling (§8.6).
+- Cross-scale *coverage* tooling during Milestone 0 — knip
+  `--production --strict` dep isolation, the committed `.d.ts` API-surface
+  snapshot, and CI sharding / tag-split: near-zero signal at one component
+  and not workflow pain points; introduced when scaling (§8.6).
+  (Chromatic visual regression *is* in Milestone 0 — it's a workflow to
+  iron out, not just coverage; see §8.2/§8.3.)
 - React Native / web-native cross-platform support.
 - Monorepo or a separately published `@scope/tokens` package (extractable
   later without breaking consumers if a non-React need ever arises).
@@ -405,6 +412,10 @@ loop.
   `react-docgen-typescript`.
 - Vitest browser-mode interaction (`play`) tests + automated a11y
   (`@storybook/addon-a11y`) for Button.
+- **Chromatic + TurboSnap visual regression**: Button story baselines,
+  PR-based baseline acceptance, wired as a **required release-gate check**
+  (§8.3/§10). Standing this up in isolation on one stable component is the
+  point — it's the historically painful integration being de-risked early.
 - Build with React Compiler + `publint`/`attw --pack` green.
 - Published to npm for real (see §8.3).
 
@@ -419,11 +430,13 @@ loop.
    own `:root` and toggles `data-theme="dark"` from a small client
    component. Verify zero-rebuild theming and correct RSC behavior.
 4. **Simulate a real consumer-driven change:** the consumer needs a Button
-   change → make it in this library → add a Changeset → version bump →
-   publish the next `0.x` → consumer `pnpm update @scope/ui` → verify the
-   change lands.
+   change → make it in this library → **Chromatic flags the visual diff on
+   the PR → review & accept the new baseline** → add a Changeset → version
+   bump → publish the next `0.x` (Chromatic green is a required gate) →
+   consumer `pnpm update @scope/ui` → verify the change lands.
 5. Repeat 3–4 until the loop is friction-free; **write the ironed-out
-   CONSUMER + MAINTAINER workflow doc** and commit it to the repo
+   CONSUMER + MAINTAINER workflow doc** (including the Chromatic
+   baseline-review/accept step) and commit it to the repo
    (`docs/workflow.md`).
 
 **Loop mechanics.** Real `npm publish` is the **authoritative, documented
@@ -466,11 +479,13 @@ component pattern is agreed and written.
 - Then the remaining core set toward the eventual ~12: **Input, Select,
   Checkbox, Radio, Tabs, Tooltip, Popover, Toast, Card, Badge**, applying
   the canonical pattern; Modal/Tabs carry the §7.1 migration.
-- **Cross-scale hardening introduced here:** Chromatic + TurboSnap visual
-  regression baselines, the committed `.d.ts` API-surface snapshot diff,
-  knip `--production --strict` dependency isolation, and CI sharding +
-  smoke/interaction story tag-split (all per §9/§4.5). These have little
-  value at one component and are deliberately deferred out of Milestone 0.
+- **Cross-scale coverage hardening introduced here:** the committed
+  `.d.ts` API-surface snapshot diff, knip `--production --strict`
+  dependency isolation, and CI sharding + smoke/interaction story
+  tag-split (per §9/§4.5) — pure coverage/scale concerns with little
+  signal at one component. (Chromatic visual regression is already
+  established and gating from Milestone 0; scaling only adds more story
+  baselines.)
 - `pkg.pr.new` per-PR previews may be enabled here if useful.
 
 ## 9. Testing & Quality
@@ -517,8 +532,10 @@ One Vitest run (browser mode, headless Chromium via
   field); one `vitest` command runs both.
 - **Visual regression** — **Chromatic + TurboSnap** (`onlyChanged: true`)
   against the built Storybook; explicit baseline acceptance on PRs;
-  `exitZeroOnChanges` on non-main branches. **Introduced post-Milestone-0**
-  (§8.6) — low value at one component.
+  `exitZeroOnChanges` on non-main branches. **In Milestone 0 scope** and a
+  **required release gate** (§8.3/§10). Regression-*coverage* value grows
+  with breadth, but the Chromatic↔Storybook↔CI↔TurboSnap↔release-gate
+  *workflow* is validated now, in isolation, on Button.
 - React 19: RTL 16 / `vitest-browser-react`.
 
 **Test performance (relevant when scaling, §8.6):** headless single
@@ -539,8 +556,9 @@ Tailwind layout needs real CSS — all of which jsdom silently mishandles.
   `"private": true` and must set `publishConfig.access: "public"`.
   GitHub Actions on push to `main`: opens/updates a "Version Packages" PR;
   merging it publishes to npm and tags the release. The build (incl. React
-  Compiler), Vitest suite, and publint/attw gate the release. (The
-  committed `.d.ts` API-surface snapshot joins the gate at §8.6.)
+  Compiler), Vitest suite, publint/attw, **and Chromatic visual regression
+  (accepted baselines)** gate the release. (The committed `.d.ts`
+  API-surface snapshot joins the gate at §8.6.)
 - **npm OIDC trusted publishing**: register the repo+workflow as a Trusted
   Publisher on npm; workflow needs `id-token: write` and **no `NPM_TOKEN`**;
   provenance attestation is automatic. First publish of a new scoped
@@ -580,7 +598,7 @@ Tailwind layout needs real CSS — all of which jsdom silently mishandles.
 | React Testing Library | 16.x | React 19 compatible; `vitest-browser-react` in browser mode |
 | Changesets | `@changesets/cli` 2.x | `changesets/action@v1`; OIDC publishing |
 | `pkg-pr-new` | latest | per-PR preview releases (post-Milestone-0) |
-| Chromatic | latest | `@chromatic-com/storybook` + TurboSnap (post-Milestone-0) |
+| Chromatic | latest | `@chromatic-com/storybook` + TurboSnap; **Milestone 0, required release gate** |
 
 > Most version-fragile spot: the Storybook ↔ Vitest ↔
 > `@storybook/addon-vitest` peer-range triad. Pin deliberately and verify
@@ -624,6 +642,10 @@ Tailwind layout needs real CSS — all of which jsdom silently mishandles.
 14. **Provisional conventions** — §6/§7/§9 authoring conventions are not
     final until the §8.4 bake-off; avoid hard-coding patterns into many
     components before then (mitigated structurally by the §8.5 gate).
+15. **Chromatic baseline churn during Button iteration** is expected —
+    intentional visual changes mean frequent baseline approvals on PRs;
+    that is the workflow being exercised, not a failure. TurboSnap +
+    accept-on-PR keeps it manageable; don't disable the gate to avoid it.
 
 ## 13. Phasing (high-level)
 
@@ -640,24 +662,27 @@ gate precedes phase 7**:
 2. **Token slice** — DTCG tokens for the Button-relevant palette + semantic
    tokens + dark re-binding; Style Dictionary v5 build (CSS vars + custom
    Tailwind `@theme inline` format); Tokens Studio GitHub sync wiring.
-3. **Styling + Storybook harness** — Tailwind v4 internal build →
-   precompiled CSS with cascade-layer/`@utility`/`:where()` strategy;
-   Storybook 10 + CSF factories + `addon-themes` (theme + palette toolbar)
-   + `react-docgen-typescript`; Vitest browser mode + `addon-vitest` +
-   `addon-a11y` wiring.
+3. **Styling + Storybook + visual-regression harness** — Tailwind v4
+   internal build → precompiled CSS with cascade-layer/`@utility`/`:where()`
+   strategy; Storybook 10 + CSF factories + `addon-themes` (theme + palette
+   toolbar) + `react-docgen-typescript`; Vitest browser mode +
+   `addon-vitest` + `addon-a11y`; **Chromatic + TurboSnap project +
+   `@chromatic-com/storybook` wired**.
 4. **Button** — fresh Button: typed props/variants, token styling, stories,
    interaction + a11y tests; React Compiler verified on built artifact;
    `publint`/`attw` green.
 5. **Workflow loop** — first real npm publish (`0.1.0`); integrate into the
    pilot Next.js App Router app; apply theme (palette override + dark);
-   run the change→republish(`0.x`/`canary`)→`pnpm update` loop until
-   friction-free; write & commit `docs/workflow.md`.
+   run the change→**Chromatic baseline review/accept**→republish(`0.x`/
+   `canary`, Chromatic-gated)→`pnpm update` loop until friction-free;
+   write & commit `docs/workflow.md`.
 6. **Bake-off** — owner builds their Button; head-to-head comparison; write
    & commit `docs/component-conventions.md`; amend spec §6/§7/§9 if needed.
 7. **(GATED) Scale** — component #2 (Dialog) then the remaining core set
-   per the canonical pattern; introduce cross-scale hardening (Chromatic +
-   TurboSnap, `.d.ts` API snapshot, knip `--production --strict`, CI
-   sharding + tag split); optionally enable `pkg.pr.new`.
+   per the canonical pattern; introduce cross-scale coverage hardening
+   (`.d.ts` API snapshot, knip `--production --strict`, CI sharding +
+   tag split); optionally enable `pkg.pr.new`. (Chromatic already gating
+   since Milestone 0 — scaling only adds baselines.)
 
 ## 14. Open Items (non-blocking)
 
