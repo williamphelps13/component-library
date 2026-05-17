@@ -90,18 +90,29 @@ independent of delivery order. What is built when is §4.
 
 **Bundler: `tsdown`** (Rolldown/Oxc, directive-preserving).
 
-- `format: ['esm']` only (add `cjs` only on demonstrated demand).
-- `unbundle: true` — per-module output so `"use client"` boundaries stay
-  granular and tree-shaking is maximal; a single bundled chunk would drag
-  the whole library across the client boundary.
-- Externalize `react`, `react-dom`, `react/*`, `radix-ui`, `@radix-ui/*`.
-- `dts: true`; JSX automatic runtime; `sourcemap: true`.
-- **React Compiler** (`babel-plugin-react-compiler` v1.x) via tsdown's
-  recipe (`@rolldown/plugin-babel` + `reactCompilerPreset()`), compiler
-  `target: '19'`. The library ships compiler-optimized output — consumers
-  cannot compile already-built `dist`, so this is the only way components
-  get auto-memoization in any consumer. Compilation is idempotent (a
-  consumer also running the compiler is a documented non-issue).
+**Alternatives considered:**
+
+- **bunchee** — equally first-class for RSC (zero-config automatic
+  client/server chunk split) and more proven on real-world RSC libraries.
+  Viable fallback; chosen against only because tsdown additionally provides
+  fast Oxc `isolatedDeclarations` DTS and built-in `publint`/`attw`, which
+  directly de-risk the RSC+Vite dual-consumer packaging requirement.
+- **tsup + `esbuild-plugin-preserve-directives` + `bundle:false`** — the
+  most battle-tested engine (esbuild), but `"use client"` preservation is
+  not zero-config and is historically fragile with code-splitting; tsup's
+  popularity is largely in the non-RSC library space. Rejected as the
+  default because correct per-module `"use client"` is a hard requirement
+  here, and leading with a bundler that treats it as a first-class
+  invariant is lower-risk. Remains a credible migration target if tsdown
+  (the youngest option) proves problematic.
+- **Vite library mode / unbuild / rslib** — all require manual,
+  non-directive-aware wiring (`rollup-preserve-directives` etc.) for RSC;
+  no advantage over tsdown/bunchee for this use case.
+
+The bundler choice is reversible: `unbundle: true` per-module ESM output is
+portable across tsdown/bunchee/tsup, so switching later is low-cost.
+
+### 4.3 RSC strategy
 
 Why tsdown over alternatives:
 
