@@ -188,10 +188,10 @@ git add tsconfig.json && git commit -m "chore: library-grade tsconfig"
 - **Tradeoffs:** ESM-only excludes legacy CJS-only consumers (acceptable; not a target). Shipping `src` enlarges the tarball ~2× (acceptable; public lib).
 - **What you'll run:** `pnpm publint` later validates this.
 
-- [ ] **Step 1 (agent authors):** Set `package.json` to (scope name is a placeholder the owner finalizes — `@wphelps/ui` used here):
+- [ ] **Step 1 (agent authors):** Set `package.json` to (scope name is a placeholder the owner finalizes — `@williamphelps13/ui` used here):
 ```json
 {
-  "name": "@wphelps/ui",
+  "name": "@williamphelps13/ui",
   "version": "0.0.0",
   "description": "Reusable React component library",
   "type": "module",
@@ -1283,7 +1283,7 @@ git add .changeset && git commit -m "chore: changeset for 0.1.0 (Button)"
 git push
 ```
 - [ ] **Step 3 `[USER RUNS]`:** Merge the auto-opened "Version Packages" PR; watch the `Release` job publish.
-Expected: `npm view @wphelps/ui version` → `0.1.0`; npm shows provenance.
+Expected: `npm view @williamphelps13/ui version` → `0.1.0`; npm shows provenance.
 - [ ] **Step 4 — guided debugging if publish fails (e.g. OIDC/access):** user reads the Actions log; agent coaches against spec §3.9 (access:public, id-token:write, trusted-publisher registration). No silent fix.
 
 ### Task 5.3: Integrate into the pilot Next.js App Router app + apply theme
@@ -1298,9 +1298,9 @@ Expected: `npm view @wphelps/ui version` → `0.1.0`; npm shows provenance.
 
 - [ ] **Step 1 `[USER RUNS]`:** In the pilot app, install the published package:
 ```bash
-pnpm add @wphelps/ui
+pnpm add @williamphelps13/ui
 ```
-- [ ] **Step 2 (agent authors, in pilot app):** Add to root `app/layout.tsx` (top): `import '@wphelps/ui/styles.css'`.
+- [ ] **Step 2 (agent authors, in pilot app):** Add to root `app/layout.tsx` (top): `import '@williamphelps13/ui/styles.css'`.
 - [ ] **Step 3 (agent authors, in pilot app):** A route `app/ui-test/page.tsx` (Server Component) rendering `<Button intent="primary">Hello</Button>` and `<Button intent="danger">Danger</Button>`.
 - [ ] **Step 4 (agent authors, in pilot app):** `app/globals.css` (after the lib import) adds `:root { --color-primary: oklch(0.55 0.2 320); }` and a small `"use client"` toggle component setting `document.documentElement.dataset.theme`.
 - [ ] **Step 5 `[USER RUNS]`:** Run the app, verify:
@@ -1311,7 +1311,7 @@ Expected: `/ui-test` renders Buttons server-side (view-source shows markup), the
 - [ ] **Step 6 — guided debugging if styles missing / RSC error:** check import order (lib CSS before overrides), root-layout import, server/client boundary; agent coaches against spec risks #1/#3/#10. No silent fix.
 - [ ] **Step 7 `[USER RUNS]`:** Commit (in the pilot app repo).
 ```bash
-git add app && git commit -m "test: consume @wphelps/ui Button + theme override"
+git add app && git commit -m "test: consume @williamphelps13/ui Button + theme override"
 ```
 
 ### Task 5.4: Run the change → republish → re-consume loop
@@ -1319,7 +1319,7 @@ git add app && git commit -m "test: consume @wphelps/ui Button + theme override"
 **Files:** iterate on `src/components/button/*`; changesets; `canary` dist-tag
 
 **Teaching Preamble**
-- **Concept:** Exercise the real loop: consumer needs a Button tweak → change here → Chromatic flags the diff on the PR → accept baseline → changeset → publish a `0.x` under `canary` → consumer installs `@wphelps/ui@canary` → verify → promote to `latest`.
+- **Concept:** Exercise the real loop: consumer needs a Button tweak → change here → Chromatic flags the diff on the PR → accept baseline → changeset → publish a `0.x` under `canary` → consumer installs `@williamphelps13/ui@canary` → verify → promote to `latest`.
 - **Why this choice (alternatives rejected):** `canary` dist-tag keeps `latest` clean during churn while still being a *real* publish (spec §4.1). `pnpm pack` is the optional fast pre-publish sanity check. Rejected: only `latest` (pollutes during experimentation); pkg.pr.new (deferred, spec §4.2).
 - **Tradeoffs:** Two-step (canary → promote) adds ceremony; it's the ceremony being learned.
 - **What you'll run:** the full loop, ≥2 iterations.
@@ -1337,12 +1337,12 @@ Expected: Chromatic shows the intended diff; accepting it unblocks the gate.
 pnpm changeset            # patch/minor
 git add .changeset && git commit -m "feat(button): outline intent" && git push
 # after Version PR merges, the Release job publishes; tag it canary:
-npm dist-tag add @wphelps/ui@<new> canary
+npm dist-tag add @williamphelps13/ui@<new> canary
 ```
 - [ ] **Step 5 `[USER RUNS]`:** In the pilot app, consume the canary, verify, then promote:
 ```bash
-pnpm add @wphelps/ui@canary && pnpm dev   # verify the change landed
-npm dist-tag add @wphelps/ui@<new> latest
+pnpm add @williamphelps13/ui@canary && pnpm dev   # verify the change landed
+npm dist-tag add @williamphelps13/ui@<new> latest
 ```
 - [ ] **Step 6 `[USER RUNS]`:** Repeat Steps 2–5 once more with a different change until the loop feels friction-free; note every rough edge.
 
@@ -1457,7 +1457,7 @@ Quiz:
 
 **Spec coverage:** §3.1 package shape → T1.4; §3.2 tsdown+RC → T1.5–1.6; §3.3 RSC/use-client → T1.7–1.8, T4.2; §3.4 tsconfig/go-to-source → T1.3; §3.5 tokens pipeline → T2.1–2.3; §3.6 styling zero-specificity → T3.1–3.2; §3.7 component model → T4.2 (conventions), Appendix A migration is Phase 7 (out of scope, correctly absent); §3.8 Storybook/Vitest/Chromatic → T3.3–3.5, T4.3–4.4; §3.9 release/OIDC → T5.1–5.2; §3.10 lint/knip/pack → T1.7,1.9,1.10; §3.11 versions → catalog T1.2 + installs; §4.1 Milestone 0 (Button, loop, bake-off, gate) → Phases 4–6; §4.3 phases → Phases 1–6; §5 Teaching Mode → preambles + `[USER RUNS]` + quiz gates throughout; §7 risks → guarded in T1.8 (#2,#8), T1.4 (#3,#9), T2.2 (#5,#6), T3.1–3.2 (#1,#10), T3.4 (#7), T4.2 (#8), plus quiz questions. Phase 7 / §4.2 deliberately excluded per scope. **No gaps.**
 
-**Placeholder scan:** Versions in the catalog are concrete with an explicit registry-confirm step (not a placeholder — the spec itself mandates verifying the SB↔Vitest triad at implementation, risk #7); the few "verify current API via ctx7" steps are guarded debugging steps, not unfinished content. `@wphelps/ui` is a clearly-flagged scope placeholder the owner finalizes (spec §8 open item). No `TBD`/`TODO`/"handle edge cases".
+**Placeholder scan:** Versions in the catalog are concrete with an explicit registry-confirm step (not a placeholder — the spec itself mandates verifying the SB↔Vitest triad at implementation, risk #7); the few "verify current API via ctx7" steps are guarded debugging steps, not unfinished content. `@williamphelps13/ui` is a clearly-flagged scope placeholder the owner finalizes (spec §8 open item). No `TBD`/`TODO`/"handle edge cases".
 
 **Type consistency:** `buttonClasses(intent, size)`, `Intent`, `Size`, `ButtonProps` consistent across T4.1→4.2→4.3 and `src/index.ts`. `data-theme` attribute consistent across token CSS (T2.2), Tailwind variant (T3.1), Storybook (T3.3), pilot app (T5.3). Script name `assert:use-client` consistent T1.8/1.10/4.2/5.1. `dist/styles.css` exports key consistent T1.4/3.2/3.3.
 

@@ -1,0 +1,42 @@
+{
+  "name": "@williamphelps13/ui",
+  "version": "0.0.0",
+  "description": "Reusable React component library",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": ["**/*.css", "./dist/styles.css"],
+  "files": ["dist", "src"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "scripts": {
+    "tokens": "node style-dictionary.config.mjs",
+    "build": "pnpm tokens && tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "test": "vitest run",
+    "knip": "knip",
+    "assert:use-client": "node scripts/assert-use-client.mjs",
+    "verify:pack": "publint && attw --pack"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.1.2",
+      "onFail": "download"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
