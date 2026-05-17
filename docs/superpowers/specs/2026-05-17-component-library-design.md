@@ -26,6 +26,10 @@ current, consolidated design.*
   a historically painful integration best ironed out early in isolation);
   knip `--production --strict`, the committed `.d.ts` API snapshot, and CI
   sharding/tag-split remain deferred (pure coverage/scale, not workflow).
+- r6 — added §14 **Execution Methodology (Teaching Mode)**: user runs all
+  CLI/setup commands, agent authors code+config and walks through it,
+  per-step Concept/Why/Tradeoffs, hard quiz gate at every phase boundary,
+  failures as guided debugging. (Old §14 Open Items → §15.)
 
 ## 1. Purpose
 
@@ -77,6 +81,7 @@ Milestone 0.
 | Lint / format | **ESLint flat config + Prettier**, optional **oxlint** fast pre-pass |
 | Quality bar | Unit + interaction tests, automated a11y, **visual regression (Chromatic + TurboSnap, release gate)** — all in Milestone 0; API-surface snapshot + dep-isolation post-Milestone-0 |
 | Release | Changesets + GitHub Actions, npm OIDC trusted publishing |
+| Execution model | **Teaching Mode** — user runs all CLI/setup commands; agent authors code+config; per-step Concept/Why/Tradeoffs; hard quiz gate at each phase boundary (see §14) |
 
 Rationale for each lives in the relevant Architecture subsection; timing
 (what ships when) lives in §4.
@@ -649,8 +654,10 @@ Tailwind layout needs real CSS — all of which jsdom silently mishandles.
 ## 13. Phasing (high-level)
 
 Detailed, step-wise implementation plan is produced separately
-(writing-plans). High-level phases — **Milestone 0 is phases 1–6; the §8.5
-gate precedes phase 7**:
+(writing-plans). Every phase is executed in **Teaching Mode (§14)** — the
+user runs all commands, each step carries a Concept/Why/Tradeoffs preamble,
+and a hard quiz gate ends each phase before the next may start. High-level
+phases — **Milestone 0 is phases 1–6; the §8.5 gate precedes phase 7**:
 
 1. **Foundation** — repo + git, pnpm 11 (+ catalogs), `package.json` /
    `exports`, tsdown config (incl. React Compiler), tsconfig
@@ -683,7 +690,54 @@ gate precedes phase 7**:
    tag split); optionally enable `pkg.pr.new`. (Chromatic already gating
    since Milestone 0 — scaling only adds baselines.)
 
-## 14. Open Items (non-blocking)
+## 14. Execution Methodology (Teaching Mode)
+
+This project is executed as a **teaching process**, not a hands-off build.
+The implementation plan and every execution session MUST follow this model.
+Rationale (from the owner): in a prior project the agent scaffolded
+everything and the choices had to be reverse-engineered afterward, making
+later troubleshooting costly. Building understanding as we go is faster
+overall and is an explicit goal of this project, not overhead.
+
+**Division of labor**
+- **The user runs every CLI/setup command personally** — package-manager
+  init, dependency installs, tool scaffolds (e.g. `pnpm create storybook`,
+  tsdown/Changesets/Chromatic init), builds, `npm publish`, and
+  consumer-side install / `pnpm update`. The agent provides the *exact*
+  command but does **not** execute it.
+- The agent authors code & config files, then walks the user through them,
+  pausing for questions. The learning target is the toolchain decisions and
+  architecture, not transcription of boilerplate.
+
+**Per-step format** — before each step the agent presents a concise:
+- **Concept** — what this step introduces.
+- **Why this choice** — the decision and the alternatives rejected.
+- **Tradeoffs** — what it costs / what it precludes.
+- **What you'll run** — the exact command(s) for the user to execute and
+  what the expected output looks like.
+
+**Phase-boundary quiz gate (hard gate)**
+- At the end of every plan phase the agent quizzes the user on what the
+  phase's pieces do and their benefits/tradeoffs.
+- Progression is **blocked** until the user can articulate it. Shaky or
+  uncertain answers → the agent re-teaches that piece, then re-quizzes.
+- Quizzes are Socratic and specific to choices just made (e.g. "why ship
+  precompiled CSS instead of requiring consumer Tailwind?", "what breaks if
+  `"use client"` is stripped from `dist`?", "why is the semantic token tier
+  the only semver-stable contract?").
+
+**Failures are lessons** — when a user-run command errors, it becomes a
+guided debugging exercise: the user drives the diagnosis, the agent coaches
+(hypothesis → check → fix) rather than silently fixing it. This directly
+builds the troubleshooting fluency the methodology exists to create.
+
+**Implications for the implementation plan** — `writing-plans` must:
+produce tasks that each carry the Concept/Why/Tradeoffs/What-you'll-run
+preamble; mark every command as *user-executed*; and end every phase with
+an explicit quiz-gate checkpoint that blocks the next phase. The plan is a
+teaching curriculum, not just a build sequence.
+
+## 15. Open Items (non-blocking)
 
 - Final npm scope/package name (owner decides; does not affect design).
 - Exact semantic token names — defined during the token-slice phase;
