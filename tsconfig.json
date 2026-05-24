@@ -9,6 +9,7 @@
     "strict": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
+    "declaration": true,
     "isolatedDeclarations": true,
     "declarationMap": true,
     "sourceMap": true,
