@@ -33,6 +33,8 @@ genuinely changes scope/sequence — not for routine within-task choices.
 - **`eslint-plugin-react-server-components` dropped** — v1.2.0 crashes on import under ESLint 10 / current eslint-plugin-react. The `"use client"` guardrail = the build-time assertion (Task 1.8); author-time RSC linting deferred to Phase 4 via `@eslint-react`'s `rsc` rules (lands with the first client component).
 - **import-x used resolver-free** (`order`, `no-duplicates` only) — TS covers unresolved imports. But pnpm 11's pre-run dep check makes `unrs-resolver`'s ignored build *fatal*, so it's allowed via `onlyBuiltDependencies` in `pnpm-workspace.yaml` (builds once).
 - **ESLint 10 + `eslint-plugin-jsx-a11y` peer lag** — jsx-a11y@6.10.2 declares `eslint ≤ ^9` (stale range); loads + lints clean, but its rules are unexercised until real JSX. **Validate on Button (Phase 4)**; downgrade to ESLint 9 only if it actually breaks. Benign peer warning accepted (strict peers off). pnpm 11 settings: `engineStrict` kept (moved to `pnpm-workspace.yaml`); `saveExact`/`strictPeerDependencies` dropped; `.npmrc` deleted (pnpm 11 ignored it).
+- **knip** ignores `react`/`react-dom`/`@types/react`/`@types/react-dom` (peer-backed devDeps) + `babel-plugin-react-compiler` (string-referenced in tsdown config). **Phase-3 to-undo:** remove `vitest` from `ignoreBinaries` and re-add `tailwindcss` to the catalog once those are installed/used.
+- **cspell kept as a real `spell` script + CI step** (not editor-only) — an editor-bundled spell-checker wouldn't help devs without the extension or enforce anything; `pnpm spell` is portable + CI-enforced. Scoped to README + `src` to stay low-noise (internal planning docs excluded).
 
 ---
 
