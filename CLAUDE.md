@@ -35,3 +35,4 @@ A versioned, public React component library (`@williamphelps13/ui`).
 - **tsdown needs Node ≥ 24.11.1.** On older Node 24, loading `tsdown.config.ts` fails with the misleading `Unexpected module status 3` ("known Node.js bug"). Fix = upgrade Node (not the `--config-loader tsx` workaround); `engines.node` enforces the floor.
 - **tsdown infers JS `target` from `engines.node`** — *silent*, no tool catches it. Set `target` explicitly (`'es2022'`) so a browser/React lib isn't built Node-targeted.
 - **tsdown emits `.mjs` / `.d.mts`.** Point `package.json` `exports` (and path-reading scripts) at those, not `.js`/`.d.ts`.
+- **pnpm 11 *silently* ignores `.npmrc` for non-auth settings.** `saveExact`, `strictPeerDependencies`, `engineStrict`, etc. only work in `pnpm-workspace.yaml` as camelCase keys (no warning if you put them in `.npmrc`). `.npmrc` = auth/registry only.
