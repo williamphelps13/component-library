@@ -1,5 +1,8 @@
 packages:
   - .
+engineStrict: true
+onlyBuiltDependencies:
+  - unrs-resolver
 catalog:
   react: 19.2.6
   react-dom: 19.2.6

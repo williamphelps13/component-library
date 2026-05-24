@@ -19,6 +19,21 @@
 
 **Source spec:** `docs/superpowers/specs/2026-05-17-component-library-design.md` (r7).
 
+## Execution deviations (live log)
+
+Real deviations from this plan as executed. A deviation is logged only when it
+genuinely changes scope/sequence — not for routine within-task choices.
+
+- **TS 6.0.3 adopted** (plan said `5.9.x / 6.x`). Verified supported by tsdown/oxc (build) and `typescript-eslint` 8.59 (lint). Greenfield → newest, since the binding tools support it.
+- **Node pinned `.nvmrc` = 24.16.0 (exact); `engines.node` floor = `>=24.11.1`** — tsdown config-load needs ≥24.11.1. **TODO before Phase 5:** `engines.node` is consumer-facing and likely over-strict; right-size it (dev-need ≠ consumer-need).
+- **React Compiler via direct `@rolldown/plugin-babel` + `babel-plugin-react-compiler`** (not `@vitejs/plugin-react`/`reactCompilerPreset`) — avoids a Vite dep in a non-Vite library.
+- **attw split out of the Phase-1 gate** into `verify:types` (was in `verify:pack`). `@arethetypeswrong/cli` 0.18.2 (latest) lacks TS 6.0 support; re-add to the gate when upstream supports it (or re-check in Phase 4 with real types). `publint` still gates.
+- **`./styles.css` export deferred to Phase 3** (Task 3.2) — `publint` requires `exports` paths to point at files that exist; CSS isn't built until Phase 3.
+- **React/a11y ESLint plugins: kept in Phase 1** (briefly considered deferring to Phase 4; reversed — known decision, belongs in foundation).
+- **`eslint-plugin-react-server-components` dropped** — v1.2.0 crashes on import under ESLint 10 / current eslint-plugin-react. The `"use client"` guardrail = the build-time assertion (Task 1.8); author-time RSC linting deferred to Phase 4 via `@eslint-react`'s `rsc` rules (lands with the first client component).
+- **import-x used resolver-free** (`order`, `no-duplicates` only) — TS covers unresolved imports. But pnpm 11's pre-run dep check makes `unrs-resolver`'s ignored build *fatal*, so it's allowed via `onlyBuiltDependencies` in `pnpm-workspace.yaml` (builds once).
+- **ESLint 10 + `eslint-plugin-jsx-a11y` peer lag** — jsx-a11y@6.10.2 declares `eslint ≤ ^9` (stale range); loads + lints clean, but its rules are unexercised until real JSX. **Validate on Button (Phase 4)**; downgrade to ESLint 9 only if it actually breaks. Benign peer warning accepted (strict peers off). pnpm 11 settings: `engineStrict` kept (moved to `pnpm-workspace.yaml`); `saveExact`/`strictPeerDependencies` dropped; `.npmrc` deleted (pnpm 11 ignored it).
+
 ---
 
 ## File Structure (decomposition lock-in)
