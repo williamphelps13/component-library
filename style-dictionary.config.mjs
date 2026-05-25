@@ -85,8 +85,13 @@ const lightSD = makeSD(mergeSets(core, light), [
 
 // Dark: re-bind the semantic vars only (primitives stay defined in :root).
 // Those semantics reference primitives intentionally NOT in this file (they
-// live in :root / tokens.light.css), so SD's "filtered references" warning is
-// an expected false positive — disable warnings for this build only.
+// live in :root / tokens.light.css). We keep the var() references (NOT
+// `outputReferencesFilter`, which would resolve them to raw values and kill the
+// primitive→semantic ripple in dark mode); they resolve fine at runtime because
+// :root defines them globally. SD can't see across files, so it emits a
+// "filtered references" WARNING — an expected false positive here. Silence that
+// one warning, but keep genuinely broken references FATAL so real mistakes still
+// fail the build (errors are not affected by `warnings: 'disabled'`).
 const darkSD = makeSD(
   mergeSets(core, dark),
   [
@@ -97,7 +102,7 @@ const darkSD = makeSD(
       filter: isSemantic,
     },
   ],
-  { log: { warnings: 'disabled' } },
+  { log: { warnings: 'disabled', errors: { brokenReferences: 'throw' } } },
 )
 
 await lightSD.buildAllPlatforms()

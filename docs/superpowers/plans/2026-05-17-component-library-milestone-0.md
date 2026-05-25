@@ -21,6 +21,8 @@
 
 ## Execution deviations (live log)
 
+- **Tailwind `prefix(tw)` REJECTED (was: "deferred"); collision-safety achieved differently.** Validated against Tailwind v4 docs (ctx7): `prefix(tw)` namespaces theme **variables** too (`--color-*` → `--tw-color-*`), which would break our consumer override contract (`:root { --color-primary }`, OVERVIEW Part IV) — the core of the theming design. So prefix() is the wrong tool here, not merely "hard." Collision-safety instead comes from three deliberate choices in `src/styles/index.css`: (1) `@import "tailwindcss/…" source(none)` + `@source "../components"` → minimal, doc-independent class surface (the bare `@import "tailwindcss"` had been auto-scanning `docs/*.md` and shipping prose-scraped utilities); (2) our own `ui-*` class names (we author the `@utility` names, so namespacing is a naming choice, no Tailwind machinery, variables untouched); (3) **Preflight omitted** via the layered-import form so we don't impose a global reset on consumers (the larger real collision risk — `prefix()` never covered it). Component classes are self-contained as a result (`.ui-btn` resets `appearance/border/margin/font`). End-to-end verification (no `--tw-color-*`, no Preflight, classes render) happens in Phase 4 once `<Button>` consumes the classes in Storybook.
+
 Real deviations from this plan as executed. A deviation is logged only when it
 genuinely changes scope/sequence — not for routine within-task choices.
 
@@ -31,9 +33,9 @@ genuinely changes scope/sequence — not for routine within-task choices.
 - **`./styles.css` export deferred to Phase 3** (Task 3.2) — `publint` requires `exports` paths to point at files that exist; CSS isn't built until Phase 3.
 - **React/a11y ESLint plugins: kept in Phase 1** (briefly considered deferring to Phase 4; reversed — known decision, belongs in foundation).
 - **`eslint-plugin-react-server-components` dropped** — v1.2.0 crashes on import under ESLint 10 / current eslint-plugin-react. The `"use client"` guardrail = the build-time assertion (Task 1.8); author-time RSC linting deferred to Phase 4 via `@eslint-react`'s `rsc` rules (lands with the first client component).
-- **import-x used resolver-free** (`order`, `no-duplicates` only) — TS covers unresolved imports. But pnpm 11's pre-run dep check makes `unrs-resolver`'s ignored build *fatal*, so it's allowed via `onlyBuiltDependencies` in `pnpm-workspace.yaml` (builds once).
+- **Native build scripts: allow via `onlyBuiltDependencies`.** pnpm 11 blocks dep build scripts by default and its pre-run check makes a *blocked* build fatal. **Tested gotcha:** `ignoredBuiltDependencies` does NOT clear that gate (it kept erroring) — only *allowing* the build (`onlyBuiltDependencies`) does. So `unrs-resolver` (eslint-plugin-import-x) and `@parcel/watcher` (@tailwindcss/cli) are both allowed (both reputable, both ship prebuilt binaries). After changing the list, run `pnpm rebuild` (or `pnpm approve-builds`) to actually execute the builds.
 - **ESLint 10 + `eslint-plugin-jsx-a11y` peer lag** — jsx-a11y@6.10.2 declares `eslint ≤ ^9` (stale range); loads + lints clean, but its rules are unexercised until real JSX. **Validate on Button (Phase 4)**; downgrade to ESLint 9 only if it actually breaks. Benign peer warning accepted (strict peers off). pnpm 11 settings: `engineStrict` kept (moved to `pnpm-workspace.yaml`); `saveExact`/`strictPeerDependencies` dropped; `.npmrc` deleted (pnpm 11 ignored it).
-- **knip** ignores `react`/`react-dom`/`@types/react`/`@types/react-dom` (peer-backed devDeps) + `babel-plugin-react-compiler` (string-referenced in tsdown config). **Phase-3 to-undo:** remove `vitest` from `ignoreBinaries` and re-add `tailwindcss` to the catalog once those are installed/used.
+- **knip config (Phase-3 corrected).** `ignoreDependencies`: `react`/`react-dom`/`@types/react`/`@types/react-dom` (peer-backed devDeps), `babel-plugin-react-compiler` (string-referenced in tsdown config), and **`tailwindcss`** — the latter is used only via CSS `@import "tailwindcss/…"` (invisible to knip, which parses JS/TS), and is declared *directly* (not leaned on transitively via `@tailwindcss/cli`) to avoid a phantom dep. The real public-API guard (spec risk #12) is **`project: ["src/**/*.{ts,tsx}"]`** (scopes analysis to our source); an explicit `entry: ["src/index.ts"]` and `ignore: ["scripts/**"]` were dropped as **redundant** — knip auto-detects `src/index.ts` as an entry, and `scripts/` is already outside the `project` scope. (An earlier audit overstated this as "entry/project missing"; only `project` was load-bearing.) **Phase-3 to-undo:** remove `vitest` from `ignoreBinaries` once Task 3.4 installs Vitest.
 - **Tokens layout: single-file `tokens/tokens.json` (Tokens Studio "sets") — chosen for FREE Figma sync.** Tokens Studio's multi-file sync *and* themes are Pro (€39/editor/mo); single-file + sets is free (Starter). **Validated locally:** Tokens Studio imports the file, `core`-as-source resolves the references, and export-by-sets → Figma native variables works. The build reads the same single file (merges `core`+`light` / `core`+`dark`). **Remaining for Phase 5:** wire the actual GitHub single-file sync (needs the remote). Caveats: light/dark as variable *modes* (one variable, two modes) is Pro — on free you export one semantic set at a time; the Studio-platform tiers (Essential/Organization) sell versioning/branching we already do in git+CI. Code-first keeps Figma sync optional/removable.
 - **cspell kept as a real `spell` script + CI step** (not editor-only) — an editor-bundled spell-checker wouldn't help devs without the extension or enforce anything; `pnpm spell` is portable + CI-enforced. Scoped to README + `src` to stay low-noise (internal planning docs excluded).
 
@@ -758,6 +760,8 @@ Goal: Tailwind v4 compiled to precompiled CSS with the zero-specificity strategy
 
 **Files:** Create `src/styles/index.css`
 
+> ⚠️ **SUPERSEDED in Phase-3 execution — the shipped `src/styles/index.css` differs from the draft below.** Changes: layered imports with **Preflight omitted**; `source(none)` + `@source "../components"` instead of whole-repo scanning (which had been scraping classes from `docs/*.md`); `prefix(tw)` **rejected** (it renames theme vars `--color-*` → `--tw-color-*` and breaks the override contract); and `btn*` → self-contained `ui-btn*`. Rationale lives in the `prefix(tw)`-rejected entry of the Execution-deviations log; the source of truth is the shipped file. The draft below is retained for history only.
+
 **Teaching Preamble**
 - **Concept:** The CSS entry imports Tailwind + generated tokens, binds tokens via `@theme inline`, defines a zero-specificity `:where()` dark variant, and namespaces with `prefix(tw)`.
 - **Why this choice (alternatives rejected):** `@theme inline` (not plain `@theme`) is the single highest-risk detail — plain `@theme` breaks consumer overrides in portals (spec risk #1). `:where()` keeps dark/palette specificity zero so consumers override with no `!important` (spec §3.6, risk #10). `prefix(tw)` avoids collisions with consumer Tailwind. Rejected: plain `@theme`; class-based dark without `:where()` (specificity wars); no prefix (collisions).
@@ -1065,10 +1069,10 @@ import { buttonClasses } from './variants'
 
 describe('buttonClasses', () => {
   it('composes base + intent + size', () => {
-    expect(buttonClasses('primary', 'md')).toBe('btn btn-primary btn-md')
+    expect(buttonClasses('primary', 'md')).toBe('ui-btn ui-btn-primary ui-btn-md')
   })
   it('supports danger + sm', () => {
-    expect(buttonClasses('danger', 'sm')).toBe('btn btn-danger btn-sm')
+    expect(buttonClasses('danger', 'sm')).toBe('ui-btn ui-btn-danger ui-btn-sm')
   })
 })
 ```
@@ -1083,7 +1087,7 @@ export type Intent = 'primary' | 'neutral' | 'danger'
 export type Size = 'sm' | 'md'
 
 export function buttonClasses(intent: Intent, size: Size): string {
-  return `btn btn-${intent} btn-${size}`
+  return `ui-btn ui-btn-${intent} ui-btn-${size}`
 }
 ```
 - [ ] **Step 4 `[USER RUNS]`:** Confirm it passes:

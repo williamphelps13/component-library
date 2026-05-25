@@ -3,7 +3,9 @@ packages:
 engineStrict: true
 onlyBuiltDependencies:
   - unrs-resolver
+  - '@parcel/watcher'
 catalog:
   react: 19.2.6
   react-dom: 19.2.6
   typescript: 6.0.3
+  tailwindcss: 4.3.0
