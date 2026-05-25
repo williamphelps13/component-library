@@ -1,10 +1,10 @@
 # The Component Library — A Plain-English Field Guide
 
-*An engaging, in-depth tour of what we're building, every tool in the box, and why
+_An engaging, in-depth tour of what we're building, every tool in the box, and why
 each one earns its place. Written for someone strong in React and frontend, but new to
-the world of build systems and publishing libraries.*
+the world of build systems and publishing libraries._
 
-*All versions and facts here were verified against live docs and the npm registry in
+\*All versions and facts here were verified against live docs and the npm registry in
 **spring 2026**. Where a tool is moving fast, that's called out — this space changes
 quickly.
 
@@ -36,28 +36,30 @@ quickly.
 - **Part VIII — Where We Are & What's Next**
 
 ---
+
 ---
 
 # Part I — The Big Picture
 
 ## What a component library actually is
 
-A **component library** is a package you publish to npm so that *other people's apps* can
+A **component library** is a package you publish to npm so that _other people's apps_ can
 install it and use your components:
 
 ```bash
 pnpm add @williamphelps13/ui
 ```
+
 ```tsx
 import { Button } from '@williamphelps13/ui'
 ```
 
-That single sentence — "*other people's apps install it*" — is the lens for this entire
+That single sentence — "_other people's apps install it_" — is the lens for this entire
 document. It changes everything about how you build.
 
 When you build an **app**, you bundle it once and ship it to a browser. You control the
 whole pipeline. When you build a **library**, you ship raw-ish building blocks into builds
-you *don't* control — different React setups, different bundlers (Next.js here, Vite
+you _don't_ control — different React setups, different bundlers (Next.js here, Vite
 there), different TypeScript settings. So a library has to be:
 
 - **Small** — don't drag your whole world into every consumer's app.
@@ -69,7 +71,7 @@ Almost every "weird" tool in Part III exists to satisfy one of those four constr
 
 ## The problem it solves (the "before")
 
-Picture life *without* a shared library, which is probably how most teams start:
+Picture life _without_ a shared library, which is probably how most teams start:
 
 - Project A has a `Button`. Project B copy-pastes it and tweaks the padding. Project C
   rebuilds it from scratch because nobody remembered B had one.
@@ -92,13 +94,13 @@ Here's the payoff we're designing for, in plain terms:
    gets the fix. No more 14 copies of the brand color.
 
 2. **Themeable per project, with no rebuild.** Each app can override the color palette
-   (primary / neutral / success / error) and flip dark mode at *runtime*, just by setting a
+   (primary / neutral / success / error) and flip dark mode at _runtime_, just by setting a
    few CSS variables. The library ships one stylesheet; each consumer dresses it
    differently. (How that magic works is Part III's theming section — it's genuinely
    elegant.)
 
 3. **Works in both worlds.** The same package renders correctly in **Next.js App Router**
-   (with React Server Components) *and* in **Vite** single-page apps. You don't ship two
+   (with React Server Components) _and_ in **Vite** single-page apps. You don't ship two
    builds.
 
 4. **Quality is automatic, not heroic.** Accessibility checks, interaction tests, and
@@ -143,6 +145,7 @@ Everything else — Storybook, the tests, the linters, the release robot — is 
 that pipeline **trustworthy**: prove each piece works before a stranger depends on it.
 
 ---
+
 ---
 
 # Part II — How We're Building It
@@ -153,22 +156,22 @@ The tempting way to build a component library is "horizontally" — make all 12 
 then set up publishing, then add tests. That's how you end up with 12 half-working
 components and a publishing process that breaks the first time you try it.
 
-We're going **vertical** instead. The first milestone builds *exactly one component (a
-Button)* but takes it through **every single layer**:
+We're going **vertical** instead. The first milestone builds _exactly one component (a
+Button)_ but takes it through **every single layer**:
 
 1. Build the Button (styled with tokens, typed, documented).
 2. Test it (interaction + accessibility + a visual snapshot).
 3. **Publish it for real** to npm.
 4. **Install it in a real Next.js app**, apply a theme, toggle dark mode.
 5. Make a change → re-publish a new version → update the app → confirm the change flows.
-6. Repeat the loop until it's *friction-free*.
+6. Repeat the loop until it's _friction-free_.
 
 Only after that whole loop is smooth do we add more components. Why this order?
 
 - **You hit the hard, finicky problems early** — packaging, the server/client boundary,
-  publishing, theming — while there's only *one* component making noise. Debugging a tricky
+  publishing, theming — while there's only _one_ component making noise. Debugging a tricky
   build with 1 component is a hundred times easier than with 12.
-- **The riskiest thing in a library isn't the components — it's the *workflow*.** "Change
+- **The riskiest thing in a library isn't the components — it's the _workflow_.** "Change
   the library → consumers get the change" is the loop you'll run a thousand times. We
   harden it first.
 - By the time we scale up, the foundation is proven and boring (the best kind of
@@ -179,13 +182,13 @@ out components. Once the rails are down, components come fast.
 
 ## The bake-off
 
-There's one more twist in Milestone 0. After we build *our* Button, **you build your own
+There's one more twist in Milestone 0. After we build _our_ Button, **you build your own
 version**, your way. Then we put them side by side and compare: the prop names, how
 variants work, how it handles refs and styling, how the tests read. We keep the best ideas
 from each and write them down as the **canonical component pattern** — the recipe every
 future component follows.
 
-The point isn't to crown a winner. It's that a pattern you *argued your way to* is one
+The point isn't to crown a winner. It's that a pattern you _argued your way to_ is one
 you'll actually remember and apply, versus one handed to you.
 
 ## Teaching Mode (how you and I work)
@@ -195,11 +198,11 @@ a library you can fix at 2am, and one you don't is a liability.
 
 So the working rules are:
 
-- **You run every command.** I give you the exact command and explain it *first* — what it
+- **You run every command.** I give you the exact command and explain it _first_ — what it
   does, why this choice, the trade-offs — but your hands are on the keyboard. Running it
   yourself is how the knowledge sticks.
 - **I write the code and config, then walk you through it.** The goal is for you to
-  understand the *decisions*, not to transcribe boilerplate.
+  understand the _decisions_, not to transcribe boilerplate.
 - **Every phase ends with a short quiz.** We don't move on until the concepts are solid in
   your own words. A shaky answer just means we revisit that piece.
 - **When something breaks, we debug it together** — you drive, I coach (hypothesis → check
@@ -208,56 +211,57 @@ So the working rules are:
 The whole bet: a little slower now, dramatically faster (and less mysterious) later.
 
 ---
+
 ---
 
 # Part III — The Toolbox (deep dives)
 
 Each tool below follows the same shape: **what it is** (plain), **an analogy**, **why it
-matters for *this* library**, **the key ideas**, **the current version**, and **a gotcha**.
+matters for _this_ library**, **the key ideas**, **the current version**, and **a gotcha**.
 
 ## Foundations
 
 ### TypeScript 6.0 — the contract layer
 
-**In plain terms.** TypeScript is JavaScript with a *type layer* on top. You annotate what
+**In plain terms.** TypeScript is JavaScript with a _type layer_ on top. You annotate what
 shapes your data and functions expect; a compiler checks you got it right; then the types
-are *erased* and plain JavaScript ships. Types cost nothing at runtime — they're a
+are _erased_ and plain JavaScript ships. Types cost nothing at runtime — they're a
 build-time safety net and an autocomplete engine.
 
 **Analogy.** Types are the labeled ports on the back of a stereo. The music (your runtime
 JS) plays the same either way, but the labels mean you plug the right cable into the right
-hole the first time — and your editor can *show* you the labels as you go.
+hole the first time — and your editor can _show_ you the labels as you go.
 
 **Why it matters for a library.** For a library, the **types ARE a shipped product.** When
 someone installs your package, their editor reads your `.d.ts` (type declaration) files to
 power autocomplete and catch their mistakes. If your types are wrong or missing, every
 consumer feels it. So a few TypeScript settings are really "library quality" settings:
 
-- **`isolatedDeclarations`** — forces every *exported* function to declare its return type.
+- **`isolatedDeclarations`** — forces every _exported_ function to declare its return type.
   Mildly annoying to write; secretly a superpower. Because all the public type info is
-  spelled out at the boundaries, a tool can generate your `.d.ts` files *per-file, in
-  parallel, without running the full slow type-checker*. This is what makes the fast
+  spelled out at the boundaries, a tool can generate your `.d.ts` files _per-file, in
+  parallel, without running the full slow type-checker_. This is what makes the fast
   Rust-based type generation (see tsdown) possible.
 - **`declarationMap` + `sourceMap`** — emit little "map" files so that when a teammate in
-  another project does *Go to Definition* on your `Button`, they land on your **real `.tsx`
+  another project does _Go to Definition_ on your `Button`, they land on your **real `.tsx`
   source**, not a cryptic generated file. We ship the `src/` folder for exactly this. It's
   a small package-size cost for a big "I can actually see how this works" win.
-- **`noEmit: true`** — TypeScript here only *checks* types; it never writes files. A
+- **`noEmit: true`** — TypeScript here only _checks_ types; it never writes files. A
   separate bundler does the actual building. Two tools, two clearly-separated jobs — easier
   to reason about, and you can swap either independently.
 
 **Current version & what's notable.** **TypeScript 6.0.3.** The 6.0 line is unusual — it's
-mostly a *"clean out the attic"* release. It turns long-dead options (ancient module
+mostly a _"clean out the attic"_ release. It turns long-dead options (ancient module
 formats, `ES5` target, etc.) into loud deprecation warnings. Why? Because **TypeScript 7**
-is a complete rewrite of the compiler in **Go** (codenamed *tsgo*, available today as a
+is a complete rewrite of the compiler in **Go** (codenamed _tsgo_, available today as a
 preview, aiming for roughly **10× faster** type-checking). 6.0 is the bridge that removes
 the baggage 7 won't carry. We're on 6.0 deliberately, with a clean modern config, so none
 of those deprecations apply to us.
 
 > **Engaging fact.** The TypeScript team chose **Go, not Rust**, for the new compiler — a
 > mildly heretical pick in a JS world obsessed with Rust — because Go mapped more cleanly
-> onto the existing compiler's design. And `isolatedDeclarations` was co-designed *with*
-> the tooling community so that *other* tools could generate types quickly: TypeScript
+> onto the existing compiler's design. And `isolatedDeclarations` was co-designed _with_
+> the tooling community so that _other_ tools could generate types quickly: TypeScript
 > shipped a feature mainly for its "competitors" to consume.
 
 **Gotcha.** `isolatedDeclarations` will light your code up red until you've annotated every
@@ -266,7 +270,7 @@ exported return type. That's a one-time tax, and it leaves you with cleaner publ
 ### React 19 + the React Compiler — performance, automated
 
 **In plain terms.** React 19 is the current React. The **React Compiler** is a build-time
-tool that reads your normal component code and *automatically* inserts the performance
+tool that reads your normal component code and _automatically_ inserts the performance
 optimizations you used to hand-write with `useMemo`, `useCallback`, and `React.memo`.
 
 **Analogy.** It's an optimizing compiler, the way a modern C compiler is. You write the
@@ -274,19 +278,19 @@ clear, obvious version of your code; the compiler quietly rewrites it into the f
 React developers are starting to stop hand-rolling `useMemo` the way C programmers stopped
 hand-writing assembly.
 
-**Why a *library* should ship compiler-optimized output.** This is subtle and important. If
+**Why a _library_ should ship compiler-optimized output.** This is subtle and important. If
 you publish raw, un-optimized components, a consumer only benefits from the compiler if
-*they* turn it on. By running the compiler during *our library's* build, the optimizations
+_they_ turn it on. By running the compiler during _our library's_ build, the optimizations
 are **baked into what we publish** — so **every consumer gets faster components for free**,
 even ones who've never heard of the compiler. We get this by setting the compiler's
-`target` to `'19'` (our minimum supported React), which uses a runtime that's *built into
-React 19* — no extra dependency needed.
+`target` to `'19'` (our minimum supported React), which uses a runtime that's _built into
+React 19_ — no extra dependency needed.
 
 **Key idea — "memoization," plainly.** Memoization means "remember a computed value so you
 don't redo the work, and don't re-render children when nothing relevant changed." Done by
 hand it's fiddly and error-prone (wrong dependency arrays everywhere). The compiler does it
-automatically and more granularly than a human would — *but only for code that follows the
-Rules of React* (render functions stay pure; you don't mutate props/state mid-render). An
+automatically and more granularly than a human would — _but only for code that follows the
+Rules of React_ (render functions stay pure; you don't mutate props/state mid-render). An
 ESLint rule keeps you honest.
 
 **Current version.** **React 19.2.6**, and — the big 2026 milestone — **React Compiler
@@ -297,7 +301,7 @@ real, stable release.
 > from "essential everyday skills" toward "manual overrides for rare edge cases," because
 > the compiler now handles the common case better than most people do by hand.
 
-**Gotcha.** The optimization only exists in the *published* output — your source still
+**Gotcha.** The optimization only exists in the _published_ output — your source still
 looks un-memoized, which is correct. And if you ever lower `target` to support React 17/18,
 you must add the `react-compiler-runtime` polyfill as a real dependency, or older-React
 consumers crash.
@@ -308,7 +312,7 @@ consumers crash.
 
 **In plain terms.** pnpm installs your dependencies, but instead of giving every project
 its own copy of every package, it stores each package **once** on your whole machine and
-*links* to it. Huge disk savings, and — more importantly for us — a *strict* `node_modules`
+_links_ to it. Huge disk savings, and — more importantly for us — a _strict_ `node_modules`
 that keeps you honest.
 
 **Analogy.** npm is a library where every patron photocopies every book (wasteful, and they
@@ -317,20 +321,21 @@ central vault and hands each project a catalog card pointing to it — and you c
 the books you actually checked out.
 
 **Why it matters for a library — "phantom dependencies."** This is the killer feature for
-*library authors*. With npm's flat `node_modules`, you can accidentally `import` a package
-you never declared in `package.json` — it happens to be there because some *other*
+_library authors_. With npm's flat `node_modules`, you can accidentally `import` a package
+you never declared in `package.json` — it happens to be there because some _other_
 dependency pulled it in. It works on your machine... then **explodes for your consumers**
-who don't have it. That's a *phantom dependency*. pnpm's strict, symlinked layout makes
-those imports fail *immediately, on your machine*, so you catch the broken package before
+who don't have it. That's a _phantom dependency_. pnpm's strict, symlinked layout makes
+those imports fail _immediately, on your machine_, so you catch the broken package before
 you publish it.
 
 **Two more things we use:**
-- **Catalogs** let you define a version *once* (in `pnpm-workspace.yaml`) and reference it
-  as `"react": "catalog:"` everywhere. The handful of packages that *must* agree (React,
+
+- **Catalogs** let you define a version _once_ (in `pnpm-workspace.yaml`) and reference it
+  as `"react": "catalog:"` everywhere. The handful of packages that _must_ agree (React,
   TypeScript, Tailwind) can never drift apart, and there's one place to bump them.
-- **Corepack + the `packageManager` field** pins the *exact* pnpm version for the repo, so
+- **Corepack + the `packageManager` field** pins the _exact_ pnpm version for the repo, so
   every machine and CI runner uses an identical package manager. (We learned the hard way
-  that this pin must be an *exact* version — a range breaks it. It's in our `CLAUDE.md`.)
+  that this pin must be an _exact_ version — a range breaks it. It's in our `CLAUDE.md`.)
 
 **Current version.** **pnpm 11.3.0.** Recent versions also added supply-chain defenses:
 it now refuses to run a dependency's install scripts unless you explicitly allow them, and
@@ -338,17 +343,17 @@ can refuse packages published less than N minutes ago (malicious versions are us
 pulled within hours).
 
 > **Engaging fact.** Because identical files are stored exactly once globally and
-> hard-linked in, a machine with twenty React projects stores React's bytes *one time*. The
+> hard-linked in, a machine with twenty React projects stores React's bytes _one time_. The
 > pnpm project itself refuses to install any package less than 24 hours old, as a
 > supply-chain stance.
 
-**Gotcha.** pnpm's strictness will *break* code that secretly relied on phantom deps when
+**Gotcha.** pnpm's strictness will _break_ code that secretly relied on phantom deps when
 you migrate from npm — that's pnpm doing its job, but it surprises people.
 
 ### The Rust toolchain (Rolldown & Oxc) — why everything got fast
 
-**In plain terms.** For a decade, JavaScript's build tools were themselves written *in
-JavaScript*. A coordinated effort (led by **VoidZero**, the company Evan You — creator of
+**In plain terms.** For a decade, JavaScript's build tools were themselves written _in
+JavaScript_. A coordinated effort (led by **VoidZero**, the company Evan You — creator of
 Vue and Vite — founded) is rewriting them in **Rust**: **Oxc** (a parser, linter, and
 transformer) and **Rolldown** (a bundler). Our build tool, **tsdown**, sits on top of both.
 
@@ -357,16 +362,16 @@ translating — and works one page at a time — with one who's natively fluent 
 faster language and can run many pages in parallel. Same job, an order of magnitude quicker.
 
 **Why Rust is fast here.** JavaScript is single-threaded and pauses for garbage collection.
-Rust compiles to native machine code, manages memory without those pauses, and can use *all
-your CPU cores at once*. The real trick, though, is architectural: Oxc provides **one shared
+Rust compiles to native machine code, manages memory without those pauses, and can use _all
+your CPU cores at once_. The real trick, though, is architectural: Oxc provides **one shared
 parser** that the bundler, the linter, and the type-stripper all reuse — your file gets
-parsed *once* and fed to every tool, instead of five tools re-parsing it five times.
+parsed _once_ and fed to every tool, instead of five tools re-parsing it five times.
 
 **Current versions.** **Rolldown 1.0.2** (a Rust port of Rollup's API, slated to become
 Vite's engine), **Oxc** components like `oxlint` (50–100× faster than ESLint). These are
 young and moving fast — which is exactly why pinning versions matters.
 
-> **Engaging fact.** Rolldown deliberately *copies Rollup's plugin API* so the huge existing
+> **Engaging fact.** Rolldown deliberately _copies Rollup's plugin API_ so the huge existing
 > plugin ecosystem comes along for free — speed without throwing away a decade of community
 > work.
 
@@ -374,7 +379,7 @@ young and moving fast — which is exactly why pinning versions matters.
 
 **In plain terms.** A **bundler** reads your entry file, follows every `import` to map out
 your code, translates TypeScript/JSX into plain JavaScript, and writes the distributable
-files. tsdown is a bundler built specifically for *libraries*, powered by the Rust toolchain
+files. tsdown is a bundler built specifically for _libraries_, powered by the Rust toolchain
 above.
 
 **Analogy.** A book publisher. You hand in a manuscript full of shorthand, margin notes, and
@@ -392,30 +397,30 @@ app bundler's. Ours is configured to:
   `"use client"` label welded to its own file (more on that two sections down).
 - **Externalize React** (`deps.neverBundle`) — "don't copy React into us; the consumer
   already has it." This prevents the infamous "two copies of React" bug that breaks hooks.
-- **Generate type files** (`.d.mts`) — fast, via the Rust path, *because* we enabled
+- **Generate type files** (`.d.mts`) — fast, via the Rust path, _because_ we enabled
   `isolatedDeclarations`. Plus declaration maps for the go-to-source experience.
 
 **Current version.** **tsdown 0.22.0** (still pre-1.0 — pin it). It's positioned as the
 modern replacement for `tsup`, and is meant to power Vite's future library mode.
 
-> **Engaging fact.** tsdown can *auto-generate* the `exports` map in your `package.json` —
+> **Engaging fact.** tsdown can _auto-generate_ the `exports` map in your `package.json` —
 > historically the single most error-prone part of publishing a package by hand — and run
 > the publish-quality inspectors (next section) for you.
 
 **Gotcha.** These tools are young; option names move between versions (we already hit
 `external` → `deps.neverBundle`). Trust current docs over old blog posts. Also: the fast
-type-generation only kicks in *if* `isolatedDeclarations` is on — otherwise it silently
+type-generation only kicks in _if_ `isolatedDeclarations` is on — otherwise it silently
 falls back to the slower path and you wonder where the speed went.
 
 ### ESM, the `exports` map, and packaging
 
-**In plain terms.** A *module system* is how code files import each other. There are two:
+**In plain terms.** A _module system_ is how code files import each other. There are two:
 the old **CommonJS** (`require`) and the modern, standard **ESM** (`import`/`export`). ESM
 is statically analyzable, which is what makes tree-shaking and modern tooling work. We go
 **ESM-only** — simplest, and both Next.js and Vite are ESM-native.
 
-The **`exports` map** in `package.json` is the part that tells any tool *which file to load*
-for a given import, and *under what condition* (types? ESM import? a CSS subpath?).
+The **`exports` map** in `package.json` is the part that tells any tool _which file to load_
+for a given import, and _under what condition_ (types? ESM import? a CSS subpath?).
 
 **Analogy.** The `exports` map is your package's **front-desk receptionist**. A visitor says
 "I'm here for the TypeScript types" or "I'm importing the stylesheet," and the receptionist
@@ -423,31 +428,33 @@ routes them to the right room (file). Get the directory wrong and visitors end u
 door — the classic "it won't import" bug.
 
 **The details that bite (and why):**
+
 - **Order matters.** Conditions are matched top to bottom; `types` must come before
   `import`; `default` must be last.
-- **`.mjs` / `.d.mts` extensions** make the module format *unambiguous* — Node treats `.mjs`
+- **`.mjs` / `.d.mts` extensions** make the module format _unambiguous_ — Node treats `.mjs`
   as ESM with zero guesswork. (We learned to point `exports` at `.mjs`/`.d.mts`, because
   that's what tsdown emits — it's in our `CLAUDE.md`.)
 - **`sideEffects` and the CSS exception.** Setting `"sideEffects": false` tells consumers'
   bundlers "nothing here runs just by being imported, so feel free to drop unused parts" —
-  that's what unlocks tree-shaking. *But a CSS import is a side effect* — it exists purely to
+  that's what unlocks tree-shaking. _But a CSS import is a side effect_ — it exists purely to
   register styles. So we list the CSS explicitly (`"sideEffects": ["**/*.css"]`), meaning
-  "tree-shake everything *except* the stylesheet." Forget this, and a consumer's bundler can
+  "tree-shake everything _except_ the stylesheet." Forget this, and a consumer's bundler can
   silently delete your styles. It's the most common silent-breakage trap for styled
   libraries.
 - **`files: ["dist", "src"]`** controls exactly what gets published. We include `src` for
   the go-to-source experience.
 
-> **Engaging fact.** The `exports` map is also an *access-control boundary*: once you define
-> it, files you *didn't* list become genuinely unimportable from outside. So it doubles as
+> **Engaging fact.** The `exports` map is also an _access-control boundary_: once you define
+> it, files you _didn't_ list become genuinely unimportable from outside. So it doubles as
 > the wall around your public API — `import "your-lib/dist/internal/secret.js"` hard-fails.
 
 ### The two inspectors: publint + "Are the Types Wrong?"
 
-**In plain terms.** Two tools that check your *published package* before a stranger does:
+**In plain terms.** Two tools that check your _published package_ before a stranger does:
+
 - **publint** — "is the package assembled correctly?" Valid `exports`, files that actually
   exist, formats that line up.
-- **attw** (*Are the Types Wrong?*) — "do the types resolve correctly and accurately describe
+- **attw** (_Are the Types Wrong?_) — "do the types resolve correctly and accurately describe
   the runtime JS, under every way a consumer might import it?"
 
 **Analogy.** Two pre-flight inspectors. publint checks the airframe and wiring — does the
@@ -455,19 +462,19 @@ plane physically work. attw checks the instruments — do the gauges (types) tel
 about the engine (runtime). A plane that flies fine but has a lying altimeter is exactly the
 "types don't match reality" bug attw exists to catch.
 
-**Why they matter.** Locally, you import your library through your *own* forgiving setup,
-which hides packaging bugs. A *consumer* imports it through *their* setup. These tools
+**Why they matter.** Locally, you import your library through your _own_ forgiving setup,
+which hides packaging bugs. A _consumer_ imports it through _their_ setup. These tools
 simulate all those outside perspectives, so a misordered `exports` or a drifted type file
-gets caught *before* publish instead of in a bug report.
+gets caught _before_ publish instead of in a bug report.
 
 **Current versions.** publint **0.3.21**, attw **0.18.2**. attw was built by a member of the
 **TypeScript team** after they found how shockingly many popular packages had subtly-wrong
-type setups during the ESM transition — proof that *the experts* consider this hard.
+type setups during the ESM transition — proof that _the experts_ consider this hard.
 
 > **A gotcha we hit live.** attw can **choke on a near-empty package** (one that doesn't
 > export anything real yet) — it reported an internal error for us on the empty `export {}`
 > starter. There was even a recent attw bug (issue #262) where a dependency made packages
-> *look* empty. The takeaway: attw becomes meaningful once we actually export the Button; an
+> _look_ empty. The takeaway: attw becomes meaningful once we actually export the Button; an
 > error against an empty stub is "nothing to check," not a real failure. publint already
 > passed — our packaging is sound.
 
@@ -476,8 +483,8 @@ type setups during the ESM transition — proof that *the experts* consider this
 This is the concept most likely to confuse, so we'll go slow.
 
 **In plain terms.** In modern Next.js (the "App Router"), components are **server components
-by default**: they render on the server, can talk to a database, and ship *zero JavaScript*
-to the browser. They *cannot* use `useState`, effects, or event handlers — there's no
+by default**: they render on the server, can talk to a database, and ship _zero JavaScript_
+to the browser. They _cannot_ use `useState`, effects, or event handlers — there's no
 interactivity on a server. To make a component interactive, you put the string
 **`"use client"`** at the very top of its file. That marks it (and everything it imports) as
 browser code.
@@ -486,29 +493,30 @@ browser code.
 ahead — fast, powerful, hidden, nothing "live." The dining room (client) is where live
 interaction happens. `"use client"` is the swinging door with the "beyond this point you're
 in the dining room" sign. You hang that sign only on the doors that actually lead to
-interactive space — *not* on the front entrance of the whole building.
+interactive space — _not_ on the front entrance of the whole building.
 
 **Why a component library must care.** If your `<Dropdown>` uses `useState` but its file lacks
-`"use client"`, then when a consumer's *server* component imports it, React tries to render it
+`"use client"`, then when a consumer's _server_ component imports it, React tries to render it
 on the server, hits the hook, and throws. So **every interactive component we ship must carry
 `"use client"`** — so consumers can drop it anywhere without thinking. Purely visual
 components (no state) stay un-marked and render on the server, a free performance win we hand
 our users.
 
 **Two load-bearing rules:**
+
 1. **The label must survive bundling.** `"use client"` is just a string; a careless bundler
    can strip it. If it's missing from what we publish, every Next.js consumer breaks. This is
    the deep reason we use `unbundle: true` (per-file output): each component stays its own
    file, so its `"use client"` stays attached.
 2. **It must NOT go on the barrel.** Our `index.ts` re-exports everything. If we put
-   `"use client"` there, we'd mark the *entire library* as client code — forcing even
+   `"use client"` there, we'd mark the _entire library_ as client code — forcing even
    server-safe components to the browser and killing the performance benefit. So the directive
    lives in the individual interactive files, and the barrel stays clean. (Our CI has a script
    that literally checks this.)
 
 > **Engaging fact.** `"use client"` doesn't mean "render only on the client." The code still
-> runs on the server for the initial HTML. It really means "this code also gets *sent to the
-> browser* and made interactive there." The name fools almost everyone at first.
+> runs on the server for the initial HTML. It really means "this code also gets _sent to the
+> browser_ and made interactive there." The name fools almost everyone at first.
 
 For our Vite consumers, by the way, `"use client"` is just a harmless ignored string. We ship
 it once; Next.js users need it, Vite users don't care. Everyone's happy.
@@ -522,7 +530,7 @@ copy of Tailwind. Here's how the pieces conspire.
 ### Tailwind CSS v4 — styling, compiled away
 
 **In plain terms.** Tailwind is a utility-CSS framework: tiny classes like `flex`, `p-4`,
-`bg-primary`. Version 4 is a ground-up rewrite where you configure it *in CSS itself* instead
+`bg-primary`. Version 4 is a ground-up rewrite where you configure it _in CSS itself_ instead
 of a JavaScript config file, powered by a Rust engine (Lightning CSS).
 
 **Analogy.** v3 was IKEA furniture with a separate instruction booklet (the JS config) you had
@@ -530,48 +538,49 @@ to keep in sync. v4 prints the instructions directly on the wood — config and 
 the same place, the same language.
 
 **Why it matters for us.** The key word is **zero-runtime**. Tailwind produces plain CSS at
-build time; *nothing* ships to the browser, and **consumers don't need Tailwind installed** —
-we hand them one finished `.css` file. The trick that makes it *themeable* is a feature called
+build time; _nothing_ ships to the browser, and **consumers don't need Tailwind installed** —
+we hand them one finished `.css` file. The trick that makes it _themeable_ is a feature called
 `@theme inline`: instead of baking color values directly into the utility classes, it makes
-classes point at a *live CSS variable*. So `bg-primary` resolves through a variable a consumer
+classes point at a _live CSS variable_. So `bg-primary` resolves through a variable a consumer
 can reassign at runtime. For collision-safety we scope the compile to our own component source
 (`source(none)` + `@source`), ship our classes under a `ui-` namespace, and omit Tailwind's
 global Preflight reset — but we deliberately **do not** use Tailwind's `prefix()`, because it
-also renames the theme *variables* (`--color-*` → `--tw-color-*`), which would break the very
+also renames the theme _variables_ (`--color-*` → `--tw-color-*`), which would break the very
 consumer override contract the theming system depends on.
 
 **Current version.** **Tailwind CSS 4.3.0**, on the Lightning CSS engine — builds up to ~10×
 faster than v3.
 
-> **Engaging fact.** v4 registers its CSS variables with real *types* (via the CSS `@property`
-> rule), which unlocks things like *animating* a gradient or a custom color — the browser now
+> **Engaging fact.** v4 registers its CSS variables with real _types_ (via the CSS `@property`
+> rule), which unlocks things like _animating_ a gradient or a custom color — the browser now
 > knows a variable is a color and can smoothly interpolate it.
 
-**Gotcha.** Plain `@theme` (without `inline`) bakes values in and *can't* be overridden at
+**Gotcha.** Plain `@theme` (without `inline`) bakes values in and _can't_ be overridden at
 runtime — the opposite of what a themeable library wants. Getting `@theme inline` right is the
 single most important styling detail; it's at the top of our risk list.
 
 ### Design tokens — the design decisions, as data
 
-**In plain terms.** A *design token* is a named design decision stored as data:
+**In plain terms.** A _design token_ is a named design decision stored as data:
 `color.primary = #0066cc`, `space.4 = 16px`. Instead of hard-coding `#0066cc` in 200 places,
-everything references the token; change it once, everything updates. There's now a *standard
-file format* for tokens (called **DTCG**, from a W3C community group) so they're portable
+everything references the token; change it once, everything updates. There's now a _standard
+file format_ for tokens (called **DTCG**, from a W3C community group) so they're portable
 across tools.
 
-**Analogy.** Tokens are *environment variables for design* — a `.env` file for your visual
+**Analogy.** Tokens are _environment variables for design_ — a `.env` file for your visual
 language.
 
 **The 3-tier idea (this is the clever bit):**
+
 1. **Primitive** tokens — raw values with no meaning: `blue.500 = #0066cc`.
-2. **Semantic** tokens — *purpose*, pointing at primitives: `color.primary → blue.500`,
+2. **Semantic** tokens — _purpose_, pointing at primitives: `color.primary → blue.500`,
    `color.surface → gray.50`. **This is the layer consumers override and the layer dark mode
    swaps.**
 3. **Component** tokens — narrowest: `button.bg → color.primary`. Optional; for when one
    component needs to vary independently.
 
-> **Engaging fact.** This structure is *why dark mode is almost free*. You don't redefine 50
-> component colors — you just re-point the ~10 *semantic* tokens (`surface → gray.900` instead
+> **Engaging fact.** This structure is _why dark mode is almost free_. You don't redefine 50
+> component colors — you just re-point the ~10 _semantic_ tokens (`surface → gray.900` instead
 > of `gray.50`), and every component downstream flips automatically through the reference
 > chain.
 
@@ -587,14 +596,14 @@ for us, CSS variables (it can also emit iOS/Android/JS, but we only need CSS).
 many editions (CSS, and later whatever else).
 
 **Why it matters — one setting is everything: `outputReferences`.** By default, Style
-Dictionary *resolves* every reference, so `color.primary` would compile straight to `#0066cc`
+Dictionary _resolves_ every reference, so `color.primary` would compile straight to `#0066cc`
 — flattening the alias chain and **destroying the override magic**. With
 `outputReferences: true`, it keeps the chain as nested CSS variables:
 
 ```css
 :root {
   --color-blue-500: #0066cc;
-  --color-primary:  var(--color-blue-500);
+  --color-primary: var(--color-blue-500);
 }
 ```
 
@@ -615,17 +624,18 @@ with no build step: **custom properties** (`--x`, the live values), **cascade la
 
 **Analogy.** Custom properties are a building's light switches wired to a central dimmer — flip
 the dimmer and every fixture changes. Cascade layers are floors with a fixed priority order.
-`:where()` is writing your rules *in pencil* so the consumer's ink always wins.
+`:where()` is writing your rules _in pencil_ so the consumer's ink always wins.
 
 **Specificity, plainly (the source of "why won't my override work?!").** When two CSS rules
-target the same element, the browser picks a winner by *specificity* — roughly, more-specific
+target the same element, the browser picks a winner by _specificity_ — roughly, more-specific
 selectors (more IDs/classes) beat less-specific ones. Two features defuse the fights:
+
 - **`:where(...)` always counts as zero specificity.** So if our library writes
   `:where(.btn) {…}`, a consumer's plain `.btn {…}` automatically wins — no `!important` needed.
-- **Cascade layers sit *below* specificity.** Anything in a layer loses to *unlayered* styles.
+- **Cascade layers sit _below_ specificity.** Anything in a layer loses to _unlayered_ styles.
   So our whole library can live in a layer, and a consumer's ordinary CSS beats it by default.
 
-> **Engaging fact.** Put together, a consumer's *single untouched line of CSS* can override a
+> **Engaging fact.** Put together, a consumer's _single untouched line of CSS_ can override a
 > fully-styled component — the holy grail of "opinionated but not bossy" library CSS, achieved
 > with zero `!important`. Dark mode is just re-pointing variables under a `[data-theme="dark"]`
 > selector; no second stylesheet.
@@ -634,22 +644,22 @@ These features are all mature and broadly supported in every modern browser as o
 
 ### Tokens Studio — the bridge to Figma
 
-**In plain terms.** A Figma plugin that lets designers manage the *same* tokens as data inside
+**In plain terms.** A Figma plugin that lets designers manage the _same_ tokens as data inside
 Figma, and **two-way syncs** that JSON with the Git repo. Design and code share one source.
 
-**Analogy.** It's a *Git remote for designers* — Figma becomes a working copy of the same token
+**Analogy.** It's a _Git remote for designers_ — Figma becomes a working copy of the same token
 files your code compiles from, with push/pull just like a developer's editor.
 
-**Why it matters.** Code stays the source of truth; designers see *exactly* the live token
+**Why it matters.** Code stays the source of truth; designers see _exactly_ the live token
 values components use; and design changes arrive as reviewable Git commits, not screenshots in
 Slack. The decades-old "designer picks a color, dev retypes the hex, they drift" problem
 becomes a Git diff.
 
 ## Component behavior: Radix Primitives
 
-**In plain terms.** Radix is a set of *unstyled, accessible* React building blocks — Dialog,
-Dropdown, Tabs, Tooltip, and so on. "Unstyled/headless" means each ships the *behavior and
-accessibility* but **zero visual design**. You bring the CSS; Radix brings the brains.
+**In plain terms.** Radix is a set of _unstyled, accessible_ React building blocks — Dialog,
+Dropdown, Tabs, Tooltip, and so on. "Unstyled/headless" means each ships the _behavior and
+accessibility_ but **zero visual design**. You bring the CSS; Radix brings the brains.
 
 **Analogy.** A car chassis with the engine, steering, and airbags fully engineered and
 crash-tested — but no body panels or paint. You bolt on the look; the safety-critical
@@ -665,12 +675,12 @@ styling.
 
 **Current state.** The ecosystem consolidated into a single `radix-ui` package:
 `import { Dialog, Tabs } from 'radix-ui'`. Each piece already carries `"use client"` for us.
-(We don't touch Radix until the *second* component, the Dialog — the Button doesn't need it.)
+(We don't touch Radix until the _second_ component, the Dialog — the Button doesn't need it.)
 
 > **Engaging fact.** Radix actively nags you toward correctness: a Dialog will warn if you
 > omit its `Title`, because screen-reader users need a name for the dialog.
 
-**Gotcha.** It is *genuinely* unstyled — a fresh Radix Dialog looks like raw HTML until you
+**Gotcha.** It is _genuinely_ unstyled — a fresh Radix Dialog looks like raw HTML until you
 write CSS. That surprises people expecting a finished component.
 
 ## Docs & testing
@@ -684,23 +694,23 @@ auto-generated docs. A workbench, a showroom, and a doc site in one.
 **Analogy.** A test kitchen. Instead of firing up the whole restaurant (app) to taste one
 sauce, the chef plates each dish alone, under good lighting, and tweaks it live.
 
-**Why it matters for a library.** Your stories *are* your living documentation and your visual
+**Why it matters for a library.** Your stories _are_ your living documentation and your visual
 catalog — exactly what an outside consumer needs to evaluate and adopt your components. And —
-the modern superpower — that *same* story also becomes your interaction test, your
+the modern superpower — that _same_ story also becomes your interaction test, your
 accessibility test, and your visual-regression snapshot. **Write the example once; five
 systems consume it.**
 
 **Current version.** **Storybook 10.** It introduces the **CSF "factory" format** — a more
 type-safe way to write stories where TypeScript infers your prop types through the chain — plus
 addons we lean on: `addon-a11y` (accessibility audits in the toolbar) and `addon-themes` (a
-toolbar toggle to flip light/dark and palettes live, so we can *see* the theming system work).
+toolbar toggle to flip light/dark and palettes live, so we can _see_ the theming system work).
 
 **Gotcha.** The theme toggle only works if the global CSS is imported in Storybook's preview —
 and autodocs are only as good as your TypeScript prop types.
 
 ### Vitest + browser mode + Testing Library — testing like a real user
 
-**In plain terms.** Vitest runs the tests. **Browser mode** runs them inside a *real* browser
+**In plain terms.** Vitest runs the tests. **Browser mode** runs them inside a _real_ browser
 (via Playwright) instead of a simulated one. Testing Library provides user-centric queries
 ("find the button labeled Submit"). Together: you test components the way a user actually
 experiences them.
@@ -711,11 +721,11 @@ events — only show up in the air.
 
 **Why it matters for us.** Our components run in real browsers, and Radix relies on real focus
 traps, portals, and pointer events that a simulated DOM mishandles. For a public library, a
-regression that slips through hits *every* consumer — so real-browser confidence is worth it.
+regression that slips through hits _every_ consumer — so real-browser confidence is worth it.
 
-**The neat part — stories *are* the tests.** A story can include a `play` function that scripts
+**The neat part — stories _are_ the tests.** A story can include a `play` function that scripts
 a user interaction (click, type) and asserts the result. The Storybook-Vitest integration then
-runs *every story as a test* in a headless browser, and the accessibility addon runs an axe
+runs _every story as a test_ in a headless browser, and the accessibility addon runs an axe
 audit on each one as part of the same pass. You don't maintain a separate test suite — the
 demos you wrote for docs are the tests.
 
@@ -738,9 +748,9 @@ you renovated.
 
 **Why it's valuable for a UI library.** Visual bugs are invisible to unit tests — a one-line
 CSS tweak can shift padding across 40 components and `expect(true).toBe(true)` won't notice.
-For a *public* library, an accidental visual change ships to every downstream app. Chromatic
+For a _public_ library, an accidental visual change ships to every downstream app. Chromatic
 makes each pixel diff an explicit, reviewable decision — visual code review. We're wiring it up
-in Milestone 0 *on purpose*, because it's historically a fiddly integration and we'd rather
+in Milestone 0 _on purpose_, because it's historically a fiddly integration and we'd rather
 debug it with one component than forty.
 
 > **Engaging fact.** Unchanged snapshots are billed at a fraction of the cost of new ones, and
@@ -754,14 +764,14 @@ debug it with one component than forty.
 
 ### Linting, formatting, dead-code: ESLint + Prettier + oxlint + knip
 
-- **ESLint** (current major: **10**, flat-config only) finds *bugs and bad patterns* — misuse
+- **ESLint** (current major: **10**, flat-config only) finds _bugs and bad patterns_ — misuse
   of React hooks, unsafe types, accessibility issues in JSX. For a library, it's the authority
   on the React-hooks and a11y rules that keep components correct.
-- **Prettier** (3.8.x) enforces *formatting* — indentation, quotes, line width — automatically
+- **Prettier** (3.8.x) enforces _formatting_ — indentation, quotes, line width — automatically
   and non-negotiably, so the codebase looks uniform and is approachable to contributors.
 - **oxlint** (the Rust linter, 50–100× faster) runs as a fast first pass for instant feedback;
   ESLint runs the deeper rules it doesn't cover yet.
-- **knip** finds *dead code* — unused files, exports, and dependencies. Especially valuable for
+- **knip** finds _dead code_ — unused files, exports, and dependencies. Especially valuable for
   a library: shipping unused dependencies bloats every consumer's install, and unused exports
   clutter your public API. Lean surface area = a more trustworthy package.
 
@@ -778,9 +788,9 @@ changelogged, securely published release" with nobody manually running `npm publ
   bumps the version (patch / minor / major).
 - **GitHub Actions** — on merge, a robot reads those notes, computes the new version, writes the
   changelog, and publishes.
-- **npm trusted publishing (OIDC)** — CI proves its identity to npm with a *short-lived* token
+- **npm trusted publishing (OIDC)** — CI proves its identity to npm with a _short-lived_ token
   minted per run. **No long-lived secret token stored anywhere.**
-- **Provenance** — a cryptographic attestation recording *which repo, commit, and workflow*
+- **Provenance** — a cryptographic attestation recording _which repo, commit, and workflow_
   built this exact package.
 
 **Analogy.** Changesets are sticky notes each contributor leaves ("this is a minor, here's
@@ -789,7 +799,7 @@ Trusted publishing replaces a permanent house key hidden under the mat (a stored
 one-time keycard issued for a single visit and auto-expired. Provenance is the tamper-evident
 shipping seal proving the box came from your factory, untouched.
 
-**Why it matters for consumers.** Provenance lets *anyone* verify a package on npm was built
+**Why it matters for consumers.** Provenance lets _anyone_ verify a package on npm was built
 from a specific public commit by a specific workflow — a real defense against the supply-chain
 attacks where a hijacked account publishes malware under a trusted name. And because the token
 lives for one run, there's no durable credential to steal — directly answering the wave of npm
@@ -800,21 +810,23 @@ modern setup: **with it, provenance is automatic and you store no `NPM_TOKEN` at
 `package.json` already opts into provenance.
 
 > **Engaging fact.** With trusted publishing, the release workflow contains **zero secrets** —
-> nothing to rotate, nothing to leak. Security goes *up* while maintenance goes *down*, which
+> nothing to rotate, nothing to leak. Security goes _up_ while maintenance goes _down_, which
 > almost never happens at the same time.
 
 ---
+
 ---
 
 # Part IV — The Consumer Experience
 
-Step back and look at what all this buys the person who *uses* our library. From their seat,
+Step back and look at what all this buys the person who _uses_ our library. From their seat,
 the entire machine above collapses into four steps:
 
 ```bash
 # 1. Install
 pnpm add @williamphelps13/ui
 ```
+
 ```tsx
 // 2. Import the stylesheet once, at the app's root
 import '@williamphelps13/ui/styles.css'
@@ -826,12 +838,13 @@ export default function Page() {
   return <Button intent="primary">Save</Button>
 }
 ```
+
 ```css
 /* 4. (Optional) Make it theirs — override a few variables. No rebuild. */
 :root {
   --color-primary: oklch(0.55 0.2 280); /* their brand purple */
 }
-[data-theme="dark"] {
+[data-theme='dark'] {
   --color-primary: oklch(0.7 0.18 280);
 }
 ```
@@ -839,17 +852,18 @@ export default function Page() {
 That's it. They didn't install Tailwind. They didn't configure a build. They get
 autocomplete (our types), correct accessibility (Radix, later), components optimized by the
 React Compiler, and — if they're on Next.js — correct server/client behavior automatically.
-Everything hard happened *in our pipeline* so it didn't have to happen in theirs. **That
+Everything hard happened _in our pipeline_ so it didn't have to happen in theirs. **That
 asymmetry — hard for us, effortless for them — is the entire job of a good library.**
 
 ---
+
 ---
 
 # Part V — The Real Challenges of Living With This (Small Team, Many Projects)
 
 Part I sold you the upside, and it's real. But a shared library is a **commitment**, and
 living with one across several projects has genuine friction. Naming these honestly up front
-means we *design for them* rather than getting ambushed later. Our stack softens most of
+means we _design for them_ rather than getting ambushed later. Our stack softens most of
 them a lot; a couple are inherent trade-offs of the model — and we'll be straight about
 which is which.
 
@@ -860,19 +874,20 @@ slightly different, but the whole point was that everyone shares the same thing.
 ## 1. The round-trip tax — publishing just to change one prop
 
 **The pain.** You're deep in App A and realize the `Button` needs a `loading` prop. In a
-single app that's a two-minute edit. With a library it becomes a *ritual*: switch to the
+single app that's a two-minute edit. With a library it becomes a _ritual_: switch to the
 library repo → make the change → version it → publish → switch back to App A → bump the
 dependency → re-test. A trivial change sprawls across two repos and a publish boundary. Do
 this ten times a day and it grates.
 
 **How we soften it — a tiered inner loop.** You don't pay the full ritual every time:
-- **Fast (local dev):** `pnpm pack` builds the real tarball and you install *that* in the
+
+- **Fast (local dev):** `pnpm pack` builds the real tarball and you install _that_ in the
   app — byte-identical to what npm would serve, but with no registry round-trip. Or, for
   truly live editing, a `pnpm link`/workspace so library changes appear in the app
-  instantly (the catch: link bypasses the real packaging, so it's for *coding*, not for
-  *validating the published shape*).
+  instantly (the catch: link bypasses the real packaging, so it's for _coding_, not for
+  _validating the published shape_).
 - **Integration:** publish a **canary** version (a `0.x` under a `canary` dist-tag, later
-  per-PR previews) so the app can try the change against a *real* install before it's
+  per-PR previews) so the app can try the change against a _real_ install before it's
   blessed as stable.
 - **Release:** the full Changesets publish — the authoritative loop, the one we hand to the
   team.
@@ -880,7 +895,7 @@ this ten times a day and it grates.
 Hardening exactly this loop — and writing it down in `docs/workflow.md` — is the entire
 point of Milestone 0.
 
-**The honest residual.** There's always *some* tax; the separation that gives you "one
+**The honest residual.** There's always _some_ tax; the separation that gives you "one
 source of truth" is the same separation that adds a publish boundary. The skill is matching
 the loop tier to the moment, not eliminating the boundary.
 
@@ -892,19 +907,20 @@ unreadable implementation; say no and apps quietly fork their own — and the dr
 the library to kill comes right back.
 
 **How we soften it — composition over configuration, plus escape hatches.**
-- **Slots / `children` / `asChild`** (a Radix pattern) let consumers *compose* what they
+
+- **Slots / `children` / `asChild`** (a Radix pattern) let consumers _compose_ what they
   need — drop an icon in as a child — instead of you adding a prop for every wish.
 - **A small, deliberate variant system** (`intent`, `size`) covers the common axes; the
   long tail gets **escape hatches**: a `className` passthrough (safe because of our
   zero-specificity theming), `style`, or a slot.
-- **The "library vs. app" line.** App-specific flourishes belong *in the app* — wrap our
+- **The "library vs. app" line.** App-specific flourishes belong _in the app_ — wrap our
   generic `Button` in the app's own `AppButton`. The library stays general; the app keeps
   its quirks. Knowing where that line goes is a judgment call we'll codify in the
   conventions doc from the bake-off.
 
 **The honest residual.** "Does this belong in the library or the app?" is a recurring
-decision with no universal answer. The guardrail is a bias toward *generic core + cheap
-escape hatches*, and resisting one-off props that serve a single app.
+decision with no universal answer. The guardrail is a bias toward _generic core + cheap
+escape hatches_, and resisting one-off props that serve a single app.
 
 ## 3. One component, many look-and-feels
 
@@ -915,13 +931,13 @@ appearances — and you don't want two Buttons.
 **How we soften it — this is exactly what the token system is for.** Each app overrides the
 **semantic tokens** (palette, radius, spacing) via CSS variables; dark mode comes free; no
 rebuild, no fork. For larger brand differences, multiple theme/token sets. The look lives in
-*data the consumer controls*, not in the component's code.
+_data the consumer controls_, not in the component's code.
 
-**The honest residual.** The theming system only flexes along the axes you *designed it to*.
+**The honest residual.** The theming system only flexes along the axes you _designed it to_.
 Expose too few semantic tokens and apps can't customize enough; expose too many and your
 "public contract" (the tokens you can never rename without a breaking change) balloons.
 Choosing that surface is real design work — it's why the semantic tier is treated as
-carefully as a code API. And when an app needs a *structurally* different component (not just
+carefully as a code API. And when an app needs a _structurally_ different component (not just
 a different skin), theming won't save you — that's a composition or app-level job.
 
 ## 4. Keeping N apps in versioned sync
@@ -932,22 +948,22 @@ live in the wild, and a bugfix might need backporting to a line you'd rather for
 
 **How we soften it.** **Semver discipline** (breaking changes = a major bump, and rare),
 **Changesets** for clear, automatic changelogs so consumers know exactly what changed, and a
-strong bias toward **additive, non-breaking evolution** — a new *optional* prop never breaks
-anyone. Being a *small* team is an advantage here: you control all the consumers, so you can
+strong bias toward **additive, non-breaking evolution** — a new _optional_ prop never breaks
+anyone. Being a _small_ team is an advantage here: you control all the consumers, so you can
 actually coordinate an upgrade rather than negotiate with strangers.
 
-**The honest residual.** Every breaking change costs migration effort *times the number of
-consuming apps*. That math is a permanent incentive to evolve additively and to think hard
+**The honest residual.** Every breaking change costs migration effort _times the number of
+consuming apps_. That math is a permanent incentive to evolve additively and to think hard
 before changing a public API (prop names, token names) you've already shipped.
 
 ## 5. "Whose bug is it?" — debugging across a boundary
 
-**The pain.** A glitch shows up in App A. Is it the app's *usage* of the Button, or the
+**The pain.** A glitch shows up in App A. Is it the app's _usage_ of the Button, or the
 Button itself? Now you're bisecting across two codebases with a published package in between
 — harder than chasing a bug in one repo.
 
 **How we soften it.** **Go-to-source** (declaration maps + the shipped `src/`) lets you
-cmd-click from the app straight into the library's *real* source, not a black-box `.d.ts`.
+cmd-click from the app straight into the library's _real_ source, not a black-box `.d.ts`.
 And **Storybook** reproduces the component in isolation: if it's broken in Storybook, it's
 the library; if it only breaks in the app, it's the integration. That isolation usually
 answers "whose bug?" in seconds.
@@ -957,14 +973,14 @@ the tools shrink it, they don't erase it.
 
 ## 6. The maintenance tax on a small team
 
-**The pain.** The library is infrastructure *everyone* leans on but *nobody* is full-time
+**The pain.** The library is infrastructure _everyone_ leans on but _nobody_ is full-time
 on. Dependency bumps, breaking changes upstream (React, Radix, the fast-moving Rust tools),
 security patches, CI upkeep — steady work that competes with shipping features.
 
 **How we soften it.** Heavy **automation** (Changesets, CI gates, and later
 Renovate/Dependabot for dependency PRs), **ruthless scope** (the spec's YAGNI discipline —
 we add only what we need), a **lean toolchain**, and **good docs** (this file, `CLAUDE.md`,
-the conventions doc) so *anyone* can pick it up cold instead of it being one person's secret.
+the conventions doc) so _anyone_ can pick it up cold instead of it being one person's secret.
 
 **The honest residual.** A shared library is a long-term commitment. Budget for upkeep; a
 library nobody maintains slowly becomes a liability everyone routes around.
@@ -972,14 +988,14 @@ library nobody maintains slowly becomes a liability everyone routes around.
 ## 7. Adoption — a library only helps if people actually reach for it
 
 **The pain.** All this effort is wasted if a teammate, not knowing the `Button` exists or
-unsure how to theme it, just builds their own. Then you have the library *and* the drift.
+unsure how to theme it, just builds their own. Then you have the library _and_ the drift.
 
 **How we soften it.** **Storybook is the living catalog** — a browsable showroom of every
 component and state, with auto-generated prop docs — plus this overview and clear naming, so
 "is there already one of these?" is easy to answer.
 
 **The honest residual.** Adoption is partly cultural; tooling lowers the barrier but
-can't force the habit. The best lever is making the shared version genuinely *nicer to use*
+can't force the habit. The best lever is making the shared version genuinely _nicer to use_
 than rolling your own.
 
 ## The throughline
@@ -991,6 +1007,7 @@ for the shared component" becomes the path of least resistance. Get them wrong a
 route around the library — which is the one failure mode that undoes the entire point.
 
 ---
+
 ---
 
 # Part VI — Putting It All Together
@@ -1009,7 +1026,7 @@ Here's the whole thing as one story, start to finish:
    If it's interactive, it gets a `"use client"` label.
 5. **tsdown** (on the Rust toolchain) bundles it to per-file ESM, externalizes React, and
    generates fast, accurate type files with go-to-source maps.
-6. A single **Storybook story** documents the component — and *that same story* runs as an
+6. A single **Storybook story** documents the component — and _that same story_ runs as an
    **interaction test** and **accessibility audit** in a real browser via **Vitest**, and as
    a **visual snapshot** in **Chromatic**.
 7. **publint** and **attw** inspect the assembled package; **knip** confirms nothing's dead;
@@ -1021,9 +1038,10 @@ Here's the whole thing as one story, start to finish:
 
 The recurring theme worth remembering: **a single story feeds five quality systems**, and
 **a single token feeds the entire visual system**. The modern stack is less a pile of tools
-than a set of *convergences* — write a thing once, and many systems benefit.
+than a set of _convergences_ — write a thing once, and many systems benefit.
 
 ---
+
 ---
 
 # Part VII — Glossary
@@ -1059,7 +1077,7 @@ Quick, plain definitions for the jargon. Skim, or come back when a term trips yo
 - **Design token** — a named design decision stored as data (`color.primary = #0066cc`).
 - **DTCG** — the W3C community-group standard JSON format for design tokens.
 - **ESM (ECMAScript Modules)** — the modern, standard module system (`import`/`export`).
-- **Externalize** — deliberately *not* bundling a dependency, expecting the consumer to provide
+- **Externalize** — deliberately _not_ bundling a dependency, expecting the consumer to provide
   it (e.g., React).
 - **Flat config** — ESLint's modern array-based config format (`eslint.config.js`).
 - **Headless / unstyled component** — ships behavior and accessibility but no visual styling
@@ -1079,7 +1097,7 @@ Quick, plain definitions for the jargon. Skim, or come back when a term trips yo
   to.
 - **OIDC (OpenID Connect)** — the standard behind "trusted publishing"; lets CI prove its
   identity with short-lived tokens.
-- **Peer dependency** — a dependency the *consumer* must provide and share (so there's one copy),
+- **Peer dependency** — a dependency the _consumer_ must provide and share (so there's one copy),
   rather than one you bundle (e.g., React).
 - **Phantom dependency** — a package you use but never declared; works locally with npm, breaks
   for consumers. pnpm prevents it.
@@ -1087,7 +1105,7 @@ Quick, plain definitions for the jargon. Skim, or come back when a term trips yo
   and stacking traps.
 - **Primitive (tokens)** — a raw token value with no semantic meaning (`blue.500`).
 - **Provenance** — a signed record proving which repo/commit/workflow built a published package.
-- **publint** — a checker for package *packaging* correctness (exports, files, formats).
+- **publint** — a checker for package _packaging_ correctness (exports, files, formats).
 - **React Server Components (RSC)** — React components that render on the server and ship no JS
   by default; the Next.js App Router model.
 - **Rolldown** — a Rust bundler (Rollup-compatible) underneath tsdown.
@@ -1109,6 +1127,7 @@ Quick, plain definitions for the jargon. Skim, or come back when a term trips yo
   easily.
 
 ---
+
 ---
 
 # Part VII — Where We Are & What's Next
@@ -1122,15 +1141,15 @@ On the `milestone-0` branch:
   CI skeleton; `publint` valid.
 - ✅ **Phase 2 — Token slice:** code-first DTCG tokens → Style Dictionary v5 → `:root` /
   `[data-theme="dark"]` CSS variables + a Tailwind `@theme inline` artifact (single-file
-  Tokens Studio layout, chosen for *free* Figma sync).
-- ⏳ **Phase 3 (here):** Tailwind v4 compiled to a *controlled* precompiled `dist/styles.css`
+  Tokens Studio layout, chosen for _free_ Figma sync).
+- ⏳ **Phase 3 (here):** Tailwind v4 compiled to a _controlled_ precompiled `dist/styles.css`
   — source-scoped to our components (no doc-scraped classes), global Preflight omitted, our
   classes `ui-`namespaced, the consumer override contract intact. Next: Storybook 10, Vitest
   browser tests, Chromatic — then the **Button itself** (Phase 4).
 
 ## The road through Milestone 0
 
-1. **Foundation** — repo, package, build, lint, CI *(here)*.
+1. **Foundation** — repo, package, build, lint, CI _(here)_.
 2. **Token slice** — the Button's tokens through Style Dictionary into CSS variables.
 3. **Styling + Storybook + visual-regression harness** — Tailwind output, Storybook 10,
    Vitest browser tests, Chromatic.
@@ -1138,17 +1157,17 @@ On the `milestone-0` branch:
 5. **Workflow loop** — first real publish, consume it in a Next.js app, run the
    change→publish→update loop until smooth.
 6. **Bake-off** — your Button vs. ours; lock the canonical pattern.
-7. *(Gated)* **Scale** — the rest of the components, plus the heavier "many components" tooling.
+7. _(Gated)_ **Scale** — the rest of the components, plus the heavier "many components" tooling.
 
 ## Lessons already banked (in `CLAUDE.md`)
 
 We've been turning every wrong turn into a permanent, curated lesson — only the ones that are
-likely to recur, cost real time, and *aren't* obvious from the error message:
+likely to recur, cost real time, and _aren't_ obvious from the error message:
 
 - **Corepack version pins must be exact** — a `^range` breaks every pnpm command, including
   the one you'd use to check the version (a real bootstrap trap).
 - **The build needs Node ≥ 24.11.1** — older Node 24 fails to load the config with a
-  *misleading* "Node bug / Unexpected module status 3" error.
+  _misleading_ "Node bug / Unexpected module status 3" error.
 - **A couple of bundler-output details** — tsdown emits `.mjs`/`.d.mts` (so `exports` must
   match), and it infers its build target from `engines.node` unless you set it explicitly.
 
@@ -1158,7 +1177,7 @@ become a meaningful gate once the Button exports real types.
 
 ---
 
-*That's the whole tour. The short version: we're building one well-made Button through every
+_That's the whole tour. The short version: we're building one well-made Button through every
 layer of a modern, mostly-Rust-powered, design-token-driven, RSC-aware publishing pipeline —
 so that by the time we make the other eleven components, the hard parts are already solved and
-boring. Onward.*
+boring. Onward._

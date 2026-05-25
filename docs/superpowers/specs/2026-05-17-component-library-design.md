@@ -2,8 +2,8 @@
 
 **Date:** 2026-05-17 · **Status:** Approved design; pending Milestone 0
 implementation plan · **Owner:** William Phelps (+ small team)
-*Evolution history is in this file's git log; this document reads as the
-current, consolidated design.*
+_Evolution history is in this file's git log; this document reads as the
+current, consolidated design._
 
 ---
 
@@ -32,32 +32,32 @@ before breadth.
 
 ## 2. Decisions at a Glance
 
-| Topic | Decision |
-|---|---|
-| Language / UI / docs | TypeScript · React 19 · Storybook 10.x |
-| Audience | Owner + small team |
-| Distribution | Versioned public scoped npm package |
-| Consumers | Next.js App Router (RSC) + Vite SPAs |
-| Repo structure | Single repo, single package; tokens compiled internally |
-| Bundler | tsdown (Rolldown/Oxc), ESM-only, per-module output |
-| React optimization | Ship React-Compiler-compiled output (`target: '19'`) |
-| Styling | Tailwind v4 internally → precompiled CSS |
-| Theming | CSS-variable token overrides; zero-specificity contract |
-| Design tokens | Code-first W3C/DTCG → Style Dictionary → CSS vars; Figma mirrors via Tokens Studio |
-| Primitives | Radix (consolidated `radix-ui` package) |
-| Package manager | pnpm 11 (+ catalogs for framework pins) |
-| Lint / format | ESLint flat config + Prettier (optional oxlint pre-pass) |
-| Quality bar | Unit + interaction + automated a11y + visual regression (Chromatic) |
-| Release | Changesets + GitHub Actions + npm OIDC trusted publishing |
-| Execution model | Teaching Mode (§5) |
-| First milestone | Button-only vertical slice (§4.1) |
+| Topic                | Decision                                                                           |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| Language / UI / docs | TypeScript · React 19 · Storybook 10.x                                             |
+| Audience             | Owner + small team                                                                 |
+| Distribution         | Versioned public scoped npm package                                                |
+| Consumers            | Next.js App Router (RSC) + Vite SPAs                                               |
+| Repo structure       | Single repo, single package; tokens compiled internally                            |
+| Bundler              | tsdown (Rolldown/Oxc), ESM-only, per-module output                                 |
+| React optimization   | Ship React-Compiler-compiled output (`target: '19'`)                               |
+| Styling              | Tailwind v4 internally → precompiled CSS                                           |
+| Theming              | CSS-variable token overrides; zero-specificity contract                            |
+| Design tokens        | Code-first W3C/DTCG → Style Dictionary → CSS vars; Figma mirrors via Tokens Studio |
+| Primitives           | Radix (consolidated `radix-ui` package)                                            |
+| Package manager      | pnpm 11 (+ catalogs for framework pins)                                            |
+| Lint / format        | ESLint flat config + Prettier (optional oxlint pre-pass)                           |
+| Quality bar          | Unit + interaction + automated a11y + visual regression (Chromatic)                |
+| Release              | Changesets + GitHub Actions + npm OIDC trusted publishing                          |
+| Execution model      | Teaching Mode (§5)                                                                 |
+| First milestone      | Button-only vertical slice (§4.1)                                                  |
 
 Rationale for each lives in the relevant Architecture subsection; timing
 (what ships when) lives in §4.
 
 ## 3. Architecture & Stack
 
-This section describes the **target architecture** — what the library *is*,
+This section describes the **target architecture** — what the library _is_,
 independent of delivery order. What is built when is §4.
 
 ### 3.1 Package & module format
@@ -193,7 +193,7 @@ Tailwind    @theme inline { --color-primary: var(--color-primary); }
             → utilities emit  color: var(--color-primary)
 ```
 
-- Consumers redefine semantic vars in their own `:root` *after* importing
+- Consumers redefine semantic vars in their own `:root` _after_ importing
   the library stylesheet (import order documented). Inherited custom
   properties → the override wins by source order, **no `!important`, no
   specificity fight**.
@@ -335,30 +335,30 @@ CI shards, smoke-vs-interaction story tag-split.
 
 ### 3.11 Recommended versions (spring 2026)
 
-| Tool | Version | Notes |
-|---|---|---|
-| React / React DOM | 19.2.x | peer `>=19` (enables RC `target:'19'` w/o runtime dep) |
-| `babel-plugin-react-compiler` | 1.x | via tsdown `@rolldown/plugin-babel` + `reactCompilerPreset()` |
-| `radix-ui` (consolidated) | 1.4.x | not individual `@radix-ui/*`; in `dependencies`, externalized |
-| Tailwind CSS | 4.x | internal only; `@theme inline`; `prefix(tw)`; `@utility` + `:where()` |
-| Style Dictionary | 5.x | ESM-only, DTCG; `@tokens-studio/sd-transforms` peer |
-| Tokens Studio (Figma) | 2.11+ | DTCG default; GitHub multi-file sync |
-| `tsdown` | 0.22.x+ | directive-preserving; `unbundle`; `sourcemap` |
-| TypeScript | 5.9.x / 6.x | `moduleResolution: bundler`; `isolatedDeclarations` goal; `tsc` is the gate |
-| `tsgo` (`@typescript/native-preview`) | preview | optional non-blocking fast pre-check only; pin |
-| pnpm | 11.x | catalogs for framework pins |
-| ESLint (flat) + Prettier | latest | + react-hooks v6/7, jsx-a11y, @eslint-react, typescript-eslint, import-x, react-server-components |
-| oxlint | 1.x | optional fast pre-pass |
-| knip | 6.x | oxc-based; library entry-point config |
-| Storybook | 10.x | `@storybook/react-vite`; CSF factory API; `addon-themes` |
-| Vitest | per `@storybook/addon-vitest`@10 | browser mode; `projects` not `workspace`; verify the SB↔Vitest↔addon-vitest peer triad at implementation |
-| `@vitest/browser-playwright` | latest | split provider package |
-| `@storybook/addon-vitest`/`-a11y`/`-themes` | SB 10.x line | successor to `experimental-addon-test` |
-| `react-docgen-typescript` | latest | autodocs (Radix-aware `propFilter`) |
-| React Testing Library | 16.x | React 19; `vitest-browser-react` in browser mode |
-| Changesets | `@changesets/cli` 2.x | `changesets/action@v1`; OIDC |
-| `pkg-pr-new` | latest | per-PR preview releases |
-| Chromatic | latest | `@chromatic-com/storybook` + TurboSnap |
+| Tool                                        | Version                          | Notes                                                                                                    |
+| ------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| React / React DOM                           | 19.2.x                           | peer `>=19` (enables RC `target:'19'` w/o runtime dep)                                                   |
+| `babel-plugin-react-compiler`               | 1.x                              | via tsdown `@rolldown/plugin-babel` + `reactCompilerPreset()`                                            |
+| `radix-ui` (consolidated)                   | 1.4.x                            | not individual `@radix-ui/*`; in `dependencies`, externalized                                            |
+| Tailwind CSS                                | 4.x                              | internal only; `@theme inline`; `prefix(tw)`; `@utility` + `:where()`                                    |
+| Style Dictionary                            | 5.x                              | ESM-only, DTCG; `@tokens-studio/sd-transforms` peer                                                      |
+| Tokens Studio (Figma)                       | 2.11+                            | DTCG default; GitHub multi-file sync                                                                     |
+| `tsdown`                                    | 0.22.x+                          | directive-preserving; `unbundle`; `sourcemap`                                                            |
+| TypeScript                                  | 5.9.x / 6.x                      | `moduleResolution: bundler`; `isolatedDeclarations` goal; `tsc` is the gate                              |
+| `tsgo` (`@typescript/native-preview`)       | preview                          | optional non-blocking fast pre-check only; pin                                                           |
+| pnpm                                        | 11.x                             | catalogs for framework pins                                                                              |
+| ESLint (flat) + Prettier                    | latest                           | + react-hooks v6/7, jsx-a11y, @eslint-react, typescript-eslint, import-x, react-server-components        |
+| oxlint                                      | 1.x                              | optional fast pre-pass                                                                                   |
+| knip                                        | 6.x                              | oxc-based; library entry-point config                                                                    |
+| Storybook                                   | 10.x                             | `@storybook/react-vite`; CSF factory API; `addon-themes`                                                 |
+| Vitest                                      | per `@storybook/addon-vitest`@10 | browser mode; `projects` not `workspace`; verify the SB↔Vitest↔addon-vitest peer triad at implementation |
+| `@vitest/browser-playwright`                | latest                           | split provider package                                                                                   |
+| `@storybook/addon-vitest`/`-a11y`/`-themes` | SB 10.x line                     | successor to `experimental-addon-test`                                                                   |
+| `react-docgen-typescript`                   | latest                           | autodocs (Radix-aware `propFilter`)                                                                      |
+| React Testing Library                       | 16.x                             | React 19; `vitest-browser-react` in browser mode                                                         |
+| Changesets                                  | `@changesets/cli` 2.x            | `changesets/action@v1`; OIDC                                                                             |
+| `pkg-pr-new`                                | latest                           | per-PR preview releases                                                                                  |
+| Chromatic                                   | latest                           | `@chromatic-com/storybook` + TurboSnap                                                                   |
 
 > Most version-fragile spot: the Storybook ↔ Vitest ↔
 > `@storybook/addon-vitest` peer triad. Pin deliberately, verify at
@@ -397,8 +397,8 @@ no-`"use client"` path. Fastest route to a working end-to-end loop.
   **required release gate**. Standing the
   Chromatic↔Storybook↔CI↔TurboSnap↔gate integration up in isolation on one
   stable component is deliberate — it's the historically painful piece,
-  de-risked while noise is near-zero. (Regression-*coverage* value grows
-  with breadth later; the *workflow* is validated now.)
+  de-risked while noise is near-zero. (Regression-_coverage_ value grows
+  with breadth later; the _workflow_ is validated now.)
 - Build with React Compiler; `publint`/`attw --pack` green.
 - Published to npm for real.
 
@@ -416,8 +416,8 @@ Router** app — RSC is the riskiest path, de-risked first):
    here → Chromatic flags the diff on the PR → review & accept the new
    baseline → Changeset → version bump → publish next `0.x` (Chromatic
    green is a required gate) → consumer `pnpm update` → verify it lands.
-   *(Frequent baseline approvals during this iteration are expected — that
-   is the workflow being exercised, not a failure.)*
+   _(Frequent baseline approvals during this iteration are expected — that
+   is the workflow being exercised, not a failure.)_
 5. Repeat 3–4 until friction-free; write & commit the ironed-out consumer +
    maintainer workflow (`docs/workflow.md`), including the Chromatic
    baseline-review step.
@@ -442,7 +442,7 @@ The §3.6/§3.7/§3.8 conventions are the working baseline until this
 concludes; the bake-off may amend them.
 
 **Gate.** All subsequent scope is blocked until both: the workflow loop is
-friction-free and documented, *and* the canonical component pattern is
+friction-free and documented, _and_ the canonical component pattern is
 agreed and written. Pulling breadth or scale-time hardening forward
 dilutes the slice's purpose — hold the gate.
 
@@ -459,8 +459,8 @@ dilutes the slice's purpose — hold the gate.
   committed `.d.ts` API-surface snapshot diff; knip
   `--production --strict` dependency isolation; the §3.8 test-performance
   levers (single Chromium, `isolate:false`, sharding, tag-split).
-  *(Chromatic is already gating from Milestone 0 — scaling only adds
-  baselines.)*
+  _(Chromatic is already gating from Milestone 0 — scaling only adds
+  baselines.)_
 - **`pkg.pr.new`** per-PR preview releases may be enabled here if useful.
   Deliberately kept out of the first ironed loop to keep §4.1 focused.
 

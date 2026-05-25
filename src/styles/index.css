@@ -8,8 +8,8 @@
  */
 @layer theme, base, components, utilities;
 
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
 /*
  * Preflight (tailwindcss/preflight.css → layer(base)) is INTENTIONALLY omitted.
  * A precompiled component lib must not impose a global reset on a consumer's
@@ -27,9 +27,9 @@
 @source "../components";
 
 /* Generated token layers (Style Dictionary → build/). */
-@import "../../build/tokens.light.css"; /* :root primitives + semantic var() refs */
-@import "../../build/tokens.dark.css"; /* [data-theme="dark"] re-binds semantics */
-@import "../../build/theme.css"; /* @theme inline: maps --color-* utilities onto our vars */
+@import '../../build/tokens.light.css'; /* :root primitives + semantic var() refs */
+@import '../../build/tokens.dark.css'; /* [data-theme="dark"] re-binds semantics */
+@import '../../build/theme.css'; /* @theme inline: maps --color-* utilities onto our vars */
 
 /* Zero-specificity dark variant — matches the token pipeline's selector. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
