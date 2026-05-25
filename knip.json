@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreDependencies": ["babel-plugin-react-compiler", "react", "react-dom", "@types/react", "@types/react-dom"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignoreDependencies": ["babel-plugin-react-compiler", "react", "react-dom", "@types/react", "@types/react-dom", "tailwindcss"],
   "ignoreBinaries": ["vitest"]
 }

@@ -534,8 +534,11 @@ build time; *nothing* ships to the browser, and **consumers don't need Tailwind 
 we hand them one finished `.css` file. The trick that makes it *themeable* is a feature called
 `@theme inline`: instead of baking color values directly into the utility classes, it makes
 classes point at a *live CSS variable*. So `bg-primary` resolves through a variable a consumer
-can reassign at runtime. We also use `prefix()` to namespace all our classes (so we never
-collide with a consumer's own styles).
+can reassign at runtime. For collision-safety we scope the compile to our own component source
+(`source(none)` + `@source`), ship our classes under a `ui-` namespace, and omit Tailwind's
+global Preflight reset — but we deliberately **do not** use Tailwind's `prefix()`, because it
+also renames the theme *variables* (`--color-*` → `--tw-color-*`), which would break the very
+consumer override contract the theming system depends on.
 
 **Current version.** **Tailwind CSS 4.3.0**, on the Lightning CSS engine — builds up to ~10×
 faster than v3.
@@ -999,7 +1002,8 @@ Here's the whole thing as one story, start to finish:
 2. **Style Dictionary** compiles the tokens into **CSS variables**, keeping the alias chain
    intact (`outputReferences`), so overrides will cascade.
 3. **Tailwind v4** turns our utility classes into one **precompiled stylesheet**, with
-   classes pointing at those live variables (`@theme inline`), namespaced (`prefix`), and
+   classes pointing at those live variables (`@theme inline`), source-scoped to our components
+   and `ui-`namespaced (not Tailwind's `prefix()`, which would rename the theme vars), and
    layered so consumers can override without `!important`.
 4. We write a component in **TypeScript** + React. The **React Compiler** auto-optimizes it.
    If it's interactive, it gets a `"use client"` label.
@@ -1107,18 +1111,22 @@ Quick, plain definitions for the jargon. Skim, or come back when a term trips yo
 ---
 ---
 
-# Part VIII — Where We Are & What's Next
+# Part VII — Where We Are & What's Next
 
-## Right now: Phase 1 — Foundation (in progress)
+## Right now: Phase 3 — Styling + Storybook + visual-regression harness (in progress)
 
-The plumbing is going in, on a `milestone-0` branch:
+On the `milestone-0` branch:
 
-- ✅ Repo, package shape, and the **build pipeline work** — TypeScript 6.0.3 + the React
-  Compiler produce a correctly-packaged ESM output (`.mjs` + `.d.mts` + source maps),
-  externalizing React, targeting `es2022`.
-- ✅ `publint` says the packaging is **valid**.
-- ⏳ Next: finish the linting setup and CI checks, then move to the **design tokens** (Phase 2)
-  and the **Button itself** (Phase 4).
+- ✅ **Phase 1 — Foundation:** packaged ESM build (TypeScript 6.0.3 + the React Compiler →
+  `.mjs`/`.d.mts` + source maps, React externalized, `es2022`); ESLint/Prettier/knip/cspell;
+  CI skeleton; `publint` valid.
+- ✅ **Phase 2 — Token slice:** code-first DTCG tokens → Style Dictionary v5 → `:root` /
+  `[data-theme="dark"]` CSS variables + a Tailwind `@theme inline` artifact (single-file
+  Tokens Studio layout, chosen for *free* Figma sync).
+- ⏳ **Phase 3 (here):** Tailwind v4 compiled to a *controlled* precompiled `dist/styles.css`
+  — source-scoped to our components (no doc-scraped classes), global Preflight omitted, our
+  classes `ui-`namespaced, the consumer override contract intact. Next: Storybook 10, Vitest
+  browser tests, Chromatic — then the **Button itself** (Phase 4).
 
 ## The road through Milestone 0
 

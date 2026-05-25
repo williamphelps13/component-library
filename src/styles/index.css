@@ -1,0 +1,79 @@
+/*
+ * Precompiled stylesheet for @williamphelps13/ui.
+ *
+ * Layered-import form (instead of a bare `@import "tailwindcss"`) so we control
+ * two things a precompiled COMPONENT library must own deliberately:
+ *   1. Source scanning  — what class names drive utility emission.
+ *   2. Preflight        — whether we ship a global browser reset to consumers.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+/*
+ * Preflight (tailwindcss/preflight.css → layer(base)) is INTENTIONALLY omitted.
+ * A precompiled component lib must not impose a global reset on a consumer's
+ * <button>/<h1>/margins. Our component classes are self-contained instead.
+ *
+ * source(none) disables Tailwind's auto-scan of the whole repo (which was
+ * scraping class names out of docs/*.md and shipping them). @source re-adds
+ * ONLY our component code, so the output is minimal and doc-independent.
+ *
+ * No prefix(): prefix(tw) namespaces theme VARIABLES too (--color-* →
+ * --tw-color-*), which would break our consumer override contract
+ * (:root { --color-primary }). Collision-safety comes from the narrow source
+ * surface + our own `ui-` class names + Preflight being off — not from prefix().
+ */
+@source "../components";
+
+/* Generated token layers (Style Dictionary → build/). */
+@import "../../build/tokens.light.css"; /* :root primitives + semantic var() refs */
+@import "../../build/tokens.dark.css"; /* [data-theme="dark"] re-binds semantics */
+@import "../../build/theme.css"; /* @theme inline: maps --color-* utilities onto our vars */
+
+/* Zero-specificity dark variant — matches the token pipeline's selector. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Component classes via @utility (predictable, low-specificity overrides).
+ * Named `ui-*` as a lightweight library namespace. Self-contained because
+ * Preflight no longer resets the native <button>.
+ */
+@utility ui-btn {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+@utility ui-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+@utility ui-btn-neutral {
+  background-color: var(--color-neutral-bg);
+  color: var(--color-neutral-fg);
+}
+@utility ui-btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-primary-fg);
+}
+@utility ui-btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+@utility ui-btn-md {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.ui-btn:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
