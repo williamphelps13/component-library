@@ -51,6 +51,7 @@
     "@eslint-react/eslint-plugin": "^5.8.4",
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
+    "@tokens-studio/sd-transforms": "^2.0.3",
     "@types/babel__core": "^7.20.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -66,6 +67,7 @@
     "publint": "^0.3.21",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "style-dictionary": "^5.4.1",
     "tsdown": "^0.22.0",
     "typescript": "catalog:",
     "typescript-eslint": "^8.59.4"
