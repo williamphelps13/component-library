@@ -10,7 +10,7 @@ Tokens Studio's **multi-file sync** and **themes** features are **Pro**
 (€39/editor/mo). We avoid that cost by using the **free Starter** tier:
 **single-file** sync + plain **token sets**. Light/dark are modelled as sets
 (`light`, `dark`) layered over `core` — not as Pro "themes". On free we forgo
-the in-Figma theme *switcher* and light/dark as variable *modes* (you export
+the in-Figma theme _switcher_ and light/dark as variable _modes_ (you export
 one semantic set at a time) — neither of which our code build needs.
 
 ## Structure (`tokens.json`)
@@ -44,5 +44,5 @@ the merged tree at build time.
 - Designers work with the **token sets**; the Pro "themes" switcher is not used.
 - In the plugin, set **`core` → "source"** and the active semantic set
   (`light`/`dark`) → **enabled** — otherwise references show as broken.
-- To create native Figma variables: **Export → Token Sets** (free), *not*
+- To create native Figma variables: **Export → Token Sets** (free), _not_
   Themes (Pro); bind layers to the resulting **variables**, not raw values.

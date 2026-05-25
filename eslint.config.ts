@@ -4,11 +4,11 @@ import jsxA11y from 'eslint-plugin-jsx-a11y'
 import reactHooks from 'eslint-plugin-react-hooks'
 import eslintReact from '@eslint-react/eslint-plugin'
 import importX from 'eslint-plugin-import-x'
+import storybook from 'eslint-plugin-storybook'
 
 export default tseslint.config(
   { ignores: ['dist', 'build', 'storybook-static', 'coverage'] },
   js.configs.recommended,
-
   // Library source: full type-aware + React/a11y/import linting.
   {
     files: ['src/**/*.{ts,tsx}'],
@@ -27,10 +27,13 @@ export default tseslint.config(
       'import-x/no-duplicates': 'error',
     },
   },
-
-  // Config files & scripts: plain lint, no type info required.
+  // Config files, scripts, Storybook/Vitest config: plain lint, no type info.
+  // (.storybook/*.ts(x) match none of the type-aware globs, so they need a TS
+  // parser block here or eslint's default parser chokes on TS syntax.)
   {
-    files: ['*.config.{ts,mjs,js}', 'scripts/**/*.{mjs,js,ts}'],
+    files: ['*.config.{ts,mjs,js}', 'scripts/**/*.{mjs,js,ts}', '.storybook/**/*.{ts,tsx}'],
     extends: [...tseslint.configs.recommended],
   },
+  // Storybook story linting (flat config; targets *.stories.*).
+  storybook.configs['flat/recommended'],
 )
