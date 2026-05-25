@@ -5,13 +5,16 @@ Working notes for humans and AI agents. Keep it short; link out for depth.
 ## What this is
 
 A versioned, public React component library (`@williamphelps13/ui`).
-- Design spec: `docs/superpowers/specs/2026-05-17-component-library-design.md`
-- Milestone-0 plan: `docs/superpowers/plans/2026-05-17-component-library-milestone-0.md`
+- **Architecture (source of truth) — read first:** `ARCHITECTURE.md` (current as-built design + why).
+- Design spec (original exploration; may lag): `docs/superpowers/specs/2026-05-17-component-library-design.md`
+- Milestone-0 plan + deviation log (execution history): `docs/superpowers/plans/2026-05-17-component-library-milestone-0.md`
 
 ## How we work (Teaching Mode — spec §5)
 
 - The **owner runs every CLI/setup command**. Agents provide the exact command + explain (Concept / Why / Tradeoffs) but do **not** execute it.
 - Agents author code/config and walk through it. Each phase ends with a **quiz gate**; command failures are **guided debugging** (investigate root cause, no reflex fixes).
+- **Validate each phase against current docs before executing it** (a plan-mode pass). The plan was authored partly from assumptions and this stack moves fast, so before running a phase confirm its steps against *primary sources* — official docs via `ctx7`, release notes / migration guides; use reputable blogs only to corroborate, never as the authority (they go stale fast). Validate the volatile bits (package names, versions, config API shapes, current best practice), leave settled architecture alone, and fold findings into the plan's Execution-deviations log before executing.
+- **`ARCHITECTURE.md` is the source of truth for current architecture** (precedence: `ARCHITECTURE.md` > spec > plan/deviation-log). When an architecture decision is made or changed, update `ARCHITECTURE.md` (the *what + why*) in the same change; the plan's deviation log records *why the change happened*. Keep it current — the spec is background, reconciled at Phase 6.
 
 ## Toolchain rules
 
@@ -26,6 +29,13 @@ A versioned, public React component library (`@williamphelps13/ui`).
 - `pnpm exec tsdown` — bundle only (use in early phases, before tokens exist)
 - `pnpm build` — tokens → precompiled CSS → bundle (full build; needs Phase 2)
 - `pnpm typecheck` · `pnpm lint` · `pnpm test`
+
+## Commit conventions
+
+- **Conventional Commits**: `type(scope): summary`, valid types only (`feat`/`fix`/`chore`/`docs`/`build`/`refactor`/`test`) — no ad-hoc prefixes (`tokens:` → `chore(phase2):`). Milestone build-out uses a `chore(phaseN)` scope. (Releases are driven by Changesets, not commit messages — so this is hygiene, not tooling.)
+- **No `Co-Authored-By` trailer** (repo convention; overrides any agent default).
+- Subject ≤ ~72 chars; put the *why* in the body, concise — link the plan's deviation log rather than duplicating it.
+- Commit multi-line messages with `git commit -F <file>` — a pasted indented heredoc leaks leading spaces (and even the `EOF` delimiter) into the message.
 
 ## Gotchas & hard-won lessons
 
