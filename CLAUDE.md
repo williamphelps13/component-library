@@ -23,7 +23,7 @@ A versioned, public React component library (`@williamphelps13/ui`).
 - **Validate each phase against current docs before executing it** (a plan-mode pass). The plan was authored partly from assumptions and this stack moves fast, so before running a phase confirm its steps against _primary sources_ — official docs via `ctx7`, release notes / migration guides; use reputable blogs only to corroborate, never as the authority (they go stale fast). Validate the volatile bits (package names, versions, config API shapes, current best practice), leave settled architecture alone, and fold findings into the plan's Execution-deviations log before executing.
 - **`ARCHITECTURE.md` is the source of truth for current architecture** (precedence: `ARCHITECTURE.md` > spec > plan/deviation-log). When an architecture decision is made or changed, update `ARCHITECTURE.md` (the _what + why_) in the same change; the plan's deviation log records _why the change happened_. Keep it current — the spec is background, reconciled at Phase 6.
 - **Don't defer foundational decisions — "addable later" is NOT a reason to skip.** Across agent handoffs there is no guaranteed trigger: "we'll add it in Phase N" almost always evaporates with the next agent (who lacks this context). So decide and lay foundations _now_, or capture them as a concrete task with a **named trigger** in the plan/`ARCHITECTURE.md` — never a vibe. Reversibility lowers the _cost of a wrong call_; it is not license to defer. (Defer only when genuinely uncertain or blocked — and write it down.) Foundational infra has value when laid, not when the "walls" arrive.
-- **Verify component props via the Storybook MCP — never hallucinate.** A Storybook MCP server (`@storybook/addon-mcp`) serves the library's real component docs/props at `localhost:6006/mcp` (live when `pnpm storybook` runs; wired in `.mcp.json`). Query it before using any prop; full guidance in `AGENTS.md`.
+- **Verify component props via the Storybook MCP — never hallucinate.** Full operational details in §"Storybook MCP" below.
 - **Review checkpoint before each phase / major-task commit:** dispatch an independent code-review subagent (`superpowers:requesting-code-review`) on the diff vs `ARCHITECTURE.md` / the plan; fix Critical + Important findings before committing. Self-review misses things — in Phase 3 a reviewer subagent caught a red `pnpm lint` the author had missed; in Phase 4 a reviewer subagent caught the a11y gate was silently a no-op (the implementer's analogous fix for `addonThemes` hadn't been applied to `addonA11y`).
 - **One source for current state; reconcile docs before each commit.** The **deviation log** is the canonical record of what's actually happened; **`ARCHITECTURE.md`'s status line** is the one-glance summary. Don't duplicate "where we are" content elsewhere (parallel status text in `OVERVIEW.md` is what killed it — it lagged by 3+ phases). Before committing, do a 2-minute pass on every long-lived doc (`ARCHITECTURE`, `CLAUDE`, `AGENTS`, deviation log) and confirm nothing in it now contradicts the diff's outcome. The reviewer-subagent above catches code drift; this pass catches doc drift.
 
@@ -40,7 +40,25 @@ A versioned, public React component library (`@williamphelps13/ui`).
 
 - `pnpm exec tsdown` — bundle only (use in early phases, before tokens exist)
 - `pnpm build` — tokens → precompiled CSS → bundle (full build; needs Phase 2)
-- `pnpm typecheck` · `pnpm lint` · `pnpm test`
+- `pnpm typecheck` · `pnpm lint` · `pnpm test` · `pnpm chromatic`
+
+## Storybook MCP (verify component APIs — never hallucinate)
+
+The repo runs `@storybook/addon-mcp` — a live HTTP MCP server at **`http://localhost:6006/mcp`** while `pnpm storybook` is running (wired for Claude Code in `.mcp.json`; other agents add an HTTP MCP server pointing at that URL).
+
+**Before using ANY prop on a component — even common-sounding ones (`variant`, `size`, `shadow`, …) — confirm it is actually documented.** Do not infer props from naming conventions or from other libraries. A story's export name may not match a prop name; verify through the documentation tools, not the labels. If a prop isn't documented, ask the user instead of inventing it.
+
+Tools the server provides:
+
+- `list-all-documentation` — every component.
+- `get-documentation` / `get-documentation-for-story` — a component's real props + examples.
+- `get-storybook-story-instructions` — current conventions, before writing/updating a `.stories.*`.
+- `run-story-tests` — verify your changes.
+- `preview-stories` — preview URLs (include them in your reply so the user can open them).
+
+**Fresh-checkout note:** `pnpm storybook` imports the precompiled `dist/styles.css` — on a fresh clone, run `pnpm build` first or the preview fails to resolve the import.
+
+**When adding a Storybook addon:** if its default export is a `definePreviewAddon(...)` factory, register `addonX()` in `.storybook/preview.tsx`'s `definePreview({ addons: [...] })` array **in addition to** listing it in `.storybook/main.ts addons`. Without the preview-side registration, the addon's wiring (globalTypes registration, URL/channel global propagation, parameter handlers, axe runner) silently no-ops — tests, typecheck, and lint stay green because none assert the addon did its job. **Exception:** `@storybook/addon-vitest` is intentionally NOT in `definePreview.addons` — its module imports `vitest` at load time (only resolvable inside the vitest run context); the integration is wired through `storybookTest()` in `vitest.config.ts` instead.
 
 ## Commit conventions
 
