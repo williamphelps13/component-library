@@ -13,6 +13,11 @@ A versioned, public React component library (`@williamphelps13/ui`).
 
 ## How we work (Teaching Mode — spec §5)
 
+> **Teaching Mode is the DEFAULT, but it is per-feature switchable.** The owner can explicitly
+> drop it for a specific feature when speed > pedagogy (B3 / Chromatic was the first such case
+> — owner direction: "without Teaching Mode"). When off, the agent runs commands directly. When
+> the owner hasn't said either way, assume Teaching Mode is on.
+
 - The **owner runs every CLI/setup command**. Agents provide the exact command + explain (Concept / Why / Tradeoffs) but do **not** execute it.
 - Agents author code/config and walk through it. Each phase ends with a **quiz gate**; command failures are **guided debugging** (investigate root cause, no reflex fixes).
 - **Validate each phase against current docs before executing it** (a plan-mode pass). The plan was authored partly from assumptions and this stack moves fast, so before running a phase confirm its steps against _primary sources_ — official docs via `ctx7`, release notes / migration guides; use reputable blogs only to corroborate, never as the authority (they go stale fast). Validate the volatile bits (package names, versions, config API shapes, current best practice), leave settled architecture alone, and fold findings into the plan's Execution-deviations log before executing.

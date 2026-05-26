@@ -20,7 +20,25 @@
 
 **Source spec:** `docs/superpowers/specs/2026-05-17-component-library-design.md` (r7).
 
+## Current status (one-screen orientation)
+
+This plan is a long historical artifact (its task sections describe original Teaching-Mode walkthroughs for Phases 1–6). For **what's actually done and what's next, read in this order**:
+
+1. **`ARCHITECTURE.md` status line** — one-glance summary of phase state.
+2. **Most recent entries in the Execution deviations log below** (chronological; newest at the BOTTOM). The three latest entries are listed under "Most recent first ↓" at the top of the next section.
+3. The **Pending** lines at the end of each deviation entry — the agreed next steps with their triggers.
+
+Task scaffolds in the plan body (e.g. `### Task 4.2`) are historical execution guides; they're SUPERSEDED where a deviation entry says so. When in doubt, the deviation log wins.
+
 ## Execution deviations (live log)
+
+> **Most recent first** ↓ (the section below is chronological with newest at the BOTTOM; this pointer reverses the discovery order for fresh readers):
+>
+> 1. **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits).** Live repo + first Chromatic baseline + branch protection on `main`. See the full entry at the end of this section.
+> 2. **Phase 4 (Button + harness verification) — COMMITTED 2026-05-25 (`2903f5f`).** Three sub-findings: initial Button scope, TS2882 dot-dir-glob blocker resolved, CSF Next addon-registration trap, WCAG AA token contrast fix.
+> 3. **Storybook 10.4 harness (Part B).** CSF-Next docs caveat, addon configuration, MCP foundation, versioning policy.
+>
+> For full text + sub-bullets, find each entry by its leading bold phrase in the chronological list below.
 
 - **Tailwind `prefix(tw)` REJECTED (was: "deferred"); collision-safety achieved differently.** Validated against Tailwind v4 docs (ctx7): `prefix(tw)` namespaces theme **variables** too (`--color-*` → `--tw-color-*`), which would break our consumer override contract (`:root { --color-primary }`) — the core of the theming design. So prefix() is the wrong tool here, not merely "hard." Collision-safety instead comes from three deliberate choices in `src/styles/index.css`: (1) `@import "tailwindcss/…" source(none)` + `@source "../components"` → minimal, doc-independent class surface (the bare `@import "tailwindcss"` had been auto-scanning `docs/*.md` and shipping prose-scraped utilities); (2) our own `ui-*` class names (we author the `@utility` names, so namespacing is a naming choice, no Tailwind machinery, variables untouched); (3) **Preflight omitted** via the layered-import form so we don't impose a global reset on consumers (the larger real collision risk — `prefix()` never covered it). Component classes are self-contained as a result (`.ui-btn` resets `appearance/border/margin/font`). End-to-end verification (no `--tw-color-*`, no Preflight, classes render) happens in Phase 4 once `<Button>` consumes the classes in Storybook.
 

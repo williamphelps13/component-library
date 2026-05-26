@@ -11,6 +11,8 @@ How the docs relate (precedence, highest first):
 3. **Plan + deviation log** `docs/superpowers/plans/2026-05-17-component-library-milestone-0.md`
    — execution steps (what was _planned_) and the live deviation log (_why_ we changed course).
 4. **`CLAUDE.md`** — always-loaded operating rules + hard-won gotchas.
+5. **`AGENTS.md`** — cross-tool agent guidance (verify component props via the Storybook MCP;
+   addon-registration checklist when adding a Storybook addon).
 
 > When an architecture decision is made or changed, update this file (the _what + why_); record the
 > transition in the plan's deviation log (the _why it changed_).
