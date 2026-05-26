@@ -10,16 +10,16 @@ How the docs relate (precedence, highest first):
    exploration + alternatives considered. Background; **may lag** this file (reconciled at Phase 6).
 3. **Plan + deviation log** `docs/superpowers/plans/2026-05-17-component-library-milestone-0.md`
    — execution steps (what was _planned_) and the live deviation log (_why_ we changed course).
-4. **`CLAUDE.md`** — always-loaded operating rules + hard-won gotchas. **`OVERVIEW.md`** — plain-
-   English teaching field guide.
+4. **`CLAUDE.md`** — always-loaded operating rules + hard-won gotchas.
 
 > When an architecture decision is made or changed, update this file (the _what + why_); record the
 > transition in the plan's deviation log (the _why it changed_).
 
 **Status:** Phase 1 (Foundation) ✅ · Phase 2 (Token slice) ✅ · Phase 3 (Styling + Storybook +
-visual-regression harness) 🔄 (styling + Storybook + Vitest done; Chromatic pending) · Phase 4
-(Button) 🔄 (component + stories + tests green; visual check + commit pending) · Phase 5 (Workflow
-loop) ⏳ · Phase 6 (Bake-off) ⏳.
+visual-regression harness) 🔄 _(Chromatic pending; everything else done)_ · Phase 4 (Button) ✅
+_(committed; Chromatic B3 + merged P3/P4 quiz gate pending)_ · Phase 5 (Workflow loop) ⏳ ·
+Phase 6 (Bake-off) ⏳. The **deviation log** is the canonical current-state record; this status
+line is the one-glance summary.
 
 ---
 
@@ -207,4 +207,4 @@ lacks TS 6.0 support; revisit.)
 ## 6. See also
 
 Spec (design rationale / alternatives), the plan's deviation log (decision history), `CLAUDE.md`
-(operating rules + gotchas), `OVERVIEW.md` (plain-English tour).
+(operating rules + gotchas).
