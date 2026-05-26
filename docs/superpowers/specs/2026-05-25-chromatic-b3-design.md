@@ -5,7 +5,7 @@
 
 ## 1. Goal & success criterion
 
-**Goal.** The next PR (and every subsequent PR) to this repo is *gated* on a live Chromatic
+**Goal.** The next PR (and every subsequent PR) to this repo is _gated_ on a live Chromatic
 visual-regression check, with the full local correctness suite gating beforehand so a broken
 build never spends a snapshot.
 
@@ -21,7 +21,7 @@ Merging that PR to `main` auto-accepts the new snapshots as the canonical baseli
 
 In scope:
 
-- First `.github/workflows/ci.yml` for the project (revives the deferred Task 1.10 *and* extends
+- First `.github/workflows/ci.yml` for the project (revives the deferred Task 1.10 _and_ extends
   it with the Chromatic job).
 - `chromatic.config.json` (TurboSnap + policy; project token never lives here).
 - `package.json` — add `"chromatic"` script.
@@ -41,15 +41,15 @@ Out of scope (deliberately YAGNI'd):
 
 Compressed to **one human touchpoint** + agent-driven everything else.
 
-| Step | Who | What |
-|------|-----|------|
-| 0 | agent | `gh auth status` precheck (verify `gh` CLI is authed locally; abort cleanly if not). |
-| 1 | agent | Author all files (CI workflow, chromatic config with **stub `projectId`**, npm script, dependabot, branch-protection script). |
-| 2 | agent | Run all local gates green; commit (`chore(phase3): ci skeleton + chromatic gate (B3) — pre-baseline`). |
-| 3 | agent | `gh repo create williamphelps13/component-library --public --source=. --description "@williamphelps13/ui — versioned, public React component library"` + push `milestone-0` and `main`. |
-| 4 | **owner** | Sign in at chromatic.com with GitHub → create project linked to the new repo → paste the project token back to the agent. (Inherently human: OAuth browser flow.) |
-| 5 | agent | `gh secret set CHROMATIC_PROJECT_TOKEN --body=<token>` + `pnpm dlx chromatic --project-token=<token>` (first baseline, captures `projectId`); patch `chromatic.config.json` with the real `projectId`; run branch-protection `gh api` calls; commit + push (`chore(phase3): chromatic projectId + branch protection`). |
-| 6 | agent | Watch CI, confirm both jobs green; update `ARCHITECTURE.md` status line (Phase 3 → ✅) and deviation log entry; commit (`docs(phase3): close Phase 3 (Chromatic live)`). |
+| Step | Who       | What                                                                                                                                                                                                                                                                                                                   |
+| ---- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | agent     | `gh auth status` precheck (verify `gh` CLI is authed locally; abort cleanly if not).                                                                                                                                                                                                                                   |
+| 1    | agent     | Author all files (CI workflow, chromatic config with **stub `projectId`**, npm script, dependabot, branch-protection script).                                                                                                                                                                                          |
+| 2    | agent     | Run all local gates green; commit (`chore(phase3): ci skeleton + chromatic gate (B3) — pre-baseline`).                                                                                                                                                                                                                 |
+| 3    | agent     | `gh repo create williamphelps13/component-library --public --source=. --description "@williamphelps13/ui — versioned, public React component library"` + push `milestone-0` and `main`.                                                                                                                                |
+| 4    | **owner** | Sign in at chromatic.com with GitHub → create project linked to the new repo → paste the project token back to the agent. (Inherently human: OAuth browser flow.)                                                                                                                                                      |
+| 5    | agent     | `gh secret set CHROMATIC_PROJECT_TOKEN --body=<token>` + `pnpm dlx chromatic --project-token=<token>` (first baseline, captures `projectId`); patch `chromatic.config.json` with the real `projectId`; run branch-protection `gh api` calls; commit + push (`chore(phase3): chromatic projectId + branch protection`). |
+| 6    | agent     | Watch CI, confirm both jobs green; update `ARCHITECTURE.md` status line (Phase 3 → ✅) and deviation log entry; commit (`docs(phase3): close Phase 3 (Chromatic live)`).                                                                                                                                               |
 
 Total owner attention: ~2 minutes (signup + paste).
 
@@ -65,7 +65,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: ["**"]
+    branches: ['**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -76,8 +76,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        with: { fetch-depth: 0 }  # full history; chromatic + turbosnap want it
-      - uses: pnpm/action-setup@v4  # Corepack-respects packageManager pin
+        with: { fetch-depth: 0 } # full history; chromatic + turbosnap want it
+      - uses: pnpm/action-setup@v4 # Corepack-respects packageManager pin
       - uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
@@ -91,7 +91,7 @@ jobs:
       - run: pnpm build
       - run: pnpm assert:use-client
       - run: pnpm test
-      - run: pnpm verify:pack          # publint
+      - run: pnpm verify:pack # publint
 
   chromatic:
     needs: correctness
@@ -119,11 +119,11 @@ jobs:
 {
   "$schema": "https://www.chromatic.com/config-file.schema.json",
   "projectId": "Project:<stubbed; populated by first chromatic run in step 5>",
-  "onlyChanged": true,            // TurboSnap — re-snap only stories whose dep graph changed
-  "autoAcceptChanges": "main",    // merging to main bakes new baselines as canonical
-  "exitZeroOnChanges": false,     // PR check stays RED until reviewer approves diffs in Chromatic
+  "onlyChanged": true, // TurboSnap — re-snap only stories whose dep graph changed
+  "autoAcceptChanges": "main", // merging to main bakes new baselines as canonical
+  "exitZeroOnChanges": false, // PR check stays RED until reviewer approves diffs in Chromatic
   "exitOnceUploaded": false,
-  "buildScriptName": "build-storybook"
+  "buildScriptName": "build-storybook",
 }
 ```
 
@@ -148,16 +148,16 @@ updates:
     ignore:
       # CSF Next is experimental; pin floor in package.json and audit SB bumps manually
       # (CLAUDE.md toolchain rule).
-      - dependency-name: "storybook"
+      - dependency-name: 'storybook'
         update-types: [version-update:semver-major]
-      - dependency-name: "@storybook/*"
+      - dependency-name: '@storybook/*'
         update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly, day: monday }
     groups:
       gh-actions:
-        patterns: ["*"]
+        patterns: ['*']
 ```
 
 ### 4.5 Branch protection (one-shot `gh api` call run in step 5)
@@ -197,7 +197,7 @@ gh api -X PUT repos/williamphelps13/component-library/branches/main/protection \
 JSON
 ```
 
-(The check names `"correctness"` and `"chromatic"` must match the `jobs.<id>` keys in the workflow exactly. Note this also means the *first* CI run on `main` must complete before branch protection takes meaningful effect — GH only enforces checks it has previously seen for the branch.)
+(The check names `"correctness"` and `"chromatic"` must match the `jobs.<id>` keys in the workflow exactly. Note this also means the _first_ CI run on `main` must complete before branch protection takes meaningful effect — GH only enforces checks it has previously seen for the branch.)
 
 ## 5. Decisions & rationale (calibrated, not exhaustive)
 
@@ -237,7 +237,7 @@ JSON
 - **CI minutes** — public-repo GitHub Actions = **unlimited** free minutes/month (the 2000-min
   limit is private-repos only). Definitively not a concern.
 - **Branch-protection ordering / first-PR caveat.** GH only enforces required status checks the
-  branch has *previously* seen. `main` won't have seen `correctness` / `chromatic` until the first
+  branch has _previously_ seen. `main` won't have seen `correctness` / `chromatic` until the first
   PR targeting `main` opens and CI runs against it. Until that PR, protection is set but functionally
   dormant for status checks — but `require_pull_request: true` + `enforce_admins: true` +
   `allow_force_pushes: false` still block direct pushes. So the order in §3 is safe: set protection
