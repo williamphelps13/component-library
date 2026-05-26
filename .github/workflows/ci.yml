@@ -20,6 +20,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Playwright browsers aren't preinstalled on GH runners; the storybook
+      # vitest project needs chromium (+ system deps) for the browser-mode tests.
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm knip
