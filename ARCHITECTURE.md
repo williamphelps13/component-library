@@ -150,7 +150,7 @@ Storybook 10 on `@storybook/react-vite` is the dev/docs/test harness; **CSF Next
 for accurate prop tables; the preview imports the **precompiled `dist/styles.css`** (matches
 consumers). One Storybook story feeds: interaction test + a11y audit (Vitest **browser mode**, real
 headless Chromium via `@vitest/browser-playwright`) + Chromatic visual snapshot. A second
-`node`-environment Vitest project (`unit`) runs pure-logic unit tests (no DOM needed — not jsdom). **Chromatic + TurboSnap** is a required visual gate.
+`node`-environment Vitest project (`unit`) runs pure-logic unit tests (no DOM needed — not jsdom). **Chromatic + TurboSnap** is a required visual gate. CI shape: `correctness` job (all 9 local gates + `playwright install`) → `chromatic` job (`needs: correctness`) — gating chromatic on correctness ensures cheap gates fail-fast and no Chromatic snapshot is spent on a broken build. Chromatic policy (`autoAcceptChanges: 'main'`, `exitZeroOnChanges: false`, `onlyChanged: true`) lives in `chromatic.config.json` so local `pnpm chromatic` and CI behave identically; the workflow only passes `projectToken` to the action.
 An **MCP server** (`@storybook/addon-mcp`, live at `localhost:6006/mcp` while `pnpm storybook`
 runs) exposes the library's real component docs/props/stories to AI agents (`AGENTS.md`) so they
 verify props instead of hallucinating.
