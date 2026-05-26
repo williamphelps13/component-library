@@ -75,9 +75,9 @@ jobs:
   correctness:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with: { fetch-depth: 0 }  # full history; chromatic + turbosnap want it
-      - uses: pnpm/action-setup@v5  # Corepack-respects packageManager pin
+      - uses: pnpm/action-setup@v4  # Corepack-respects packageManager pin
       - uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
@@ -97,9 +97,9 @@ jobs:
     needs: correctness
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
