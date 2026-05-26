@@ -17,8 +17,9 @@ How the docs relate (precedence, highest first):
 > transition in the plan's deviation log (the _why it changed_).
 
 **Status:** Phase 1 (Foundation) ✅ · Phase 2 (Token slice) ✅ · Phase 3 (Styling + Storybook +
-visual-regression harness) 🔄 (styling done; Storybook/Vitest/Chromatic in progress) · Phase 4
-(Button) ⏳ · Phase 5 (Workflow loop) ⏳ · Phase 6 (Bake-off) ⏳.
+visual-regression harness) 🔄 (styling + Storybook + Vitest done; Chromatic pending) · Phase 4
+(Button) 🔄 (component + stories + tests green; visual check + commit pending) · Phase 5 (Workflow
+loop) ⏳ · Phase 6 (Bake-off) ⏳.
 
 ---
 
@@ -68,12 +69,24 @@ otherwise infers it from `engines.node`), externalizes `react`/`react-dom`/`radi
 runs **in our build** (via `@rolldown/plugin-babel` + `babel-plugin-react-compiler`, `target:'19'`)
 so every consumer gets memoized output for free. Emits **`.mjs`/`.d.mts`** — `exports` point there.
 
-### TypeScript (`tsconfig.json`) — TS **6.0.3**
+### TypeScript — layered configs, TS **6.0.3**
 
-`moduleResolution:"bundler"` (matches Next/Vite resolving our `exports`), `isolatedDeclarations`
-(fast parallel DTS via Oxc; requires explicit export return types), `declarationMap` + `sourceMap`
+Two explicit configs (a child can't merge `include`/`exclude` from `extends`):
 
-- shipped `src/` (go-to-source). `noEmit:true` — **tsc is the typecheck gate only; tsdown emits.**
+- **`tsconfig.build.json`** (strict — the publish contract): `isolatedDeclarations` (fast parallel
+  DTS via Oxc; requires explicit export return types), `rootDir:src`, **src-only** (excludes
+  stories/tests). Drives tsdown's emit (`--tsconfig`) + typecheck pass 1.
+- **`tsconfig.json`** (broad, lenient): `src` + `.storybook/**/*` — type-checks the stories,
+  `preview.tsx`, `main.ts`, and ambient `globals.d.ts`; powers the editor + typecheck pass 2.
+
+Shared: `moduleResolution:"bundler"` (matches Next/Vite resolving our `exports`),
+`verbatimModuleSyntax`, `declarationMap` + `sourceMap` shipped from `src/` (go-to-source),
+`noEmit:true` — **tsc is the typecheck gate only; tsdown emits.** `pnpm typecheck` runs both passes.
+
+> **Load-bearing gotcha:** the broad `include` must be `'.storybook/**/*'`, _not_ bare `'.storybook'`
+> — TS silently skips dot-directories, so the bare form loads nothing and the `*.css` ambient
+> declaration vanishes → `TS2882` (under TS 6.0's now-default `noUncheckedSideEffectImports`).
+> Diagnose include scope with `tsc --showConfig`. See CLAUDE.md + the plan's Phase-4 deviation entry.
 
 ### Tokens — 3-tier DTCG, single-file (`tokens/tokens.json`, `style-dictionary.config.mjs`)
 
@@ -115,14 +128,30 @@ client). Interactive components get the directive per-file; purely-visual ones (
 server-renderable. A build-time assertion (`scripts/assert-use-client.mjs`) scans `dist/` to catch
 directive stripping/hoisting — the highest-severity RSC failure mode.
 
-### Testing & docs (Phase 3 / in progress)
+### Component model — Button (first component, Phase 4)
+
+- **`ref` is a plain prop** (React 19) — `Button` is a plain function with `ref?: Ref<HTMLButtonElement>`;
+  **no `forwardRef`** (removed in React 19). An explicit `ReactElement` return type satisfies
+  `isolatedDeclarations`.
+- **Variants = a typed literal-class map** (`variants.ts`): `Record<Intent,string>` /
+  `Record<Size,string>` resolve to `ui-btn …` strings. Tailwind can't see dynamic names
+  (`ui-btn-${intent}`), so each class must appear as a literal in scanned source; the `Record` makes
+  TS enforce one class per variant — add a variant and TS forces its class to ship. The pure
+  `buttonClasses()` is unit-testable on its own.
+- **Purely visual → no `"use client"`** (server-renderable). Native props spread via `...rest`;
+  `className` merges with the variant classes.
+- **Stories are CSF Next** (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })`
+  with `import { fn, expect } from 'storybook/test'`. One story feeds the interaction test + a11y
+  audit + (Phase 4 B3) the Chromatic snapshot.
+
+### Testing & docs (Phase 3 — Chromatic still pending)
 
 Storybook 10 on `@storybook/react-vite` is the dev/docs/test harness; **CSF Next** factory stories
 (`definePreview` → `preview.meta()` → `meta.story()`) for type-safe stories; `react-docgen-typescript`
 for accurate prop tables; the preview imports the **precompiled `dist/styles.css`** (matches
 consumers). One Storybook story feeds: interaction test + a11y audit (Vitest **browser mode**, real
-headless Chromium via `@vitest/browser-playwright`) + Chromatic visual snapshot. A second jsdom
-Vitest project runs pure-logic unit tests. **Chromatic + TurboSnap** is a required visual gate.
+headless Chromium via `@vitest/browser-playwright`) + Chromatic visual snapshot. A second
+`node`-environment Vitest project (`unit`) runs pure-logic unit tests (no DOM needed — not jsdom). **Chromatic + TurboSnap** is a required visual gate.
 An **MCP server** (`@storybook/addon-mcp`, live at `localhost:6006/mcp` while `pnpm storybook`
 runs) exposes the library's real component docs/props/stories to AI agents (`AGENTS.md`) so they
 verify props instead of hallucinating.
@@ -146,18 +175,19 @@ lacks TS 6.0 support; revisit.)
 | `package.json`                                                        | ESM manifest: exports, sideEffects, peers, scripts, publishConfig                                          | ✅         |
 | `pnpm-workspace.yaml`                                                 | pnpm catalog (react/react-dom/typescript/tailwindcss) + pnpm settings (`engineStrict`, `allowBuilds`)      | ✅         |
 | `.nvmrc` (24.16.0 exact), Corepack pin `pnpm@11.1.2`                  | runtime + package-manager pins                                                                             | ✅         |
-| `tsconfig.json`                                                       | bundler resolution, isolatedDeclarations, maps, `noEmit`                                                   | ✅         |
+| `tsconfig.build.json`                                                 | strict publish contract: isolatedDeclarations, rootDir:src, src-only; tsdown emit + typecheck pass 1       | ✅         |
+| `tsconfig.json`                                                       | broad/lenient: `src` + `.storybook/**/*`; editor + typecheck pass 2 (dot-dir glob is load-bearing)         | ✅         |
 | `tsdown.config.ts`                                                    | ESM, unbundle, externals, dts, React Compiler                                                              | ✅         |
 | `eslint.config.ts` / `.prettierrc.json` / `cspell.json` / `knip.json` | lint/format/spell/dead-code                                                                                | ✅         |
 | `scripts/assert-use-client.mjs`                                       | build-time `"use client"` guardrail                                                                        | ✅         |
 | `tokens/tokens.json`, `tokens/README.md`                              | DTCG tokens (single-file sets) + sync contract                                                             | ✅         |
 | `style-dictionary.config.mjs`                                         | tokens → `build/*.css` (CSS vars + `@theme inline`)                                                        | ✅         |
 | `src/styles/index.css`                                                | Tailwind entry → `dist/styles.css` (source-scoped, Preflight off, `ui-*`)                                  | ✅         |
-| `src/index.ts`                                                        | barrel (no `"use client"`)                                                                                 | ✅ (stub)  |
-| `src/components/**`                                                   | components (Button = Phase 4)                                                                              | ⏳         |
+| `src/index.ts`                                                        | barrel (no `"use client"`); exports `Button` + `Intent`/`Size`/`ButtonProps`                               | ✅         |
+| `src/components/button/**`                                            | Button: `button.tsx`, `variants.ts`, `*.stories.tsx`, `*.test.ts`                                          | ✅         |
 | `.storybook/main.ts`, `.storybook/preview.tsx`                        | Storybook 10 config (CSF Next `definePreview`; addon-themes/docs/a11y/vitest/mcp; react-docgen-typescript) | ✅ boots   |
 | `.mcp.json`, `AGENTS.md`                                              | Storybook MCP wiring (Claude Code) + cross-tool agent guidance (verify props via MCP)                      | ✅         |
-| `vitest.config.ts`                                                    | Vitest: storybook browser project (+ jsdom `unit` project)                                                 | 🔄 B2      |
+| `vitest.config.ts`                                                    | Vitest: `storybook` browser project + `node`-env `unit` project                                            | ✅         |
 | `chromatic.config.json`, `.github/workflows/ci.yml`                   | visual gate + CI                                                                                           | 🔄 Part B  |
 | `.github/workflows/release.yml`, `.changeset/`                        | Changesets + OIDC publish                                                                                  | ⏳ Phase 5 |
 
