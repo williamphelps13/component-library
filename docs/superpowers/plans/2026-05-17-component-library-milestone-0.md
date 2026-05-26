@@ -59,6 +59,27 @@ genuinely changes scope/sequence — not for routine within-task choices.
 
   - **Pending (post-commit):** Chromatic (B3) — `chromatic.config.json` + CI job; first baseline needs the project token. Then merged Phase 3+4 quiz gate (Teaching Mode). Then **over-strict-settings audit** — does `verbatimModuleSyntax` earn its friction? It was **not** the culprit for the include-glob blocker, so judge it on its own merits.
 
+- **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (four commits).** Executed without Teaching Mode per owner direction; spec + sub-plan at `docs/superpowers/specs/2026-05-25-chromatic-b3-design.md` (`745b6df`) and `docs/superpowers/plans/2026-05-25-chromatic-b3.md` (`af0cf0b`). **Repo went live at https://github.com/williamphelps13/component-library (public).** Branch protection on `main` via `gh api`: required checks `correctness` + `chromatic` (strict), `enforce_admins: true`, PRs required with 0 reviews (solo-dev), force-push + deletions blocked. **First Chromatic baseline:** Build #1 captured 5 stories from `milestone-0` (`--auto-accept-changes`); `projectId: Project:6a151bd855f397c6fdf9042a` committed to `chromatic.config.json`. Build #2 onwards run from CI's `chromatic` job. Token in GH Actions secret `CHROMATIC_PROJECT_TOKEN` only.
+
+  - **Spec correction (recorded here, not amended in spec/plan):** The B3 spec said "first `.github/workflows/ci.yml` for the project / Task 1.10 deferred." Actually Phase 1 (`a95e03f`) had committed a single-job `quality` workflow. B3 _expanded_ it: renamed `quality`→`correctness`, added `format` + `test` steps, bumped `actions/checkout@v4`→`@v6` and `actions/setup-node@v4`→`@v5`, expanded triggers to all branches, added the new `chromatic` job.
+
+  - **Three in-flight CI fixes the spec/plan didn't anticipate (each caught by CI itself):**
+    1. **Playwright Chromium not preinstalled on GH runners** — Vitest storybook (browser-mode) crashed with "Executable doesn't exist." Fix: added `pnpm exec playwright install --with-deps chromium` after `pnpm install --frozen-lockfile` in the `correctness` job. Local was masked by the existing `~/Library/Caches/ms-playwright/` install.
+    2. **`pnpm chromatic` script non-functional locally** (caught by Task-2 code-quality reviewer with empirical verification — added `chromatic` as a direct devDependency since pnpm doesn't hoist transitive bins, so `node_modules/.bin/chromatic` was absent). Affected only local DX, not CI (CI uses `chromaui/action`).
+    3. **`chromatic` job lacked `pnpm build`** — `chromaui/action` runs `build-storybook` which loads `preview.tsx` which side-effect-imports `dist/styles.css`; `dist/` is gitignored, so without `pnpm build` first the storybook build failed with `UNRESOLVED_IMPORT`. Fix: added `pnpm build` to the `chromatic` job before the action.
+
+  - **Two reviewer-driven cleanups during execution:**
+    1. **`onlyChanged` centralized in `chromatic.config.json`** only (was duplicated in `ci.yml`); ensures local `pnpm chromatic` and CI behave identically — Task-2 reviewer Important finding.
+    2. **`fetch-depth: 0` removed from `correctness` job** (kept on `chromatic` for TurboSnap); no correctness step uses git history. Spec §4.1 still shows it on both; deviation kept (the spec was being defensive without a use-case).
+
+  - **Other notes:**
+    - **TurboSnap dormant for now** — Chromatic free-tier requires ≥10 CI builds before TurboSnap activates. `onlyChanged: true` stays in config; will start working automatically once we cross that threshold.
+    - **CI workflow uses `chromaui/action@latest`** — Chromatic publishes a moving `latest` tag (per chromatic.com/docs/github-actions); Dependabot's gh-actions group will still surface major bumps if they retag.
+    - **Dependabot opened 2 PRs on first push** (gh-actions group + npm minor-and-patch group); both should be reviewable once branch protection's status-check requirement is exercised on a real PR (the first PR to `main`).
+    - **The first PR to `main`** (likely the eventual `milestone-0 → main` merge) is the one that first exercises the required-status-checks rule on the branch — GH only enforces checks it has previously seen.
+
+  - **Pending:** merged Phase 3+4 quiz gate (Teaching Mode); **over-strict-settings audit** (`verbatimModuleSyntax` etc.); plus the standing review of the 2 open Dependabot PRs when convenient.
+
 ---
 
 ## File Structure (decomposition lock-in)
@@ -1227,6 +1248,11 @@ git commit -m "test: Vitest browser mode + storybook + a11y wiring"
 ```
 
 ### Task 3.5: Chromatic + TurboSnap wiring
+
+> **SUPERSEDED by the B3 spec + sub-plan (executed without Teaching Mode):**
+> `docs/superpowers/specs/2026-05-25-chromatic-b3-design.md` (`745b6df`) +
+> `docs/superpowers/plans/2026-05-25-chromatic-b3.md` (`af0cf0b`). Original
+> Teaching-Mode walkthrough preserved below for historical reference.
 
 **Files:** Create `chromatic.config.json`; Modify `.github/workflows/ci.yml`
 
