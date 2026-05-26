@@ -16,10 +16,9 @@ How the docs relate (precedence, highest first):
 > transition in the plan's deviation log (the _why it changed_).
 
 **Status:** Phase 1 (Foundation) ✅ · Phase 2 (Token slice) ✅ · Phase 3 (Styling + Storybook +
-visual-regression harness) 🔄 _(Chromatic pending; everything else done)_ · Phase 4 (Button) ✅
-_(committed; Chromatic B3 + merged P3/P4 quiz gate pending)_ · Phase 5 (Workflow loop) ⏳ ·
-Phase 6 (Bake-off) ⏳. The **deviation log** is the canonical current-state record; this status
-line is the one-glance summary.
+visual-regression harness) ✅ · Phase 4 (Button) ✅ _(merged P3/P4 quiz gate pending)_ ·
+Phase 5 (Workflow loop) ⏳ · Phase 6 (Bake-off) ⏳. The **deviation log** is the canonical
+current-state record; this status line is the one-glance summary.
 
 ---
 
@@ -170,26 +169,28 @@ lacks TS 6.0 support; revisit.)
 
 ## 4. File / module map
 
-| Path                                                                  | Responsibility                                                                                             | Status     |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------- |
-| `package.json`                                                        | ESM manifest: exports, sideEffects, peers, scripts, publishConfig                                          | ✅         |
-| `pnpm-workspace.yaml`                                                 | pnpm catalog (react/react-dom/typescript/tailwindcss) + pnpm settings (`engineStrict`, `allowBuilds`)      | ✅         |
-| `.nvmrc` (24.16.0 exact), Corepack pin `pnpm@11.1.2`                  | runtime + package-manager pins                                                                             | ✅         |
-| `tsconfig.build.json`                                                 | strict publish contract: isolatedDeclarations, rootDir:src, src-only; tsdown emit + typecheck pass 1       | ✅         |
-| `tsconfig.json`                                                       | broad/lenient: `src` + `.storybook/**/*`; editor + typecheck pass 2 (dot-dir glob is load-bearing)         | ✅         |
-| `tsdown.config.ts`                                                    | ESM, unbundle, externals, dts, React Compiler                                                              | ✅         |
-| `eslint.config.ts` / `.prettierrc.json` / `cspell.json` / `knip.json` | lint/format/spell/dead-code                                                                                | ✅         |
-| `scripts/assert-use-client.mjs`                                       | build-time `"use client"` guardrail                                                                        | ✅         |
-| `tokens/tokens.json`, `tokens/README.md`                              | DTCG tokens (single-file sets) + sync contract                                                             | ✅         |
-| `style-dictionary.config.mjs`                                         | tokens → `build/*.css` (CSS vars + `@theme inline`)                                                        | ✅         |
-| `src/styles/index.css`                                                | Tailwind entry → `dist/styles.css` (source-scoped, Preflight off, `ui-*`)                                  | ✅         |
-| `src/index.ts`                                                        | barrel (no `"use client"`); exports `Button` + `Intent`/`Size`/`ButtonProps`                               | ✅         |
-| `src/components/button/**`                                            | Button: `button.tsx`, `variants.ts`, `*.stories.tsx`, `*.test.ts`                                          | ✅         |
-| `.storybook/main.ts`, `.storybook/preview.tsx`                        | Storybook 10 config (CSF Next `definePreview`; addon-themes/docs/a11y/vitest/mcp; react-docgen-typescript) | ✅ boots   |
-| `.mcp.json`, `AGENTS.md`                                              | Storybook MCP wiring (Claude Code) + cross-tool agent guidance (verify props via MCP)                      | ✅         |
-| `vitest.config.ts`                                                    | Vitest: `storybook` browser project + `node`-env `unit` project                                            | ✅         |
-| `chromatic.config.json`, `.github/workflows/ci.yml`                   | visual gate + CI                                                                                           | 🔄 Part B  |
-| `.github/workflows/release.yml`, `.changeset/`                        | Changesets + OIDC publish                                                                                  | ⏳ Phase 5 |
+| Path                                                                  | Responsibility                                                                                                                                                                                                                        | Status     |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `package.json`                                                        | ESM manifest: exports, sideEffects, peers, scripts, publishConfig                                                                                                                                                                     | ✅         |
+| `pnpm-workspace.yaml`                                                 | pnpm catalog (react/react-dom/typescript/tailwindcss) + pnpm settings (`engineStrict`, `allowBuilds`)                                                                                                                                 | ✅         |
+| `.nvmrc` (24.16.0 exact), Corepack pin `pnpm@11.1.2`                  | runtime + package-manager pins                                                                                                                                                                                                        | ✅         |
+| `tsconfig.build.json`                                                 | strict publish contract: isolatedDeclarations, rootDir:src, src-only; tsdown emit + typecheck pass 1                                                                                                                                  | ✅         |
+| `tsconfig.json`                                                       | broad/lenient: `src` + `.storybook/**/*`; editor + typecheck pass 2 (dot-dir glob is load-bearing)                                                                                                                                    | ✅         |
+| `tsdown.config.ts`                                                    | ESM, unbundle, externals, dts, React Compiler                                                                                                                                                                                         | ✅         |
+| `eslint.config.ts` / `.prettierrc.json` / `cspell.json` / `knip.json` | lint/format/spell/dead-code                                                                                                                                                                                                           | ✅         |
+| `scripts/assert-use-client.mjs`                                       | build-time `"use client"` guardrail                                                                                                                                                                                                   | ✅         |
+| `tokens/tokens.json`, `tokens/README.md`                              | DTCG tokens (single-file sets) + sync contract                                                                                                                                                                                        | ✅         |
+| `style-dictionary.config.mjs`                                         | tokens → `build/*.css` (CSS vars + `@theme inline`)                                                                                                                                                                                   | ✅         |
+| `src/styles/index.css`                                                | Tailwind entry → `dist/styles.css` (source-scoped, Preflight off, `ui-*`)                                                                                                                                                             | ✅         |
+| `src/index.ts`                                                        | barrel (no `"use client"`); exports `Button` + `Intent`/`Size`/`ButtonProps`                                                                                                                                                          | ✅         |
+| `src/components/button/**`                                            | Button: `button.tsx`, `variants.ts`, `*.stories.tsx`, `*.test.ts`                                                                                                                                                                     | ✅         |
+| `.storybook/main.ts`, `.storybook/preview.tsx`                        | Storybook 10 config (CSF Next `definePreview`; addon-themes/docs/a11y/vitest/mcp; react-docgen-typescript)                                                                                                                            | ✅ boots   |
+| `.mcp.json`, `AGENTS.md`                                              | Storybook MCP wiring (Claude Code) + cross-tool agent guidance (verify props via MCP)                                                                                                                                                 | ✅         |
+| `vitest.config.ts`                                                    | Vitest: `storybook` browser project + `node`-env `unit` project                                                                                                                                                                       | ✅         |
+| `.github/workflows/ci.yml`                                            | `correctness` (typecheck/lint/knip/spell/format/build/assert:use-client/test/publint, +playwright install) → `chromatic` (needs:correctness; `chromaui/action@latest`, TurboSnap via config). Concurrency cancel-in-progress per ref. | ✅         |
+| `chromatic.config.json`                                               | Chromatic policy: TurboSnap (`onlyChanged`), `autoAcceptChanges:"main"`, `exitZeroOnChanges:false`. Token NEVER here — GH Actions secret only.                                                                                        | ✅         |
+| `.github/dependabot.yml`                                              | Weekly grouped npm minor+patch + gh-actions PRs. Storybook majors ignored (CSF Next experimental).                                                                                                                                    | ✅         |
+| `.github/workflows/release.yml`, `.changeset/`                        | Changesets + OIDC publish                                                                                                                                                                                                             | ⏳ Phase 5 |
 
 ## 5. Invariants & contracts
 
