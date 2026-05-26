@@ -9,15 +9,15 @@
     "strict": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "declaration": true,
-    "isolatedDeclarations": true,
-    "declarationMap": true,
-    "sourceMap": true,
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
-    "rootDir": "src",
-    "outDir": "dist",
     "noEmit": true
   },
-  "include": ["src"]
+  // ".storybook/**/*" — NOT bare ".storybook". TS's include globber silently
+  // skips dot-directories, so a bare ".storybook" matches zero files (globals.d.ts
+  // + main.ts go untyped; the *.css side-effect import then fails TS2882). The
+  // "/**/*" forces it to glob into the dot-dir.
+  // (This file is JSONC: tsc / typescript-eslint / knip / publint all parse it
+  // via the TS API; only a plain JSON.parse would throw.)
+  "include": ["src", ".storybook/**/*"]
 }
