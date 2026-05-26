@@ -141,9 +141,9 @@ directive stripping/hoisting — the highest-severity RSC failure mode.
   `className` merges with the variant classes.
 - **Stories are CSF Next** (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })`
   with `import { fn, expect } from 'storybook/test'`. One story feeds the interaction test + a11y
-  audit + (Phase 4 B3) the Chromatic snapshot.
+  audit + the Chromatic visual snapshot.
 
-### Testing & docs (Phase 3 — Chromatic still pending)
+### Testing & docs (Phase 3)
 
 Storybook 10 on `@storybook/react-vite` is the dev/docs/test harness; **CSF Next** factory stories
 (`definePreview` → `preview.meta()` → `meta.story()`) for type-safe stories; `react-docgen-typescript`
