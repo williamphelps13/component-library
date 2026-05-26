@@ -87,6 +87,7 @@ Tools the server provides:
 
 ## Commit conventions
 
+- **Ask before committing.** Don't run `git commit` (or `--amend`, or a history-rewriting `rebase`) without explicit in-conversation approval. Surface the staged diff/status + proposed commit message; wait for a clear "yes" (or edits) before the commit. An approved commit also covers the immediate `git push origin <feature-branch>` that follows — no second ask. Force-pushes and any push to `main` need their own confirmation.
 - **Conventional Commits**: `type(scope): summary`, valid types only (`feat`/`fix`/`chore`/`docs`/`build`/`refactor`/`test`) — no ad-hoc prefixes (`tokens:` → `chore(phase2):`). Milestone build-out uses a `chore(phaseN)` scope. (Releases are driven by Changesets, not commit messages — so this is hygiene, not tooling.)
 - **No `Co-Authored-By` trailer** (repo convention; overrides any agent default).
 - Subject ≤ ~72 chars; put the _why_ in the body, concise — link the plan's deviation log rather than duplicating it.
