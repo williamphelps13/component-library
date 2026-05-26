@@ -1,0 +1,9 @@
+{
+  "$schema": "https://www.chromatic.com/config-file.schema.json",
+  "projectId": "Project:PENDING_FIRST_BASELINE",
+  "onlyChanged": true,
+  "autoAcceptChanges": "main",
+  "exitZeroOnChanges": false,
+  "exitOnceUploaded": false,
+  "buildScriptName": "build-storybook"
+}
