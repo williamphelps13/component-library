@@ -1,15 +1,18 @@
 # @williamphelps13/ui
 
-A versioned, public React component library. ESM-only · React 19+ peer dep ·
-server-renderable by default (`"use client"` per file where interactivity
-demands it) · ships one precompiled stylesheet (no Tailwind install on your
-end) · runtime theming via CSS-variable override — set `--color-*` on
-`:root`; no rebuild needed.
+A versioned, public React component library.
 
-**Status:** see [`ARCHITECTURE.md`](./ARCHITECTURE.md) (status line at the top)
-for the canonical phase state.
+- ESM-only
+- React 19+ peer dep
+- Server-renderable by default (`"use client"` per file where interactivity demands it)
+- Ships one precompiled stylesheet (no Tailwind install on your end)
+- Runtime theming via CSS-variable override — set `--color-*` on `:root`; no rebuild needed
 
-## Install (once published — Phase 5)
+## Status
+
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) (status line at the top) for the canonical phase state.
+
+## Install (once published)
 
 ```bash
 pnpm add @williamphelps13/ui
@@ -24,8 +27,7 @@ export default function Page() {
 }
 ```
 
-To re-theme without rebuilding, override the semantic CSS variables in your
-own `:root` (and `[data-theme="dark"]`):
+To re-theme without rebuilding, override the semantic CSS variables in your own `:root` (and `[data-theme="dark"]`):
 
 ```css
 :root {
@@ -33,20 +35,10 @@ own `:root` (and `[data-theme="dark"]`):
 }
 ```
 
-## For contributors & AI agents
+## For contributors and AI agents
 
-- **Read first:** [`ARCHITECTURE.md`](./ARCHITECTURE.md) — source of truth
-  for the current design + why each decision was made.
-- **Toolchain rules + gotchas:** [`CLAUDE.md`](./CLAUDE.md) — pnpm + Node
-  pins, commit conventions, hard-won lessons that are easy to repeat.
-- **Cross-tool agent guidance:** [`AGENTS.md`](./AGENTS.md) — verify
-  component props through the live Storybook MCP server, never hallucinate.
-- **Execution history + current pending items:**
-  [`docs/superpowers/plans/2026-05-17-component-library-milestone-0.md`](./docs/superpowers/plans/2026-05-17-component-library-milestone-0.md)
-  — the deviation log near the top is canonical for "what actually happened
-  and what's next."
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) § "See Also" for the doc landscape (what each doc covers and the read order).
 
 ## License
 
-MIT — see [`LICENSE`](./LICENSE) if present, or `package.json`'s `license`
-field.
+MIT — see [`LICENSE`](./LICENSE) if present, or `package.json`'s `license` field.
