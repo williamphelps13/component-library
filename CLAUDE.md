@@ -27,6 +27,31 @@ A versioned, public React component library (`@williamphelps13/ui`).
 - **Review checkpoint before each phase / major-task commit:** dispatch an independent code-review subagent (`superpowers:requesting-code-review`) on the diff vs `ARCHITECTURE.md` / the plan; fix Critical + Important findings before committing. Self-review misses things — in Phase 3 a reviewer subagent caught a red `pnpm lint` the author had missed; in Phase 4 a reviewer subagent caught the a11y gate was silently a no-op (the implementer's analogous fix for `addonThemes` hadn't been applied to `addonA11y`).
 - **One source for current state; reconcile docs before each commit.** The **deviation log** is the canonical record of what's actually happened; **`ARCHITECTURE.md`'s status line** is the one-glance summary. Don't duplicate "where we are" content elsewhere (parallel status text in `OVERVIEW.md` is what killed it — it lagged by 3+ phases). Before committing, do a 2-minute pass on every long-lived doc (`ARCHITECTURE`, `CLAUDE`, `AGENTS`, deviation log) and confirm nothing in it now contradicts the diff's outcome. The reviewer-subagent above catches code drift; this pass catches doc drift.
 
+## Docs hygiene (the three persisting docs)
+
+> Three docs persist long-term: `README.md`, `CLAUDE.md`, `ARCHITECTURE.md`. Every concept lives in **exactly one of them**; the others link. When in doubt about where a piece of content belongs, check the ownership matrix below and pick one — never two.
+
+Per-file ownership:
+
+- `ARCHITECTURE.md` — **what is** + **why**; the status line (canonical phase state); the file/module map. Architectural decisions live here, with rationale.
+- `CLAUDE.md` (this file) — **how we work**; operational rules + commit conventions + gotchas + Storybook-MCP usage. Process discipline lives here.
+- `README.md` — **consumer-facing view only**: install, basic usage, the runtime override contract, license, and pointers to the other two for depth. No status restatement; no internal-toolchain enumeration.
+- The plan's **deviation log** is the canonical decision journal — the three persisting docs cite from it, never mirror it.
+
+Common DRY traps (these have all actually bitten this project — concrete, not abstract):
+
+- **Don't restate `ARCHITECTURE.md`'s status line** in `README.md` or anywhere else — link. `OVERVIEW.md` died of this exact pattern (lagged 3+ phases before deletion).
+- **Don't restate the internal build pipeline** (Style Dictionary / Tailwind v4 / tsdown specifics) in `README.md` — that's `ARCHITECTURE.md`'s territory. README sticks to consumer-relevant claims (ESM, React 19+ peer dep, runtime CSS-var override, no Tailwind install on consumer side).
+- **Don't restate `CLAUDE.md` rules** (pnpm-only, no `Co-Authored-By` trailer, version pins, etc.) elsewhere. Other docs link to the bullet; never duplicate the text.
+
+Semantic markdown:
+
+- Use headings (`##`, `###`) for structure; reserve `**bold**` for body-text emphasis. A bolded sentence acting as a section header is a smell — promote to `##` or drop the bold (TOC tools, anchors, and section-parsing agents see `##` as structure but bold as just emphasis).
+- Bullets > prose for any list of ≥2 items — scales as items are added; comma-joined prose falls apart at 3+ entries. Each bullet carries its own description.
+- For "see also"-style links, use `[Link](url) — description.` with an em-dash separator. Every link gets a description; no bare links.
+
+**Update protocol** — extends the "One source for current state; reconcile docs before each commit" bullet above with one specific instruction: when touching ANY of the three persisting docs, **re-read the other two end-to-end** before committing. Not just the lines you intended to touch — drift hides in the lines you don't think to look at. (The `d6fe795` close-Phase-3 commit dogfooded this lesson by missing a stale section header in the very commit that bumped the status line; reviewer subagent caught it in `a018dff`.)
+
 ## Toolchain rules
 
 - **pnpm only**, via Corepack. Do **not** use `npm`/`npx` inside the repo (they fail on our `packageManager` pin). Use `pnpm` and `pnpm dlx`.

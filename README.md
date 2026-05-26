@@ -1,15 +1,13 @@
 # @williamphelps13/ui
 
-A versioned, public React component library. ESM-only, React 19, Tailwind v4
-(precompiled — no Tailwind install needed by consumers), code-first design
-tokens (DTCG → Style Dictionary → CSS variables) with a runtime override
-contract (set `--color-*` on `:root`; no rebuild). Server-renderable by
-default; `"use client"` per file where interactivity demands it.
+A versioned, public React component library. ESM-only · React 19+ peer dep ·
+server-renderable by default (`"use client"` per file where interactivity
+demands it) · ships one precompiled stylesheet (no Tailwind install on your
+end) · runtime theming via CSS-variable override — set `--color-*` on
+`:root`; no rebuild needed.
 
-**Status:** Milestone 0 in progress — Phases 1–4 done (foundation, token
-slice, Storybook/Vitest/Chromatic harness, Button). See
-[`ARCHITECTURE.md`](./ARCHITECTURE.md) for the canonical status line and
-the as-built design rationale.
+**Status:** see [`ARCHITECTURE.md`](./ARCHITECTURE.md) (status line at the top)
+for the canonical phase state.
 
 ## Install (once published — Phase 5)
 
