@@ -46,6 +46,11 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Storybook's preview.tsx side-effect-imports ../dist/styles.css (the
+      # precompiled Tailwind output). Build the lib first so the file exists
+      # when chromaui/action runs `build-storybook`. dist/ is gitignored, so
+      # this is necessary in CI even though it's already present locally.
+      - run: pnpm build
       - uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
