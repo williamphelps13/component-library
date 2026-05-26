@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5 # explicit == GH default; spelled out for legibility.
+    ignore:
+      # CSF Next is experimental; SB majors get audited manually per CLAUDE.md.
+      - dependency-name: storybook
+        update-types: [version-update:semver-major]
+      - dependency-name: '@storybook/*'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      # GH Actions majors are auto-included here (no update-types filter); they're
+      # rare + low-stakes vs npm majors. CI gates every PR, so a breaking action
+      # bump is caught before merge.
+      gh-actions:
+        patterns: ['*']

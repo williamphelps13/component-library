@@ -1,26 +1,51 @@
 name: CI
+
 on:
-  push:
-    branches: [main]
   pull_request:
+  push:
+    branches: ['**']
+
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
-  quality:
+  correctness:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm spell
       - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm knip
+      - run: pnpm spell
+      - run: pnpm format
       - run: pnpm build
       - run: pnpm assert:use-client
+      - run: pnpm test
       - run: pnpm verify:pack
-      - run: pnpm knip
+
+  chromatic:
+    needs: correctness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          # All other policy (onlyChanged, autoAcceptChanges, exitZeroOnChanges,
+          # buildScriptName) lives in chromatic.config.json so local
+          # `pnpm chromatic` and CI behave identically.
