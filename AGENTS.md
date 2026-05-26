@@ -32,6 +32,17 @@ tools. Other agents: add an HTTP MCP server pointing at that URL.
 Note: `pnpm storybook` imports the precompiled `dist/styles.css`, so on a fresh checkout run
 `pnpm build` first (it generates `dist/styles.css`) or the preview fails to resolve the import.
 
+## When adding a Storybook addon
+
+When you add an entry to `.storybook/main.ts addons`, check whether its default export is a
+`definePreviewAddon(...)` factory. If yes, it ALSO needs `addonX()` registered in
+`.storybook/preview.tsx`'s `definePreview({ addons: [...] })` array — otherwise its preview-side
+wiring (globalTypes registration, URL/channel global propagation, parameter handlers, axe runner,
+etc.) silently no-ops. Tests, typecheck, and lint all stay green because none assert the addon
+did its job. **Exception:** `@storybook/addon-vitest` is intentionally NOT in `definePreview.addons`
+— its module imports `vitest` at load time, which is only resolvable inside the vitest run
+context; the integration is wired through `storybookTest()` in `vitest.config.ts` instead.
+
 ## See also
 
 `CLAUDE.md` (toolchain rules, gotchas, commit + workflow conventions) · `ARCHITECTURE.md`
