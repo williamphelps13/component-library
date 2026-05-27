@@ -34,9 +34,9 @@ Task scaffolds in the plan body (e.g. `### Task 4.2`) are historical execution g
 
 > **Most recent first** ↓ (the section below is chronological with newest at the BOTTOM; this pointer reverses the discovery order for fresh readers):
 >
-> 1. **Phase 4 follow-up — Storybook docgen layer + canonical story pattern (2026-05-26).** Lean CSF Next stories convention; docgen-layer fixes for leaking `ref` and spurious `undefined`; component JSDoc as source of truth for prop descriptions.
-> 2. **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits).** Live repo + first Chromatic baseline + branch protection on `main`. See the full entry at the end of this section.
-> 3. **Phase 4 (Button + harness verification) — COMMITTED 2026-05-25 (`2903f5f`).** Three sub-findings: initial Button scope, TS2882 dot-dir-glob blocker resolved, CSF Next addon-registration trap, WCAG AA token contrast fix.
+> 1. **Pre-Phase-5 debts cleared (2026-05-26).** `engines.node` right-sized to `>=22.12.0`; over-strict-settings audit kept every knob; 2 Dependabot PRs rebased.
+> 2. **Phase 4 follow-up — Storybook docgen layer + canonical story pattern (2026-05-26).** Lean CSF Next stories convention; docgen-layer fixes for leaking `ref` and spurious `undefined`; component JSDoc as source of truth for prop descriptions.
+> 3. **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits).** Live repo + first Chromatic baseline + branch protection on `main`. See the full entry at the end of this section.
 >
 > For full text + sub-bullets, find each entry by its leading bold phrase in the chronological list below.
 
@@ -46,7 +46,7 @@ Real deviations from this plan as executed. A deviation is logged only when it
 genuinely changes scope/sequence — not for routine within-task choices.
 
 - **TS 6.0.3 adopted** (plan said `5.9.x / 6.x`). Verified supported by tsdown/oxc (build) and `typescript-eslint` 8.59 (lint). Greenfield → newest, since the binding tools support it.
-- **Node pinned `.nvmrc` = 24.16.0 (exact); `engines.node` floor = `>=24.11.1`** — tsdown config-load needs ≥24.11.1. **TODO before Phase 5:** `engines.node` is consumer-facing and likely over-strict; right-size it (dev-need ≠ consumer-need).
+- **Node pinned `.nvmrc` = 24.16.0 (exact); `engines.node` floor = `>=22.12.0`.** Dev pin (`.nvmrc`) stays at 24.16.0 — tsdown config-load needs ≥24.11.1. Consumer floor (`engines.node`) right-sized 2026-05-26 from `>=24.11.1` to `>=22.12.0` (Vite 6's floor; satisfies React 19 + Next.js + Active LTS Node 22). Dev-need ≠ consumer-need; consumers ship our precompiled output and never run tsdown.
 - **React Compiler via direct `@rolldown/plugin-babel` + `babel-plugin-react-compiler`** (not `@vitejs/plugin-react`/`reactCompilerPreset`) — avoids a Vite dep in a non-Vite library.
 - **attw split out of the Phase-1 gate** into `verify:types` (was in `verify:pack`). `@arethetypeswrong/cli` 0.18.2 (latest) lacks TS 6.0 support; re-add to the gate when upstream supports it (or re-check in Phase 4 with real types). `publint` still gates.
 - **`./styles.css` export deferred to Phase 3** (Task 3.2) — `publint` requires `exports` paths to point at files that exist; CSS isn't built until Phase 3.
@@ -75,7 +75,7 @@ genuinely changes scope/sequence — not for routine within-task choices.
 
   - **Now-live a11y gate immediately caught a real WCAG AA violation in the primary token** — white-on-`blue.500` = 3.68 : 1, AA needs 4.5 : 1. Root cause was the token, not the Button; the gate worked correctly the moment it became live. **Token fix (owner's option-1 choice):** added darker primitive `color.blue.600: oklch(0.50 0.19 256)` to `tokens/tokens.json`; repointed `light.color.primary` from `{color.blue.500}` to `{color.blue.600}`. Dark theme unchanged (`blue.300` + dark text already passed). `--color-ring` deliberately left on `blue.500` (focus-ring is a separate semantic decision). Rebuild + re-test green; 7/7 tests pass; `dist/styles.css` ships `var(--color-blue-600)` for `--color-primary`.
 
-  - **Pending (post-commit):** Chromatic (B3) — `chromatic.config.json` + CI job; first baseline needs the project token. Then merged Phase 3+4 quiz gate (Teaching Mode). Then **over-strict-settings audit** — does `verbatimModuleSyntax` earn its friction? It was **not** the culprit for the include-glob blocker, so judge it on its own merits.
+  - **Pending (post-commit):** Chromatic (B3) — done 2026-05-25 (see entry below). Merged Phase 3+4 quiz gate (Teaching Mode) — skipped per owner direction (Teaching Mode off for Phase 5). Over-strict-settings audit — done 2026-05-26 (see entry below); kept `verbatimModuleSyntax` on its own merits.
 
 - **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits: `e769f01` spec format-fix, `b536639` ci skeleton + chromatic gate, `2e67313` + `dc446da` two CI fixes caught on first runs, `bbf096a` projectId + branch protection, `d6fe795` close-Phase-3 docs).** Executed without Teaching Mode per owner direction; spec + sub-plan (commits `745b6df` + `af0cf0b`, with format-fix `e769f01`) were deleted post-completion as redundant with this deviation log + ARCHITECTURE.md (same OVERVIEW.md doc-system logic — fewer parallel docs to maintain). The two commits remain in git history for archaeology. **Repo went live at https://github.com/williamphelps13/component-library (public).** Branch protection on `main` via `gh api`: required checks `correctness` + `chromatic` (strict), `enforce_admins: true`, PRs required with 0 reviews (solo-dev), force-push + deletions blocked. **First Chromatic baseline:** Build #1 captured 5 stories from `milestone-0` (`--auto-accept-changes`); `projectId: Project:6a151bd855f397c6fdf9042a` committed to `chromatic.config.json`. Build #2 onwards run from CI's `chromatic` job. Token in GH Actions secret `CHROMATIC_PROJECT_TOKEN` only.
 
@@ -96,7 +96,7 @@ genuinely changes scope/sequence — not for routine within-task choices.
     - **Dependabot opened 2 PRs on first push** (gh-actions group + npm minor-and-patch group); both should be reviewable once branch protection's status-check requirement is exercised on a real PR (the first PR to `main`).
     - **The first PR to `main`** (likely the eventual `milestone-0 → main` merge) is the one that first exercises the required-status-checks rule on the branch — GH only enforces checks it has previously seen.
 
-  - **Pending:** merged Phase 3+4 quiz gate (Teaching Mode); **over-strict-settings audit** (`verbatimModuleSyntax` etc.); plus the standing review of the 2 open Dependabot PRs when convenient.
+  - **Pending:** merged Phase 3+4 quiz gate — skipped (Teaching Mode off for Phase 5); over-strict-settings audit — done 2026-05-26 (see entry below); 2 Dependabot PRs — being addressed (rebase + merge before Phase 5; see entry below).
 
 - **Phase 4 follow-up — Storybook docgen layer + canonical story pattern (2026-05-26).** Pure UI/docs touch on completed Phase 4; status line unchanged. Branch `milestone-0`, Teaching Mode off.
 
@@ -117,6 +117,16 @@ genuinely changes scope/sequence — not for routine within-task choices.
   - **Verification:** `pnpm test` 10/10 (8 storybook browser tests + 2 unit) green; `pnpm typecheck`/`lint` green; Storybook clean startup (both prior warnings gone). Playwright MCP-driven live-page check: Controls panel shows 3 rows (`children`, `intent`, `size`) — no `ref`, no `undefined` options — and the autodocs page renders JSDoc-sourced descriptions with auto-derived `Default` column. Full-page screenshot at `button-autodocs-final.png`. Independent reviewer-subagent (per CLAUDE.md "Review checkpoint" rule) caught the `ref` leak the human reviewer would have missed; fix applied before commit.
 
   - **Pending:** existing pending items unchanged.
+
+- **Pre-Phase-5 debts cleared (2026-05-26).** Three pending items resolved together. Branch `milestone-0`, Teaching Mode off.
+
+  - **`engines.node`: `>=24.11.1` → `>=22.12.0`.** The v24 floor existed only because tsdown's config-load needs it at *our* build time; consumers ship our precompiled output and never run tsdown. New floor matches Vite 6, satisfies React 19 + Next.js, sits on Active LTS Node 22. `engineStrict: true` in `pnpm-workspace.yaml` now enforces a real consumer constraint instead of a phantom dev one. `.nvmrc` stays at 24.16.0 (dev pin). Verified locally: `pnpm install --frozen-lockfile && pnpm typecheck && pnpm lint && pnpm test` green (10/10 tests).
+
+  - **Over-strict-settings audit — all knobs retained.** Walked `verbatimModuleSyntax`, `isolatedModules`, `isolatedDeclarations`, `noUncheckedIndexedAccess`, `strict`, `engineStrict` individually. The Phase-4 entry flagged `verbatimModuleSyntax` for re-examination after it was wrongly accused of causing TS2882 (real cause: bare `.storybook` include glob). On its own merits it earns its keep — `import type` discipline for a published-types library. Only `engines.node` was over-strict.
+
+  - **Dependabot PRs #1 (gh-actions group) + #2 (npm minor-and-patch group)** rebased via `@dependabot rebase`. Both branched off `b536639` before the Phase-3-B3 CI follow-up fixes (`2e67313` playwright install, `dc446da` chromatic build, `bbf096a` projectId), so their CI was red on stale infra — *not* the dep bumps themselves. Merge order: PR #1 first (lowest blast radius), then PR #2. Update post-merge with chromatic outcome (and any "Allow Dependabot secrets" toggle needed).
+
+  - **Skipped: merged Phase 3+4 quiz gate.** Owner chose Teaching Mode off for Phase 5 — gate dropped, not deferred. Foundational decisions still get Teaching-Mode walkthroughs by default.
 
 ---
 
