@@ -34,9 +34,9 @@ Task scaffolds in the plan body (e.g. `### Task 4.2`) are historical execution g
 
 > **Most recent first** ↓ (the section below is chronological with newest at the BOTTOM; this pointer reverses the discovery order for fresh readers):
 >
-> 1. **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits).** Live repo + first Chromatic baseline + branch protection on `main`. See the full entry at the end of this section.
-> 2. **Phase 4 (Button + harness verification) — COMMITTED 2026-05-25 (`2903f5f`).** Three sub-findings: initial Button scope, TS2882 dot-dir-glob blocker resolved, CSF Next addon-registration trap, WCAG AA token contrast fix.
-> 3. **Storybook 10.4 harness (Part B).** CSF-Next docs caveat, addon configuration, MCP foundation, versioning policy.
+> 1. **Phase 4 follow-up — Storybook docgen layer + canonical story pattern (2026-05-26).** Lean CSF Next stories convention; docgen-layer fixes for leaking `ref` and spurious `undefined`; component JSDoc as source of truth for prop descriptions.
+> 2. **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits).** Live repo + first Chromatic baseline + branch protection on `main`. See the full entry at the end of this section.
+> 3. **Phase 4 (Button + harness verification) — COMMITTED 2026-05-25 (`2903f5f`).** Three sub-findings: initial Button scope, TS2882 dot-dir-glob blocker resolved, CSF Next addon-registration trap, WCAG AA token contrast fix.
 >
 > For full text + sub-bullets, find each entry by its leading bold phrase in the chronological list below.
 
@@ -97,6 +97,26 @@ genuinely changes scope/sequence — not for routine within-task choices.
     - **The first PR to `main`** (likely the eventual `milestone-0 → main` merge) is the one that first exercises the required-status-checks rule on the branch — GH only enforces checks it has previously seen.
 
   - **Pending:** merged Phase 3+4 quiz gate (Teaching Mode); **over-strict-settings audit** (`verbatimModuleSyntax` etc.); plus the standing review of the 2 open Dependabot PRs when convenient.
+
+- **Phase 4 follow-up — Storybook docgen layer + canonical story pattern (2026-05-26).** Pure UI/docs touch on completed Phase 4; status line unchanged. Branch `milestone-0`, Teaching Mode off.
+
+  - **Bugs fixed at the docgen layer, not per-story.** `ref` was leaking into Controls + autodocs (React-19 ref-as-prop puts it on every component's `Props`); fixed once globally via `propFilter: prop.name !== 'ref'` in `.storybook/main.ts`. Optional union props (`intent?: 'primary' | …`) were showing a spurious `undefined` radio because `react-docgen-typescript` reports the type as `… | undefined`; fixed once globally via `shouldRemoveUndefinedFromOptional: true` (needs `shouldExtractLiteralValuesFromEnum: true` too — both set). CLAUDE.md gotcha added.
+
+  - **`tags: ['autodocs']` lifted to `definePreview`** so every component gets a docs page without per-meta repetition. Individual stories opt out via `tags: ['!autodocs']` (only `AllVariants` uses it).
+
+  - **Component JSDoc made the source of truth for prop descriptions.** `react-docgen-typescript` reads JSDoc on the props interface fields → populates the autodocs prop table. No per-story `argTypes.<prop>.description` repetition. Consumers reading the TS types see the same docs. Bonus: react-docgen-typescript also extracts function-signature destructure defaults (`intent = 'primary'`) into the `Default` column without any per-prop work.
+
+  - **Coverage additions** (one story feeds interaction test + a11y + Chromatic per the existing harness contract): `Disabled` (visual + a11y coverage; no play assertion — a11y gate covers it), `BrandPalette` (wraps the button in an ancestor that sets `--color-primary`; story-level demonstration of the runtime-override contract, complementing the existing global Palette toolbar), `AllVariants` (intent × size matrix; `tags: ['!autodocs']`, `controls.disable`, `chromatic.modes` from new `.storybook/modes.ts`).
+
+  - **Canonical story pattern committed to `ARCHITECTURE.md` § "Story pattern"** — Button is the reference; the doc names what lives in the component file vs the story file vs `preview.tsx` vs `modes.ts` vs `main.ts`, with explicit Rule-of-Three deferral for helper factories and MDX.
+
+  - **`KeyboardActivation` story deliberately not added** — explicitly deferred in the pattern doc for components that don't customize default browser keyboard behavior; revisit if a custom-keyboard component (e.g., a combobox) proves the case.
+
+  - **Bundled prior storybook-startup hygiene** in the same change: removed the MDX glob in `stories` that matched zero files; added `reactDocgenTypescriptOptions.include: ['**/*.tsx', '.storybook/**/*.tsx']` so the docgen-plugin's TS program covers `preview.tsx` (its default glob skips dot-dirs, mirroring the TS-include trap from Phase 4).
+
+  - **Verification:** `pnpm test` 10/10 (8 storybook browser tests + 2 unit) green; `pnpm typecheck`/`lint` green; Storybook clean startup (both prior warnings gone). Playwright MCP-driven live-page check: Controls panel shows 3 rows (`children`, `intent`, `size`) — no `ref`, no `undefined` options — and the autodocs page renders JSDoc-sourced descriptions with auto-derived `Default` column. Full-page screenshot at `button-autodocs-final.png`. Independent reviewer-subagent (per CLAUDE.md "Review checkpoint" rule) caught the `ref` leak the human reviewer would have missed; fix applied before commit.
+
+  - **Pending:** existing pending items unchanged.
 
 ---
 

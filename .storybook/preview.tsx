@@ -38,6 +38,10 @@ const withPalette: Decorator = (Story, context) => {
 }
 
 export default definePreview({
+  // Cascades to every story — autodocs page is rendered for every component
+  // without a per-meta `tags: ['autodocs']`. Exclude individual stories from
+  // autodocs with `tags: ['!autodocs']` (e.g., the AllVariants matrix).
+  tags: ['autodocs'],
   // Every addon listed in main.ts that exposes a `definePreviewAddon(...)`
   // default export MUST appear here, factory-called, or its preview wiring
   // silently no-ops (see header comment). One per line so additions/removals
