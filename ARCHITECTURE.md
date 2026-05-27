@@ -200,4 +200,4 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 - `dist/styles.css` is precompiled and content-controlled (`source(none)` and `@source`) — editing docs must not change it.
 - `exports` resolve to `.mjs` and `.d.mts` (tsdown's output extensions).
 - Build order is `tokens && tsdown && css` (tsdown wipes `dist/`).
-- `engines.node` floor (`>=24.11.1`) is a dev and build need (tsdown config load) — right-size it for consumers before the first publish (pending).
+- `engines.node` floor is `>=22.12.0` — Vite 6's floor; satisfies React 19 + Next.js + Active LTS Node 22. `.nvmrc` (24.16.0 exact) is the dev pin (tsdown config-load needs ≥24.11.1 at our build time; not a consumer concern).
