@@ -25,6 +25,18 @@ import addonThemes, { withThemeByDataAttribute } from '@storybook/addon-themes'
 // Ship-shaped: import the SAME precompiled stylesheet consumers get.
 import '../dist/styles.css'
 
+// Canvas surface: tracks the active theme by binding the iframe body to our
+// neutral tokens (gray.100 in light, gray.900 in dark — already flipped per
+// theme by .storybook/tokens). Storybook-only — the shipped library doesn't
+// impose a page background (Preflight is intentionally omitted; see
+// src/styles/index.css). Without this, the dark-theme toggle re-skins the
+// component but leaves the canvas browser-default white.
+const withCanvasSurface: Decorator = (Story) => {
+  document.body.style.backgroundColor = 'var(--color-neutral-bg)'
+  document.body.style.color = 'var(--color-neutral-fg)'
+  return Story()
+}
+
 // Palette toolbar: overrides a semantic token at runtime, proving the
 // zero-rebuild theming contract (consumer sets --color-primary in :root).
 const withPalette: Decorator = (Story, context) => {
@@ -59,6 +71,7 @@ export default definePreview({
       themes: { light: 'light', dark: 'dark' },
       defaultTheme: 'light',
     }),
+    withCanvasSurface,
     withPalette,
   ],
   parameters: {
