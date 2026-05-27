@@ -21,14 +21,13 @@ Listed as most important first.
 - ✅ Phase 3 - Styling, Storybook, and visual-regression harness
 - ✅ Phase 4 - Button
 - Phase 5 - Workflow loop
-- Phase 6 - Bake-off
+- Phase 6 - Comparison
 
 ---
 
 ## Purpose and shape
 
-A versioned, public React component library published to npm and consumed by Next.js (App Router /
-RSC) and Vite apps. Everything follows from four library constraints: small, precisely typed, debuggable from outside, and adaptable.
+A versioned, public React component library published to npm and consumed by Next.js (App Router, RSC) and Vite apps. Everything follows from four library constraints: small, precisely typed, debuggable from outside, and adaptable.
 
 ## Pipeline and data flow
 
@@ -41,41 +40,63 @@ stories ──> Storybook 10 ──> Vitest browser mode (stories-as-tests + a11
 main ──> Changesets ──> GitHub Actions ──> npm (OIDC trusted publish + provenance)
 ```
 
-Build order is `tokens && tsdown && css` — `css` runs after tsdown because tsdown wipes
-`dist/` each run (see CLAUDE.md gotcha).
-
 ## Key decisions and rationale (as-built)
 
 ### Package shape — ESM-only (`package.json`)
 
-`"type":"module"`, no CJS. `exports`: `.` → `./dist/index.mjs` and `./dist/index.d.mts`; `./styles.css` → `./dist/styles.css`. `sideEffects: ["**/*.css","./dist/styles.css"]` so consumer bundlers never tree-shake the stylesheet. `files: ["dist","src"]` ships source for go-to-source. `react` and `react-dom` are peerdeps (`>=19`) — one copy in the consumer, and React Compiler `target:'19'` needs no runtime dep. `publishConfig`: public access and provenance. Why: RSC and Vite both resolve ESM; CJS doubles surface and fights `"use client"`.
+- `"type":"module"`, no CJS
+- `exports`: `.` → `./dist/index.mjs` and `./dist/index.d.mts`; `./styles.css` → `./dist/styles.css`
+- `sideEffects: ["**/*.css","./dist/styles.css"]` so consumer bundlers never tree-shake the stylesheet
+- `files: ["dist","src"]` ships source for go-to-source
+- `react` and `react-dom` are peerdeps (`>=19`) — one copy in the consumer; React Compiler `target:'19'` needs no runtime dep
+- `publishConfig`: public access and provenance
+
+Why ESM-only: RSC and Vite both resolve ESM; CJS doubles surface and fights `"use client"`.
 
 ### Build — tsdown and React Compiler (`tsdown.config.ts`)
 
-tsdown (Rolldown and Oxc) emits per-file ESM with `unbundle:true` (keeps `"use client"` boundaries granular and tree-shaking maximal), `dts` and sourcemaps, `target:'es2022'` (set explicitly — tsdown otherwise infers it from `engines.node`), externalizes `react`, `react-dom`, and `radix`. React Compiler runs in our build (via `@rolldown/plugin-babel` and `babel-plugin-react-compiler`, `target:'19'`) so every consumer gets memoized output for free. Emits `.mjs` and `.d.mts` — `exports` point there.
+tsdown (Rolldown and Oxc) emits per-file ESM. Config:
 
-### TypeScript — layered configs, TS 6.0.3
+- `unbundle:true` — keeps `"use client"` boundaries granular and tree-shaking maximal
+- `dts` and sourcemaps emitted
+- `target:'es2022'` set explicitly (tsdown otherwise infers it from `engines.node`)
+- Externals: `react`, `react-dom`, `radix`
+- React Compiler runs in-build via `@rolldown/plugin-babel` and `babel-plugin-react-compiler` (`target:'19'`) so every consumer gets memoized output for free
+- Emits `.mjs` and `.d.mts` — `exports` point there
+
+### TypeScript — layered configs, TS 6.0
 
 Two explicit configs (a child can't merge `include` or `exclude` from `extends`):
 
 - `tsconfig.build.json` (strict — the publish contract): `isolatedDeclarations` (fast parallel DTS via Oxc; requires explicit export return types), `rootDir:src`, src-only (excludes stories and tests). Drives tsdown's emit (`--tsconfig`) and typecheck pass 1.
 - `tsconfig.json` (broad, lenient): `src` and `.storybook/**/*` — type-checks the stories, `preview.tsx`, `main.ts`, and ambient `globals.d.ts`; powers the editor and typecheck pass 2.
 
-Shared: `moduleResolution:"bundler"` (matches Next and Vite resolving our `exports`), `verbatimModuleSyntax`, `declarationMap` and `sourceMap` shipped from `src/` (go-to-source), `noEmit:true` — tsc is the typecheck gate only; tsdown emits. `pnpm typecheck` runs both passes.
+Shared settings:
 
-Critical: the broad `include` must be `'.storybook/**/*'`, not bare `'.storybook'` — TS silently skips dot-directories, so the bare form loads nothing and the `*.css` ambient declaration vanishes → `TS2882` (under TS 6.0's now-default `noUncheckedSideEffectImports`). Diagnose include scope with `tsc --showConfig`. See CLAUDE.md and the plan's deviation log.
+- `moduleResolution:"bundler"` — matches Next and Vite resolving our `exports`
+- `verbatimModuleSyntax`
+- `declarationMap` and `sourceMap` shipped from `src/` (go-to-source)
+- `noEmit:true` — tsc is the typecheck gate only; tsdown emits
+
+`pnpm typecheck` runs both passes.
+
+The broad `include` uses the glob `'.storybook/**/*'`, not bare `'.storybook'` — TS silently skips dot-directories. See CLAUDE.md's gotcha for the symptom and diagnosis.
 
 ### Tokens — 3-tier DTCG, single-file (`tokens/tokens.json`, `style-dictionary.config.mjs`)
 
-Tiers: primitive (raw scale) → semantic (intent; the override surface; flips between light and dark); component tier deferred (not needed for Button). Single-file Tokens Studio layout (sets: `core`, `light`, `dark`) — chosen for free Figma Git sync (multi-file and themes are Pro). SD v5 with `@tokens-studio/sd-transforms`, `outputReferences:true` so semantic tokens stay `var(--primitive)` (one consumer override cascades — the themeable chain). Emits three CSS artifacts: `:root` (light), `[data-theme=dark]`, and a `@theme inline` artifact. Dark build filters to semantics only; its "filtered references" warning is silenced but broken references stay fatal.
+- Tiers: primitive (raw scale) → semantic (intent; the override surface; flips between light and dark). Component tier deferred (not needed for Button).
+- Single-file Tokens Studio layout (sets: `core`, `light`, `dark`) — chosen for free Figma Git sync (multi-file and themes are Pro).
+- SD v5 with `@tokens-studio/sd-transforms`, `outputReferences:true` so semantic tokens stay `var(--primitive)` — one consumer override cascades down the themeable chain.
+- Emits three CSS artifacts: `:root` (light), `[data-theme=dark]`, and a `@theme inline` artifact.
+- Dark build filters to semantics only; its "filtered references" warning is silenced but broken references stay fatal.
 
 ### Styling and theming — Tailwind v4, precompiled and controlled (`src/styles/index.css`)
 
 The most-corrected area. Decisions:
 
 - `@theme inline` (not plain `@theme`) — utilities reference the live `--color-*` variable, so
-  a consumer override in their `:root` cascades with no rebuild. This is the crown-jewel contract.
-- `prefix()` REJECTED. Validated against Tailwind v4 docs: `prefix(tw)` also renames theme
+  a consumer override in their `:root` cascades with no rebuild.
+- `prefix()` rejected. Validated against Tailwind v4 docs: `prefix(tw)` also renames theme
   variables (`--color-*` → `--tw-color-*`), which would break the override contract. Wrong tool.
 - `source(none)` and `@source "../components"` (layered import form) — disables Tailwind's whole-repo auto-scan (which had been scraping class names out of `docs/*.md` into the output). The shipped CSS is now minimal and deterministic — doc-independent.
 - Preflight omitted — a precompiled component lib must not impose a global reset on consumers.
@@ -85,9 +106,7 @@ The most-corrected area. Decisions:
 - `:where()` zero-specificity dark variant matching `[data-theme="dark"]` so consumer overrides
   win with no `!important`.
 
-Override contract (the public theming API): consumers set semantic tokens in their own
-`:root { --color-primary: … }` (and `[data-theme="dark"] { … }`) — unprefixed `--color-*`, which
-beat ours by cascade order. No rebuild, no Tailwind install.
+Override contract: the public theming API is unprefixed `--color-*` semantic tokens — consumers' overrides beat ours by cascade order (no `!important`, no rebuild, no Tailwind install). See README for the consumer-facing example.
 
 ### Server and client boundary — `"use client"`
 
@@ -100,15 +119,20 @@ The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole
   `isolatedDeclarations`.
 - Variants are a typed literal-class map (`variants.ts`): `Record<Intent,string>` and `Record<Size,string>` resolve to `ui-btn …` strings. Tailwind can't see dynamic names (`ui-btn-${intent}`), so each class must appear as a literal in scanned source; the `Record` makes TS enforce one class per variant — add a variant and TS forces its class to ship. The pure `buttonClasses()` is unit-testable on its own.
 - Purely visual → no `"use client"` (server-renderable). Native props spread via `...rest`; `className` merges with the variant classes.
-- Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`. One story feeds the interaction test, a11y audit, and Chromatic visual snapshot.
+- Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
 
 ### Testing and docs
 
-Storybook 10 on `@storybook/react-vite` is the dev, docs, and test harness; CSF Next factory stories (`definePreview` → `preview.meta()` → `meta.story()`) for type-safe stories; `react-docgen-typescript` for accurate prop tables; the preview imports the precompiled `dist/styles.css` (matches consumers). One Storybook story feeds the interaction test, the a11y audit (Vitest browser mode, real headless Chromium via `@vitest/browser-playwright`), and the Chromatic visual snapshot. A second `node`-environment Vitest project (`unit`) runs pure-logic unit tests (no DOM needed — not jsdom).
+- Storybook 10 on `@storybook/react-vite` is the dev, docs, and test harness
+- CSF Next factory stories (`definePreview` → `preview.meta()` → `meta.story()`) for type-safe stories
+- `react-docgen-typescript` for accurate prop tables
+- The preview imports the precompiled `dist/styles.css` (matches consumers)
+- One Storybook story feeds the interaction test, the a11y audit (Vitest browser mode, real headless Chromium via `@vitest/browser-playwright`), and the Chromatic visual snapshot
+- A second `node`-environment Vitest project (`unit`) runs pure-logic unit tests (no DOM — not jsdom)
 
-Chromatic with TurboSnap is a required visual gate. CI shape: a `correctness` job (all 9 local gates plus `playwright install`) → a `chromatic` job (`needs: correctness`). Gating chromatic on correctness ensures cheap gates fail-fast and no Chromatic snapshot is spent on a broken build. Chromatic policy (`autoAcceptChanges: 'main'`, `exitZeroOnChanges: false`, `onlyChanged: true`) lives in `chromatic.config.json` so local `pnpm chromatic` and CI behave identically; the workflow only passes `projectToken` to the action.
+Chromatic with TurboSnap is a required visual gate. CI shape: a `correctness` job (all local gates plus `playwright install`) → a `chromatic` job (`needs: correctness`). Gating chromatic on correctness ensures cheap gates fail-fast and no Chromatic snapshot is spent on a broken build. Chromatic policy (`autoAcceptChanges: 'main'`, `exitZeroOnChanges: false`, `onlyChanged: true`) lives in `chromatic.config.json` so local `pnpm chromatic` and CI behave identically; the workflow only passes `projectToken` to the action.
 
-An MCP server (`@storybook/addon-mcp`, live at `localhost:6006/mcp` while `pnpm storybook` runs) exposes the library's real component docs, props, and stories. See CLAUDE.md § "Storybook MCP" for usage rules.
+An MCP server (`@storybook/addon-mcp`) exposes the library's real component docs, props, and stories. See CLAUDE.md § "Storybook MCP" for the URL, lifecycle, and usage rules.
 
 ### Release
 
@@ -124,7 +148,7 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `package.json`                                                     | ESM manifest: exports, sideEffects, peers, scripts, publishConfig                                                                                                                                                                                        |
 | `pnpm-workspace.yaml`                                              | pnpm catalog (react, react-dom, typescript, tailwindcss) and pnpm settings (`engineStrict`, `allowBuilds`)                                                                                                                                               |
-| `.nvmrc` (24.16.0 exact), Corepack pin `pnpm@11.1.2`               | runtime and package-manager pins                                                                                                                                                                                                                         |
+| `.nvmrc`, `package.json` `packageManager`                          | runtime and package-manager pins (exact, no ranges)                                                                                                                                                                                                      |
 | `tsconfig.build.json`                                              | strict publish contract: isolatedDeclarations, rootDir:src, src-only; tsdown emit and typecheck pass 1                                                                                                                                                   |
 | `tsconfig.json`                                                    | broad and lenient: `src` and `.storybook/**/*`; editor and typecheck pass 2                                                                                                                                                                              |
 | `tsdown.config.ts`                                                 | ESM, unbundle, externals, dts, React Compiler                                                                                                                                                                                                            |
