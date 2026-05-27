@@ -121,6 +121,32 @@ The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole
 - Purely visual → no `"use client"` (server-renderable). Native props spread via `...rest`; `className` merges with the variant classes.
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
 
+### Story pattern
+
+Every component's `*.stories.tsx` follows the same shape so reviewers and agents pattern-match without rediscovery. Button is the reference.
+
+Authoring source-of-truth split:
+
+- Component file (`component.tsx`) — JSDoc on props interface fields → autodocs prop descriptions; JSDoc above the component export → autodocs component description.
+- Story file (`component.stories.tsx`) — runtime examples (stories, play tests, override demos, the matrix).
+- `.storybook/preview.tsx` — globals: `tags: ['autodocs']` cascade, `a11y: { test: 'error' }`, themes.
+- `.storybook/modes.ts` — Chromatic mode definitions (`allModes.{light,dark}`).
+- `.storybook/main.ts` — `reactDocgenTypescriptOptions.shouldRemoveUndefinedFromOptional: true` (strips `undefined` from optional union props in inferred controls); `propFilter` excludes `ref` globally (React 19 ref-as-prop is implementation detail, not consumer surface).
+
+Per-story shape, in order:
+
+1. Variant baselines — one one-liner per public variant (`export const Primary = meta.story({ args: { intent: 'primary' } })`). Story names carry the meaning; no `parameters.docs.description.story` blocks.
+2. State baselines — render-only one-liners for visually-distinct states (`Disabled`, `Loading`). Captured by Chromatic; scanned by addon-a11y.
+3. Interaction test — one `play` story per user interaction the component owns. Skip native HTML behavior the component doesn't customize (e.g., browser-default Enter/Space activation on a plain `<button>`).
+4. Override demo — one story wrapping the component in an ancestor that sets a `--color-*` token, proving the runtime override contract per-component.
+5. `AllVariants` matrix — `tags: ['!autodocs']`, `controls: { disable: true }`, `parameters.chromatic.modes: { light, dark }`. The Chromatic multi-theme baseline.
+
+Deferred (re-evaluate at component #3 — Rule of Three):
+
+- Helper factories (`variantMatrix(Component, intents, sizes)`, assertion shorthands).
+- MDX per component (autodocs from CSF + JSDoc covers the docs case; reach for MDX only when a component needs multi-section narrative).
+- `KeyboardActivation` tests for components that don't customize keyboard handling.
+
 ### Testing and docs
 
 - Storybook 10 on `@storybook/react-vite` is the dev, docs, and test harness
