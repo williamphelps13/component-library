@@ -32,12 +32,12 @@ A versioned, public React component library published to npm and consumed by Nex
 ## Pipeline and data flow
 
 ```
-tokens/tokens.json ──(Style Dictionary v5 + sd-transforms)──> build/tokens.{light,dark}.css (:root / [data-theme=dark])
-                                                          └──> build/theme.css (@theme inline)
+tokens/tokens.json ──(Style Dictionary v5 with sd-transforms)──> build/tokens.{light,dark}.css (:root / [data-theme=dark])
+                                                            └──> build/theme.css (@theme inline)
 src/styles/index.css ──(@tailwindcss/cli; source-scoped, Preflight omitted)──> dist/styles.css   (precompiled, controlled)
-src/**/*.tsx ──(tsdown: Rolldown/Oxc + babel-plugin-react-compiler)──> dist/*.mjs + dist/*.d.mts  (unbundled, RC-optimized)
-stories ──> Storybook 10 ──> Vitest browser mode (stories-as-tests + a11y) + Chromatic (visual gate)
-main ──> Changesets ──> GitHub Actions ──> npm (OIDC trusted publish + provenance)
+src/**/*.tsx ──(tsdown: Rolldown/Oxc with babel-plugin-react-compiler)──> dist/*.mjs and dist/*.d.mts  (unbundled, RC-optimized)
+stories ──> Storybook 10 ──> Vitest browser mode (stories-as-tests, a11y) and Chromatic (visual gate)
+main ──> Changesets ──> GitHub Actions ──> npm (OIDC trusted publish, provenance)
 ```
 
 ## Key decisions and rationale (as-built)
@@ -60,7 +60,7 @@ tsdown (Rolldown and Oxc) emits per-file ESM. Config:
 - `unbundle:true` — keeps `"use client"` boundaries granular and tree-shaking maximal
 - `dts` and sourcemaps emitted
 - `target:'es2022'` set explicitly (tsdown otherwise infers it from `engines.node`)
-- Externals: `react`, `react-dom`, `radix`
+- Externals: `react`, `react-dom`, and `radix-ui` and `@radix-ui/*` (Radix entries pre-registered for component #2 — Dialog — per spec §4.2; no-op until the first Radix import lands)
 - React Compiler runs in-build via `@rolldown/plugin-babel` and `babel-plugin-react-compiler` (`target:'19'`) so every consumer gets memoized output for free
 - Emits `.mjs` and `.d.mts` — `exports` point there
 
@@ -144,7 +144,7 @@ Per-story shape, in order:
 Deferred (re-evaluate at component #3 — Rule of Three):
 
 - Helper factories (`variantMatrix(Component, intents, sizes)`, assertion shorthands).
-- MDX per component (autodocs from CSF + JSDoc covers the docs case; reach for MDX only when a component needs multi-section narrative).
+- MDX per component (autodocs from CSF and JSDoc covers the docs case; reach for MDX only when a component needs multi-section narrative).
 - `KeyboardActivation` tests for components that don't customize keyboard handling.
 
 ### Testing and docs
@@ -166,7 +166,7 @@ Changesets (public access, `@changesets/changelog-github`) with GitHub Actions a
 
 ### Quality gates
 
-ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x), Prettier, knip (scoped via `project: src/`; CSS-only and peer deps in `ignoreDependencies`), cspell, and publint. `attw` is split into `verify:types` and not gating yet — `@arethetypeswrong/cli` lacks TS 6.0 support; revisit.
+ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x), Prettier, knip (scoped via `project: src/`; CSS-only and peer deps in `ignoreDependencies`), cspell, and publint. `attw` is split into `verify:types` and not gating yet — `@arethetypeswrong/cli@0.18.2` is broken on this Node 24 / pnpm 11 environment regardless of project (reproduces against any npm package). See CLAUDE.md "Gotchas" entry for the diagnostic and re-enable trigger.
 
 ## File and module map
 
@@ -200,4 +200,4 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 - `dist/styles.css` is precompiled and content-controlled (`source(none)` and `@source`) — editing docs must not change it.
 - `exports` resolve to `.mjs` and `.d.mts` (tsdown's output extensions).
 - Build order is `tokens && tsdown && css` (tsdown wipes `dist/`).
-- `engines.node` floor is `>=22.12.0` — Vite 6's floor; satisfies React 19 + Next.js + Active LTS Node 22. `.nvmrc` (24.16.0 exact) is the dev pin (tsdown config-load needs ≥24.11.1 at our build time; not a consumer concern).
+- `engines.node` floor is `>=22.12.0` — Vite 6's floor; satisfies React 19, Next.js, and Active LTS Node 22. `.nvmrc` (24.16.0 exact) is the dev pin (tsdown config-load needs ≥24.11.1 at our build time; not a consumer concern).

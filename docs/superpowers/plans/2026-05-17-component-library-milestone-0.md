@@ -34,9 +34,9 @@ Task scaffolds in the plan body (e.g. `### Task 4.2`) are historical execution g
 
 > **Most recent first** ↓ (the section below is chronological with newest at the BOTTOM; this pointer reverses the discovery order for fresh readers):
 >
-> 1. **Pre-Phase-5 debts cleared (2026-05-26).** `engines.node` right-sized to `>=22.12.0`; over-strict-settings audit kept every knob; 2 Dependabot PRs rebased.
-> 2. **Phase 4 follow-up — Storybook docgen layer + canonical story pattern (2026-05-26).** Lean CSF Next stories convention; docgen-layer fixes for leaking `ref` and spurious `undefined`; component JSDoc as source of truth for prop descriptions.
-> 3. **Phase 3 / B3 (Chromatic visual gate) — COMMITTED 2026-05-25 (six commits).** Live repo + first Chromatic baseline + branch protection on `main`. See the full entry at the end of this section.
+> 1. **Pre-merge review pass before milestone-0 → main (2026-05-26).** `attw` root-caused as environmental (fails on `zod@3.23.8` too — generic 0.18.2 bug, not TS 6.0); spec §3.6 `prefix(tw)` flagged superseded.
+> 2. **Task 5.1 validation pass — `release.yml` draft revisions (2026-05-26).** Action majors `@v4` → `@v6`, Node from `.nvmrc`, drop release-build cache, slim to `pnpm build` + publish (correctness already gates on same SHA), `publish: pnpm release` via new package.json script, OIDC-only with a planned token fallback, sequence as milestone-0 → main merge → publish from main.
+> 3. **Pre-Phase-5 debts cleared (2026-05-26).** `engines.node` right-sized to `>=22.12.0`; over-strict-settings audit kept every knob; 2 Dependabot PRs rebased.
 >
 > For full text + sub-bullets, find each entry by its leading bold phrase in the chronological list below.
 
@@ -127,6 +127,52 @@ genuinely changes scope/sequence — not for routine within-task choices.
   - **Dependabot PRs merged 2026-05-27** — PR #1 (gh-actions group: `pnpm/action-setup` v4→v6, `actions/setup-node` v5→v6) as `22bae7d`; PR #3 (npm minor-and-patch: 5 dev-dep bumps — `@babel/core`, `@eslint-react/eslint-plugin`, `@types/react`, `chromatic` 17.0.0→17.0.1, `typescript-eslint`) as `35a8178`. PR #2 was Dependabot's first draft of the npm group; on rebase Dependabot auto-closed it ("updatable in another way, no longer needed") and reopened as PR #3 with `chromatic 17.0.0 → 17.0.1` added. Both PRs originally branched off `b536639` before the Phase-3-B3 CI follow-up fixes (`2e67313` playwright install, `dc446da` chromatic build, `bbf096a` projectId), so original CI was red on stale infra — *not* the dep bumps themselves. **Chromatic only passed after registering `CHROMATIC_PROJECT_TOKEN` as a Dependabot-scoped secret** (separate namespace from Actions): `gh secret set CHROMATIC_PROJECT_TOKEN --app dependabot`. PR #1's Chromatic Build #16 needed manual visual-accept — the diffs were accumulated milestone-0 changes since Build #1's baseline (canvas/story-pattern updates), unrelated to PR #1 itself; `autoAcceptChanges: 'main'` in `chromatic.config.json` doesn't match our default-branch name `milestone-0` so nothing auto-accepted in between. PR #3's Build #18 then auto-passed (dev-dep bumps render no pixels). Post-merge local re-verify green (typecheck/lint/test 10/10/build). CLAUDE.md gotcha added re: Dependabot secret scope.
 
   - **Skipped: merged Phase 3+4 quiz gate.** Owner chose Teaching Mode off for Phase 5 — gate dropped, not deferred. Foundational decisions still get Teaching-Mode walkthroughs by default.
+
+- **Task 5.1 validation pass — `release.yml` draft revisions (2026-05-26).** Plan-mode pass against current docs (`changesets/action`, npmjs.com trusted-publishing, pnpm.io changesets recipe) before authoring `release.yml`. The draft below (plan body, written ~3 months ago) is SUPERSEDED on the following points. Branch `milestone-0`, Teaching Mode off.
+
+  - **Action majors `@v4` → `@v6`.** `actions/checkout`, `pnpm/action-setup`, `actions/setup-node` are all on `@v6` in the existing `ci.yml` (Dependabot PR #1 merged as `22bae7d`); upstream changesets/action README example also uses `@v6`. release.yml will match — no cross-workflow drift.
+
+  - **Node from `.nvmrc`, not pinned.** `node-version-file: .nvmrc` (single source of truth — 24.16.0) replaces the draft's hardcoded `node-version: 24`. Matches `ci.yml`.
+
+  - **Drop `cache: pnpm` in the release job.** npm's current trusted-publishing recipe explicitly recommends `package-manager-cache: false` for release builds (cache poisoning surface; publish path is rare so cold install isn't a real cost). release.yml will omit the cache key entirely.
+
+  - **Slim release.yml to `pnpm build` + publish; no re-run of the CI gate.** The draft re-ran `pnpm build && pnpm test && pnpm verify:pack && pnpm assert:use-client` inside the release job. The `correctness` job in `ci.yml` already gates 9 commands on every push (typecheck, lint, knip, spell, format, build, assert:use-client, test, verify:pack) and release fires on the same SHA — same outputs. Keeping only `pnpm build` because changesets/action's publish step needs `dist/` artifacts to exist (gitignored). Owner-chosen tradeoff: smaller release.yml, faster releases, accept the (theoretical) risk that someone bypasses branch protection between correctness passing and release running. Branch protection on `main` with required checks makes that an admin-only window.
+
+  - **`publish: pnpm release` via new `package.json` script.** Idiomatic shape: `"release": "pnpm build && pnpm changeset publish"` becomes the single source of truth for "what publish does." Replaces the draft's split `version:` + `publish:` inputs to changesets/action. Local-runnable too (`pnpm release` for emergency manual publish).
+
+  - **`changesets/action@v1` DOES support OIDC despite its top-level README still showing `NPM_TOKEN`.** Validated against changesets/action's internal docs (`Setup NPM auth: .npmrc or OIDC`) and env-var table (`ACTIONS_ID_TOKEN_REQUEST_TOKEN` / `ACTIONS_ID_TOKEN_REQUEST_URL` → "OIDC for npm trusted publishing"). Behavior: when `NPM_TOKEN` is absent and `id-token: write` permission is granted, action falls back to OIDC. permissions block in plan draft is correct.
+
+  - **OIDC strategy — owner chose OIDC-only with a planned fallback path.** First publish attempt: no `NPM_TOKEN`, just `id-token: write`. If it fails with an auth-protocol mismatch from `pnpm publish` (see next bullet), fall back to a scoped granular npm publish token (7-day TTL). Matches spec §3.9 and the ARCHITECTURE.md pipeline diagram.
+
+  - **`pnpm publish` + npm trusted-publisher — UNCONFIRMED risk.** pnpm 11 rewrote `pnpm publish` to no longer delegate to the npm CLI (per pnpm.io: "Since v11, `pnpm publish` is implemented natively"). Couldn't find authoritative confirmation that pnpm 11.1.2's native publisher implements the OIDC handshake the npm registry requires for trusted publishing (npm CLI 11.5.1+ does; pnpm CLI status not stated in docs). Both pnpm.io's changesets recipe and changesets/action's README still show `NPM_TOKEN`. If the first OIDC publish fails on this, fallback (granular npm token) is one secret-set + one env line in release.yml. Worth flagging up front so we don't mistake a known-uncertainty for a real bug.
+
+  - **`.changeset/config.json` adjustments.** Add `"repo": "williamphelps13/component-library"` (plan's placeholder `wphelps/ui` was wrong). Keep `baseBranch: main` — owner chose to merge milestone-0 → main first, then publish from main (avoids changing baseBranch + branch-protection scope + `chromatic.config.json` autoAcceptChanges target; aligns with plan's Task 5.2 wording).
+
+  - **Sequencing — merge milestone-0 → main FIRST, then Task 5.1.** Owner-chosen path: open milestone-0 → main PR, manually visual-accept the accumulated Chromatic diffs (the `autoAcceptChanges: 'main'` value didn't match `milestone-0` so nothing auto-accepted in between), merge, then proceed with Task 5.1 on main. This is the first PR into `main` since branch protection was set, so it exercises the required-status-checks rule for the first time (the rule only enforces checks GH has previously seen).
+
+  - **`gh repo create` (plan Step 1) — already done.** Repo live at `github.com/williamphelps13/component-library` (Phase 3 / B3).
+
+  - **`CHROMATIC_PROJECT_TOKEN` secret (plan Step 4) — already done** in both Actions and Dependabot scopes.
+
+  - **npm trusted-publisher registration on npmjs.com — still pending, blocks first publish.** Owner has not yet registered. release.yml drafting can proceed independently; the npmjs.com registration becomes an explicit `[USER RUNS]` step blocking Task 5.2 (first publish). Registration parameters: repo `williamphelps13/component-library`, workflow `release.yml`, environment none (no GH environments configured).
+
+  - **Pilot Next.js App Router app path (Task 5.3) — TBD; owner will surface before 5.3.** Not blocking 5.1 / 5.2.
+
+  - **Pending:**
+    1. Open milestone-0 → main PR (manual Chromatic visual-accept required for accumulated diffs).
+    2. After merge, author `release.yml` + add `release` script to `package.json` + add `repo` to `.changeset/config.json`.
+    3. Owner registers npm trusted publisher on npmjs.com pointing at this repo + `release.yml` (one-time UI step) — blocks Task 5.2 first publish.
+    4. Task 5.2 first publish under `0.1.0`; if `pnpm publish` doesn't speak OIDC, fall back to scoped granular NPM_TOKEN (mitigation already scoped above).
+
+- **Pre-merge review pass before milestone-0 → main (2026-05-26).** Read-only review of all persistent docs and implementation files against the as-built state. Two findings logged here as deviations; routine doc-drift fixes (ARCHITECTURE.md pipeline diagram conformance, externals-callout wording, attw note redirect to CLAUDE.md gotcha, prettier escape fix) land in the same commit but are recorded in git history rather than here — per the log's own scope/sequence-change bar. Branch `milestone-0`, Teaching Mode off.
+
+  - **`attw` failure root-caused — environmental, not a project bug; refines the Phase-1 entry above.** `pnpm verify:types` errors with `Cannot read properties of undefined (reading 'filename')`. Reproduced against `zod@3.23.8` from npm — fails identically, confirming this is a generic `@arethetypeswrong/cli@0.18.2` runtime bug on this Node 24 / pnpm 11 environment, NOT a problem with our package's types exports and NOT specifically a TS 6.0 issue. Our tarball shape is healthy (`dist/index.mjs` + `dist/index.d.mts` + `dist/styles.css` + `src/`, verified via `pnpm pack && tar -tf`). The line-51 entry above speculated "lacks TS 6.0 support" — that was wrong; the tool is broken on TS 5.x packages too. **Spec §4.1 line 402 gate status:** `publint` green; `attw --pack` not green and currently unable to be made green via our actions. Re-enable in CI gate when attw ships a fix; until then `pnpm verify:types` remains a not-CI-gated script. CLAUDE.md gotcha added so this isn't re-debugged on the next agent handoff.
+
+  - **Spec §3.6 `prefix(tw)` reference now flagged superseded.** Spec lines 215 and 343 still presented `@import "tailwindcss" prefix(tw);` as the styling decision, contradicting both ARCHITECTURE.md §"Styling and theming" and the "Tailwind `prefix(tw)` REJECTED" entry above (line 43). Per CLAUDE.md doc precedence (ARCHITECTURE > spec > plan), unflagged spec/built contradictions corrode trust in the doc system. Added inline `> Superseded` notices at both lines pointing readers to ARCHITECTURE.md and the deviation entry — pure markdown, no code change. CLAUDE.md explicitly allows this kind of spec annotation ("spec may lag this file"); the annotation makes the lag visible instead of silent.
+
+  - **Pending:**
+    1. (Unchanged from above) Open milestone-0 → main PR + manual Chromatic visual-accept.
+    2. (Unchanged) Task 5.1 release-workflow author on `main` post-merge.
 
 ---
 

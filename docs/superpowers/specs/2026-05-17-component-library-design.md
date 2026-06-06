@@ -214,6 +214,13 @@ Tailwind    @theme inline { --color-primary: var(--color-primary); }
   consumer overrides in portals/nested DOM. Highest-risk config detail.
 - **Prefixed** (`@import "tailwindcss" prefix(tw);`) — namespaces utilities
   and `--tw-*` vars against consumers who also run Tailwind.
+  - **As-built supersession** — `prefix(tw)` was rejected during Phase 3:
+    it renames theme variables (`--color-*` → `--tw-color-*`), which
+    breaks the §3.5 consumer override contract. Collision-safety lands
+    instead via `source(none) + @source "../components"`, our own
+    `ui-*` `@utility` names, and Preflight omission. See
+    ARCHITECTURE.md §"Styling and theming" and the plan deviation log
+    entry "Tailwind `prefix(tw)` REJECTED".
 - **Zero-specificity override strategy** (hardens the §3.5 contract):
   - Dark/palette variant as
     `@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));`
@@ -340,7 +347,7 @@ CI shards, smoke-vs-interaction story tag-split.
 | React / React DOM                           | 19.2.x                           | peer `>=19` (enables RC `target:'19'` w/o runtime dep)                                                   |
 | `babel-plugin-react-compiler`               | 1.x                              | via tsdown `@rolldown/plugin-babel` + `reactCompilerPreset()`                                            |
 | `radix-ui` (consolidated)                   | 1.4.x                            | not individual `@radix-ui/*`; in `dependencies`, externalized                                            |
-| Tailwind CSS                                | 4.x                              | internal only; `@theme inline`; `prefix(tw)`; `@utility` + `:where()`                                    |
+| Tailwind CSS                                | 4.x                              | internal only; `@theme inline`; `@utility` and `:where()` (`prefix(tw)` superseded — see §3.6)           |
 | Style Dictionary                            | 5.x                              | ESM-only, DTCG; `@tokens-studio/sd-transforms` peer                                                      |
 | Tokens Studio (Figma)                       | 2.11+                            | DTCG default; GitHub multi-file sync                                                                     |
 | `tsdown`                                    | 0.22.x+                          | directive-preserving; `unbundle`; `sourcemap`                                                            |
