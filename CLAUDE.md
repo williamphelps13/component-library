@@ -52,6 +52,21 @@ Three docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md.
 
 When touching any of the three persisting docs, re-read the other two end-to-end before committing. Drift hides in lines you don't think to look at — the reviewer subagent catches code drift; this re-read catches doc drift.
 
+## Comments
+
+Default to none. Add only when the WHY is non-obvious — a hidden constraint, a subtle invariant, a workaround for a specific bug, or a silent-failure mode the gates won't catch. If removing the comment wouldn't confuse a careful reader who knows the rest of the codebase, delete it. Every comment is a future drift candidate.
+
+Two patterns this codebase keeps:
+
+- Trap-and-rule. Names a silent-failure mode and the operational rule that defends against it. `.storybook/preview.tsx`'s addon-registration block is the reference: it pays for its line count because re-discovering the bug is more expensive than reading. Reach for this when lint, typecheck, and tests all stayed green during the original bug.
+- Public JSDoc. Exported types, props, and functions get consumer-facing JSDoc — `react-docgen-typescript` surfaces it in autodocs, so it's part of the published API. Bar: clear, accurate, consumer-useful.
+
+Three patterns this codebase does not keep:
+
+- Narrating the code. Restating what well-named identifiers already say.
+- Diff archaeology. "Added for the X flow", "used by the Y story", "fixes issue #N" — git log and the PR description own this; in source it rots.
+- Aspirational TODOs without a named trigger. Either capture the follow-up in `ARCHITECTURE.md` or the deviation log with the trigger that will fire it, or delete. A TODO with no trigger is "addable later" by another name (see "Don't defer foundational decisions" above).
+
 ## Toolchain rules
 
 - pnpm only, via Corepack. Do not use `npm` or `npx` inside the repo (they fail on our `packageManager` pin). Use `pnpm` and `pnpm dlx`.

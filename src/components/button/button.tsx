@@ -3,7 +3,11 @@ import type { ButtonHTMLAttributes, ReactElement, Ref } from 'react'
 import { buttonClasses, type Intent, type Size } from './variants'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Semantic role: `primary` for the main action, `neutral` for secondary, `danger` for destructive. */
+  /**
+   * Semantic role: `primary` for the main action, `neutral` for secondary, `danger` for destructive.
+   * For `danger`, pair the colored treatment with an explicit destructive label (e.g. "Delete account")
+   * so the action is unambiguous to users for whom color carries less signal.
+   */
   intent?: Intent
   /** Visual size: `sm` (compact) or `md` (default). */
   size?: Size
