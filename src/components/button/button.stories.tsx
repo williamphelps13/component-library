@@ -25,9 +25,7 @@ export const Clicks = meta.story({
   },
 })
 
-// Override semantic tokens in PAIRS — overriding `--color-primary` alone leaves
-// `--color-primary-fg` unchanged, which sub-AA's the contrast against any new
-// brand background.
+// Override token pairs — overriding `--color-primary` alone leaves `--color-primary-fg` sub-AA.
 export const BrandPalette = meta.story({
   render: (args) => (
     <div
@@ -43,11 +41,8 @@ export const BrandPalette = meta.story({
   ),
 })
 
-// Axe runs the active theme only. Without dark companions, dark-mode WCAG
-// regressions stay silent — the trap that hid the original danger contrast
-// bug. Every component needs `Dark*` stories for each intent until the
-// vitest storybook project itself runs both themes (deferred — trigger:
-// component #3, when the per-story duplication crosses ROI).
+// Axe runs only the active theme. Each component needs `Dark*` stories until
+// the vitest storybook project runs both themes (deferred until component #3).
 export const DarkPrimary = meta.story({
   args: { intent: 'primary' },
   globals: { theme: 'dark' },

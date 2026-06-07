@@ -5,8 +5,7 @@ import { buttonClasses, type Intent, type Size } from './variants'
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Semantic role: `primary` for the main action, `neutral` for secondary, `danger` for destructive.
-   * For `danger`, pair the colored treatment with an explicit destructive label (e.g. "Delete account")
-   * so the action is unambiguous to users for whom color carries less signal.
+   * Pair `danger` with an explicit destructive label — color alone is not enough.
    */
   intent?: Intent
   /** Visual size: `sm` (compact) or `md` (default). */

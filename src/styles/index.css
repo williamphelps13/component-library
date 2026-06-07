@@ -25,13 +25,7 @@
  * surface + our own `ui-` class names + Preflight being off — not from prefix().
  */
 @source "../components";
-/*
- * Tailwind scans every file under @source, including *.stories.tsx. Inline
- * style literals like `{ display: 'grid' }` in stories are extracted as
- * class names and ship as utility rules in dist/styles.css unless excluded.
- * Stories are dev-only — exclude them so the published CSS contains only
- * classes the components actually use.
- */
+/* Exclude stories: inline-style literals (e.g. `display: 'grid'`) would otherwise ship as utility classes. */
 @source not "../components/**/*.stories.*";
 
 /* Generated token layers (Style Dictionary → build/). */

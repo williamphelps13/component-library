@@ -1,12 +1,8 @@
 import { readFileSync } from 'node:fs'
 
-// A semantic added to one theme set but not the other silently inherits the
-// :root binding under the unmodified theme. Style Dictionary's
-// brokenReferences:'throw' only catches `{...}` references that fail to
-// resolve — not missing tokens. This script catches the parity drift before
-// Style Dictionary runs, so the failure mode is one the gate can describe
-// (which key, where to add it) instead of a generic "looks fine in light,
-// silently broken in dark" runtime bug.
+// A semantic added to one theme set but forgotten in the other silently inherits
+// :root under the unmodified theme. SD's `brokenReferences:'throw'` doesn't catch
+// missing tokens — only unresolved `{...}` references.
 
 const { light, dark } = JSON.parse(readFileSync('tokens/tokens.json', 'utf8'))
 

@@ -1,12 +1,8 @@
 import { execSync } from 'node:child_process'
 import { existsSync, readFileSync, unlinkSync } from 'node:fs'
 
-// publint validates exports/types metadata but does not look inside the
-// tarball. files: ['dist', 'src'] historically shipped stories, tests, and
-// the build-time CSS (which import from storybook/test, vitest, and
-// ../../../.storybook/preview — none of which resolve in a consumer
-// environment). This script packs the tarball, walks the entries, and fails
-// on any path that should not reach a consumer install.
+// publint validates exports metadata, not tarball contents. This script packs,
+// walks the entries, and fails on paths that wouldn't resolve in a consumer install.
 
 const DISALLOWED = [
   { pattern: /\.stories\.(ts|tsx|js|jsx|mjs)$/, why: 'story files import storybook/test' },

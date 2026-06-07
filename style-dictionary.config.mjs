@@ -48,10 +48,8 @@ StyleDictionary.registerFormat({
   },
 })
 
-// Tailwind v4 @theme inline: map category utilities onto our semantic CSS vars.
-// First path segment is the category (color, radius, spacing, …) so emitted
-// Tailwind utility names match the category. Hardcoding `--color-` would
-// silently emit future non-color semantics under the color prefix.
+// First path segment is the token category (color, radius, ...). Hardcoding
+// `--color-` would silently emit future non-color semantics under the wrong prefix.
 StyleDictionary.registerFormat({
   name: 'tailwind/theme-inline',
   format: ({ dictionary }) => {
@@ -79,11 +77,8 @@ function makeSD(tokens, files, config = {}) {
   })
 }
 
-// Selectors are :where()-wrapped to keep specificity at zero (the override
-// contract — consumer overrides win without !important, regardless of whether
-// the consumer's bundler hoists our stylesheet first or last). Without :where,
-// `:root` and `[data-theme="dark"]` both ship at (0,1,0), and a vendor-style-
-// last bundler config silently inverts the override outcome in dark mode.
+// :where() keeps token-selector specificity at zero so consumer `:root` overrides
+// win regardless of bundler hoist order. Bare selectors at (0,1,0) silently invert.
 
 // Light: :root with all primitives (raw) + semantic vars (as var() references),
 // plus the Tailwind @theme artifact (semantic names only).
