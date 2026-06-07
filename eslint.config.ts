@@ -36,4 +36,18 @@ export default tseslint.config(
   },
   // Storybook story linting (flat config; targets *.stories.*).
   storybook.configs['flat/recommended'],
+  // Edit-time guard for the barrel directive — faster feedback than the dist gate.
+  {
+    files: ['src/index.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Program > ExpressionStatement > Literal[value="use client"]',
+          message:
+            'The barrel must not carry "use client" — would force the entire library client-side and kill RSC server rendering.',
+        },
+      ],
+    },
+  },
 )
