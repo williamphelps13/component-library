@@ -18,6 +18,7 @@ Teaching Mode is the default but per-feature switchable. The owner can explicitl
 - Verify component props via the Storybook MCP — never hallucinate. Full operational details in §"Storybook MCP" below.
 - Review checkpoint before each phase or major-task commit: dispatch an independent code-review subagent (`superpowers:requesting-code-review`) on the diff vs `ARCHITECTURE.md` and the plan; fix Critical and Important findings before committing. Self-review misses things — reviewer subagents have caught a red `pnpm lint` the author missed, and an a11y gate that was silently a no-op because the analogous fix for one Storybook addon hadn't been applied to a sibling.
 - One source for current state. The deviation log is the canonical record of what's actually happened; `ARCHITECTURE.md`'s status line is the one-glance summary. Don't duplicate "where we are" content elsewhere (parallel status text in a separate doc has historically lagged real status by multiple phases).
+- Owner-driven visual verification is the gate before any component is declared done. Automated tests, the a11y addon, and Chromatic catch most regressions; they do not catch missing interactive states, missing transitions, or layout drift the owner notices in real interaction. After all automated gates pass, the owner opens the component in Storybook and exercises every documented state.
 
 ## Documentation
 
@@ -28,6 +29,7 @@ Three docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md.
 - Documentation is easy to maintain, easy to visually parse, easy to update
 - Don't repeat concepts within a document or across documents
 - Act like content is user-facing — apply [Material Design 3 writing guidelines](https://m3.material.io/foundations/content-design/style) (sentence case, no periods on fragmentary list items, plain language, active voice)
+- Persistent docs codify settled decisions only. Speculative ideas, placeholder names, and aspirational features stay in spec/plan files (or conversation) until decided. Future agents read these docs as source of truth — anything written here gets treated as committed.
 
 ### Rules
 
@@ -79,7 +81,9 @@ Three kinds this codebase does not keep:
 ## Common commands
 
 - `pnpm build` — full pipeline: tokens, bundle, precompiled CSS
+- `pnpm tokens` — Style Dictionary only (rebuilds `build/*.css`)
 - `pnpm exec tsdown` — bundle only (skips tokens and CSS)
+- `pnpm css` — Tailwind only (rebuilds `dist/styles.css`; requires tokens to have run)
 - `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm chromatic` — gates
 
 ## Storybook MCP (verify component APIs — never hallucinate)
@@ -129,3 +133,5 @@ Log ruthlessly. Add a line here only if all three hold: (1) likely to recur, (2)
 - Optional union props (`intent?: 'primary' | 'neutral' | 'danger'`) inflate the inferred Controls panel with an `undefined` option, because `react-docgen-typescript` reports the type as `… | undefined`. Set `shouldRemoveUndefinedFromOptional: true` in `.storybook/main.ts`'s `reactDocgenTypescriptOptions` to strip it globally — one knob, applies to every component. Without it, each new component re-needs a per-meta `argTypes.<prop>.options` override (~6 LOC) to remove the `undefined` row. Tests, typecheck, and lint all pass while the bogus option is present; only opening the Controls panel reveals it. (`shouldExtractLiteralValuesFromEnum: true` is also required for any of this to auto-derive.)
 - Dependabot secrets live in a separate namespace from Actions secrets. Workflows running on Dependabot PRs cannot see Actions-scoped secrets — `secrets.X` resolves to empty, and GitHub's `***` log redaction makes "missing" indistinguishable from "wrong value" (we cycled through "Missing project token" → "Failed to authenticate / No app with code '\*\*\*' found" before realizing). For each secret a Dependabot PR's workflow needs to read: `gh secret set NAME --app dependabot` in addition to `--app actions`. No tooling warns you; only a real Dependabot CI run catches it.
 - `@arethetypeswrong/cli` (`attw`) 0.18.2 is broken on this Node 24 / pnpm 11 environment regardless of the package under test. `pnpm verify:types` errors with the generic `Cannot read properties of undefined (reading 'filename')`; reproduces against `zod@3.23.8` and other published packages from npm too. The cryptic message suggests a project-specific types-export bug — it isn't. Confirm by running `pnpm exec attw --from-npm zod@3.23.8`: same error → environmental; different error → real types problem worth chasing. Until upstream ships a fix, `pnpm verify:types` is not in the CI gate (`publint` still gates via `pnpm verify:pack`). Don't burn an hour re-diagnosing.
+- `visibility:hidden` on content also removes it from the accessibility tree, so axe-core's "button has no accessible name" rule fails on a loading button whose label is hidden that way. Use `opacity:0` to visually hide content that must remain in the a11y tree (the label still announces; `aria-busy` plus HTML `disabled` covers the busy semantics). Layout space is preserved either way. Tests, typecheck, and lint all pass; only an a11y story run catches it.
+- `@testing-library/user-event` v14+ refuses to fire clicks on elements with `pointer-events:none` (browser-realistic). Tests asserting "loading blocks clicks" must check `toBeDisabled()` and `aria-busy="true"` directly rather than attempting `await userEvent.click(...)` — the click never reaches the handler so `fn()`'s `toHaveBeenCalledTimes(0)` assertion is meaningless if the click also never happened. Symptom: cryptic `assertPointerEvents` error from user-event's deps, not from our code.

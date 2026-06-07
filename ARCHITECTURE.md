@@ -42,6 +42,14 @@ main ──> Changesets ──> GitHub Actions ──> npm (OIDC trusted publish
 
 ## Key decisions and rationale (as-built)
 
+### API philosophy — convention-based, not composition
+
+Public component APIs are high-level and convention-based: each component exposes an opinionated prop surface rather than a primitive composition. `<Button loading>` not `<Button><Spinner /></Button>`. The library handles internal composition; the consumer sees one configurable component.
+
+Why convention over composition: composition libraries push consistency onto the consumer. A loading button in shadcn requires the consumer to import a Spinner, place it inside the Button, and wire `disabled` — at every use site. Across an app that is many places to keep consistent; forget one and the button is clickable while looking busy. Convention-based APIs move the burden into the library, enforced once.
+
+When behavior-heavy components are added (combobox, dialog, menu, etc.), behavior primitives from headless libraries are wrapped internally as implementation details. They are never re-exported. The consumer's mental model is the high-level component, not the underlying primitive.
+
 ### Package shape — ESM-only (`package.json`)
 
 - `"type":"module"`, no CJS
@@ -84,7 +92,7 @@ The broad `include` uses the glob `'.storybook/**/*'`, not bare `'.storybook'` �
 
 ### Tokens — 3-tier DTCG, single-file (`tokens/tokens.json`, `style-dictionary.config.mjs`)
 
-- Tiers: primitive (raw scale) → semantic (intent; the override surface; flips between light and dark). Component tier deferred (not needed for Button).
+- Tiers: primitive (raw scale) → semantic (intent; the override surface; flips between light and dark). Component tier deferred (not needed for Button). Primitives include `core.color`, `core.spacing` (0/1/2/3/4/5/6/8/10 in 8px increments) and `core.radius` (none/sm/md/lg/full). Spacing and radius are exposed via `@theme inline` so Tailwind utilities resolve through them.
 - Single-file Tokens Studio layout (sets: `core`, `light`, `dark`) — chosen for free Figma Git sync (multi-file and themes are Pro).
 - SD v5 with `@tokens-studio/sd-transforms`, `outputReferences:true` so semantic tokens stay `var(--primitive)` — one consumer override cascades down the themeable chain.
 - Emits three CSS artifacts: `:root` (light), `[data-theme=dark]`, and a `@theme inline` artifact.
@@ -107,6 +115,10 @@ The most-corrected area. Decisions:
   win with no `!important`.
 
 Override contract: the public theming API is unprefixed `--color-*` semantic tokens — consumers' overrides beat ours by cascade order (no `!important`, no rebuild, no Tailwind install). See README for the consumer-facing example.
+
+Per-component CSS layout: each component's styles live in `src/components/<name>/<name>.css` (co-located with the TSX). `src/styles/index.css` is a thin entry point that `@layer`-declares the order, imports Tailwind's theme and utilities layers, imports the Style Dictionary outputs, declares the dark custom-variant, and then `@import`s each component's CSS file explicitly. Adding a new component means creating the CSS file and adding one `@import` line. `@utility` blocks compile into `@layer utilities` regardless of which file they live in, so layer ordering stays predictable.
+
+Direction: planned migration from Tailwind v4 to vanilla CSS using native `@layer` and per-component `.css` files. We do not use Tailwind's JIT utility classes in JSX; `@utility` blocks compile to plain CSS regardless; `@theme inline` is convenience over vanilla `:root` variable declarations. A future agent should verify the three premises still hold (no JIT utility classes have crept into JSX; `@utility` syntax is used only as block sugar rewritable to `.class { … }` rules; `@theme inline` remains single-purpose) and then execute the migration. Current state stays Tailwind until that verification passes.
 
 ### Server and client boundary — `"use client"`
 
@@ -211,3 +223,4 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 - Build order is `tokens && tsdown && css` (tsdown wipes `dist/`).
 - `engines.node` floor is `>=22.12.0` — Vite 6's floor; satisfies React 19, Next.js, and Active LTS Node 22. `.nvmrc` (24.16.0 exact) is the dev pin (tsdown config-load needs ≥24.11.1 at our build time; not a consumer concern).
 - `peerDependencies` for `react` and `react-dom` are `>=19` while at `0.0.0`. Tighten to `^19.0.0` before the first `1.0.0` publish; expand to `^19.0.0 || ^20.0.0` after React 20 is verified. React Compiler `target: '19'` is baked into the emit, so accepting unverified majors silently is a real risk at v1.
+- `--spacing-*` and `--radius-*` are part of the public override surface alongside `--color-*` — consumers can rebrand proportions without rebuild.
