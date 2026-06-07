@@ -171,7 +171,7 @@ An MCP server (`@storybook/addon-mcp`) exposes the library's real component docs
 
 ### Release
 
-Changesets (public access, `@changesets/changelog-github`) with GitHub Actions and npm OIDC trusted publishing (no stored `NPM_TOKEN`) with automatic provenance.
+Changesets (public access) with GitHub Actions and npm OIDC trusted publishing (no stored `NPM_TOKEN`) and automatic provenance. The `@changesets/changelog-github` formatter and the `release.yml` workflow land in Phase 5 (currently `.changeset/config.json` uses the default `@changesets/cli/changelog`).
 
 ### Quality gates
 
@@ -210,3 +210,4 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 - `exports` resolve to `.mjs` and `.d.mts` (tsdown's output extensions).
 - Build order is `tokens && tsdown && css` (tsdown wipes `dist/`).
 - `engines.node` floor is `>=22.12.0` — Vite 6's floor; satisfies React 19, Next.js, and Active LTS Node 22. `.nvmrc` (24.16.0 exact) is the dev pin (tsdown config-load needs ≥24.11.1 at our build time; not a consumer concern).
+- `peerDependencies` for `react` and `react-dom` are `>=19` while at `0.0.0`. Tighten to `^19.0.0` before the first `1.0.0` publish; expand to `^19.0.0 || ^20.0.0` after React 20 is verified. React Compiler `target: '19'` is baked into the emit, so accepting unverified majors silently is a real risk at v1.

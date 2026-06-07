@@ -27,13 +27,46 @@ export default function Page() {
 }
 ```
 
-To re-theme without rebuilding, override the semantic CSS variables in your own `:root` (and `[data-theme="dark"]`):
+## Theming
+
+Seven semantic CSS variables drive every component's colors. Override them in your own `:root` (and `[data-theme="dark"]` for dark mode) to re-theme without rebuilding the library.
+
+| Variable             | Role                                     |
+| -------------------- | ---------------------------------------- |
+| `--color-primary`    | Primary intent background                |
+| `--color-primary-fg` | Foreground on `--color-primary` surfaces |
+| `--color-neutral-bg` | Neutral intent background                |
+| `--color-neutral-fg` | Foreground on `--color-neutral-bg`       |
+| `--color-danger`     | Danger intent background                 |
+| `--color-danger-fg`  | Foreground on `--color-danger`           |
+| `--color-ring`       | Focus ring on every intent               |
+
+Current default values live in [`tokens/tokens.json`](./tokens/tokens.json) (canonical) and the published `dist/styles.css` (compiled).
+
+Override in pairs — `--color-primary` without `--color-primary-fg` (or vice versa) can drop the foreground below WCAG AA contrast. The defaults are AA-compliant in both modes.
 
 ```css
 :root {
   --color-primary: oklch(0.55 0.2 320);
+  --color-primary-fg: oklch(1 0 0);
+}
+[data-theme='dark'] {
+  --color-primary: oklch(0.7 0.18 320);
+  --color-primary-fg: oklch(0.18 0 0);
 }
 ```
+
+### Dark mode
+
+Activation is consumer-controlled — there is no automatic `prefers-color-scheme` wiring. Set `data-theme="dark"` on `<html>` (or any ancestor of the components you want themed):
+
+```html
+<html data-theme="dark">
+  ...
+</html>
+```
+
+Toggle from a small `"use client"` component if you want runtime switching.
 
 ## For contributors and AI agents
 
@@ -41,4 +74,4 @@ See [`ARCHITECTURE.md`](./ARCHITECTURE.md) § "See Also" for the doc landscape (
 
 ## License
 
-MIT — see [`LICENSE`](./LICENSE) if present, or `package.json`'s `license` field.
+MIT — see [`LICENSE`](./LICENSE).

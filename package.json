@@ -31,7 +31,7 @@
     "format": "prettier --check .",
     "test": "vitest run",
     "knip": "knip",
-    "spell": "cspell \"README.md\" \"src/**/*.{ts,tsx,md}\"",
+    "spell": "cspell \"README.md\" \"tokens/README.md\" \"src/**/*.{ts,tsx,md}\"",
     "assert:use-client": "node scripts/assert-use-client.mjs",
     "verify:pack": "node scripts/assert-pack-contents.mjs && publint",
     "verify:types": "attw --pack",
