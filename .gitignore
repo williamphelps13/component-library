@@ -7,6 +7,3 @@ storybook-static/
 coverage/
 *.tgz
 .playwright-mcp/
-
-# Local agent / IDE state — never committed.
-.claude/

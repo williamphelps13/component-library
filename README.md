@@ -1,6 +1,6 @@
 # @williamphelps13/ui
 
-A versioned, public React component library.
+A focused React component library for React 19 and the Next.js App Router.
 
 - ESM-only
 - React 19+ peer dep
