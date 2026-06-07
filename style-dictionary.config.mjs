@@ -33,6 +33,12 @@ function mergeSets(...sets) {
 const isSemantic = (token) =>
   typeof token.original?.$value === 'string' && token.original.$value.startsWith('{')
 
+// Primitive scales that Tailwind utilities resolve through (spacing-1, rounded-md, etc.).
+// Not semantic-themable (no light/dark variant) but part of the public override surface.
+const isTailwindPrimitive = (token) => token.path[0] === 'spacing' || token.path[0] === 'radius'
+
+const isThemeArtifact = (token) => isSemantic(token) || isTailwindPrimitive(token)
+
 // CSS custom properties under a configurable selector (SD v5 pattern).
 StyleDictionary.registerFormat({
   name: 'css/themed',
@@ -48,13 +54,18 @@ StyleDictionary.registerFormat({
   },
 })
 
-// First path segment is the token category (color, radius, ...). Hardcoding
-// `--color-` would silently emit future non-color semantics under the wrong prefix.
+// Tailwind v4 @theme inline: map utility variables onto our CSS vars.
+// Emits one line per token; the variable prefix comes from path[0] (color / spacing / radius).
+// Hardcoding `--color-` would silently emit future non-color semantics under the wrong prefix.
 StyleDictionary.registerFormat({
   name: 'tailwind/theme-inline',
   format: ({ dictionary }) => {
     const lines = dictionary.allTokens
-      .map((t) => `  --${t.path[0]}-${t.path.slice(1).join('-')}: var(--${t.name});`)
+      .map((t) => {
+        const ns = t.path[0]
+        const rest = t.path.slice(1).join('-')
+        return `  --${ns}-${rest}: var(--${t.name});`
+      })
       .join('\n')
     return `@theme inline {\n${lines}\n}\n`
   },
@@ -81,10 +92,10 @@ function makeSD(tokens, files, config = {}) {
 // win regardless of bundler hoist order. Bare selectors at (0,1,0) silently invert.
 
 // Light: :root with all primitives (raw) + semantic vars (as var() references),
-// plus the Tailwind @theme artifact (semantic names only).
+// plus the Tailwind @theme artifact (semantic + Tailwind-primitive names only).
 const lightSD = makeSD(mergeSets(core, light), [
   { destination: 'tokens.light.css', format: 'css/themed', options: { selector: ':where(:root)' } },
-  { destination: 'theme.css', format: 'tailwind/theme-inline', filter: isSemantic },
+  { destination: 'theme.css', format: 'tailwind/theme-inline', filter: isThemeArtifact },
 ])
 
 // Dark: re-bind the semantic vars only (primitives stay defined in :root).
