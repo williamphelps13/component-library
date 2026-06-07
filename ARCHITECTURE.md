@@ -121,6 +121,15 @@ The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole
 - Purely visual → no `"use client"` (server-renderable). Native props spread via `...rest`; `className` merges with the variant classes.
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
 
+### Cross-cutting accessibility
+
+Three policies every component honors. Documented here so the first component to need each one inherits the convention rather than re-discovering it.
+
+- Survive `forced-colors` (Windows HCM). Token colors collapse to system colors under `@media (forced-colors: active)`, so each component adds an explicit `border: 1px solid ButtonText` (or equivalent) and a `Highlight` focus outline. Button is the reference.
+- Respect `prefers-reduced-motion`. Animations and transitions are gated behind `@media (prefers-reduced-motion: no-preference)` (or kept short and non-essential). No current component needs this; the first one with a transition is the trigger.
+- Never rely on color alone. Destructive intent pairs with an explicit label; status indicators pair with an icon or text. Documented per-component in JSDoc.
+- Right-to-left support deferred. `modes.ts` exports only `light` and `dark` today. Add an `rtl: { dir: 'rtl' }` mode there when the first directional component lands (likely Tabs, Menu, or Tooltip post-§4.1).
+
 ### Story pattern
 
 Every component's `*.stories.tsx` follows the same shape so reviewers and agents pattern-match without rediscovery. Button is the reference.

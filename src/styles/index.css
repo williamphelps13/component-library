@@ -79,3 +79,18 @@
   outline: 2px solid var(--color-ring);
   outline-offset: 2px;
 }
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Windows High Contrast Mode: token colors collapse to system ones, so add an
+   explicit border + Highlight focus outline so the button stays distinguishable. */
+@media (forced-colors: active) {
+  .ui-btn {
+    border: 1px solid ButtonText;
+  }
+  .ui-btn:focus-visible {
+    outline-color: Highlight;
+  }
+}
