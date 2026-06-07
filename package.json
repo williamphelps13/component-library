@@ -10,7 +10,10 @@
   ],
   "files": [
     "dist",
-    "src"
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.stories.*",
+    "!src/**/*.test.*",
+    "!src/styles/**"
   ],
   "exports": {
     ".": {
@@ -30,7 +33,7 @@
     "knip": "knip",
     "spell": "cspell \"README.md\" \"src/**/*.{ts,tsx,md}\"",
     "assert:use-client": "node scripts/assert-use-client.mjs",
-    "verify:pack": "publint",
+    "verify:pack": "node scripts/assert-pack-contents.mjs && publint",
     "verify:types": "attw --pack",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
