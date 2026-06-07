@@ -20,7 +20,7 @@
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "tokens": "node style-dictionary.config.mjs",
+    "tokens": "node scripts/assert-theme-parity.mjs && node style-dictionary.config.mjs",
     "css": "tailwindcss -i src/styles/index.css -o dist/styles.css",
     "build": "pnpm tokens && tsdown --tsconfig tsconfig.build.json && pnpm css",
     "typecheck": "tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p tsconfig.json",

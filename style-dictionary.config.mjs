@@ -48,12 +48,15 @@ StyleDictionary.registerFormat({
   },
 })
 
-// Tailwind v4 @theme inline: map color-* utilities onto our semantic CSS vars.
+// Tailwind v4 @theme inline: map category utilities onto our semantic CSS vars.
+// First path segment is the category (color, radius, spacing, …) so emitted
+// Tailwind utility names match the category. Hardcoding `--color-` would
+// silently emit future non-color semantics under the color prefix.
 StyleDictionary.registerFormat({
   name: 'tailwind/theme-inline',
   format: ({ dictionary }) => {
     const lines = dictionary.allTokens
-      .map((t) => `  --color-${t.path.slice(1).join('-')}: var(--${t.name});`)
+      .map((t) => `  --${t.path[0]}-${t.path.slice(1).join('-')}: var(--${t.name});`)
       .join('\n')
     return `@theme inline {\n${lines}\n}\n`
   },
@@ -76,10 +79,16 @@ function makeSD(tokens, files, config = {}) {
   })
 }
 
+// Selectors are :where()-wrapped to keep specificity at zero (the override
+// contract — consumer overrides win without !important, regardless of whether
+// the consumer's bundler hoists our stylesheet first or last). Without :where,
+// `:root` and `[data-theme="dark"]` both ship at (0,1,0), and a vendor-style-
+// last bundler config silently inverts the override outcome in dark mode.
+
 // Light: :root with all primitives (raw) + semantic vars (as var() references),
 // plus the Tailwind @theme artifact (semantic names only).
 const lightSD = makeSD(mergeSets(core, light), [
-  { destination: 'tokens.light.css', format: 'css/themed', options: { selector: ':root' } },
+  { destination: 'tokens.light.css', format: 'css/themed', options: { selector: ':where(:root)' } },
   { destination: 'theme.css', format: 'tailwind/theme-inline', filter: isSemantic },
 ])
 
@@ -98,7 +107,7 @@ const darkSD = makeSD(
     {
       destination: 'tokens.dark.css',
       format: 'css/themed',
-      options: { selector: '[data-theme="dark"]' },
+      options: { selector: ':where([data-theme="dark"])' },
       filter: isSemantic,
     },
   ],
