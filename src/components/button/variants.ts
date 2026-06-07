@@ -1,10 +1,21 @@
-export type Intent = 'primary' | 'neutral' | 'danger'
-export type Size = 'sm' | 'md'
+export type Intent =
+  /** Main action — most important on the screen. */
+  | 'primary'
+  /** Secondary or default action. */
+  | 'neutral'
+  /** Destructive action. */
+  | 'danger'
+
+export type Size =
+  /** Compact. */
+  | 'sm'
+  /** Default. */
+  | 'md'
 
 // Literal class names per variant. Tailwind scans these statically, so the
-// precompiled CSS ships EVERY variant's classes — independent of which
-// stories/tests happen to reference them. The Record<…> types force a class for
-// each Intent/Size: add a variant → TS makes you add its class → it ships.
+// precompiled CSS ships every variant's classes — independent of which
+// stories/tests happen to reference them. The Record<…> types force a class
+// per Intent/Size: add a variant → TS makes you add its class → it ships.
 // (Tailwind can't resolve dynamically-built names like `ui-btn-${intent}`.)
 const intentClass: Record<Intent, string> = {
   primary: 'ui-btn-primary',
