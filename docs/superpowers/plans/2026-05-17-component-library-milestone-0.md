@@ -174,6 +174,22 @@ genuinely changes scope/sequence — not for routine within-task choices.
     1. (Unchanged from above) Open milestone-0 → main PR + manual Chromatic visual-accept.
     2. (Unchanged) Task 5.1 release-workflow author on `main` post-merge.
 
+- **June hardening + Button rebuild + contributor skill (2026-06-13).** Branch `milestone-0`, Teaching Mode off. Catch-up entry — these landed without their own log entries; recorded before the milestone-0 → main merge. Architecture detail lives in ARCHITECTURE.md (§ "Component model — Button", "Cross-cutting accessibility"); this records what changed and why.
+
+  - **Phase-4 hardening (`545ca1a`..`1770843`).** Dark-mode danger contrast fixed (`--color-danger-fg` semantic; dark `ring` rebind) with dark stories so axe runs under `[data-theme=dark]`. Token emit wrapped in `:where()` for zero-specificity overrides; `assert-theme-parity.mjs` gate added. Published tarball scoped to `dist` + component `.ts(x)`, guarded by `assert-pack-contents.mjs`; story-class leak into `dist/styles.css` closed. `assert-use-client.mjs` hardened (missing-dist fails; symmetric allowlist; barrel value-export check) plus an edit-time ESLint barrel guard. Disabled affordance, `forced-colors` border/outline, and a cross-cutting a11y policy added. Comment discipline codified in CLAUDE.md and applied retroactively.
+
+  - **Button rebuild (PR #6, squash `e7a20d7`).** Six interactive states, `loading`/`loadingIndicator`/`startIcon`/`endIcon` props, per-component CSS co-location (`button.css`), and `core.spacing`/`core.radius` primitives exposed as override surface. MUI is the design target with named-justification deviations; focus signaled by elevation depth (no static ring); Button stays server-renderable (no `"use client"`). Sizes renamed `sm`/`md` → `small`/`medium`/`large`. Cloud code review caught a reintroduced disabled `pointer-events:none` and a dark-danger contrast regression; both fixed before merge.
+
+  - **Contributor skill in-tree.** `.gitignore` un-ignores `.claude/`; `.claude/skills/add-component/SKILL.md` and `.claude/settings.json` (Storybook MCP) ship so the add-component workflow survives agent handoffs.
+
+  - **Pending (supersedes the list above):**
+    1. Merge PR #5 (milestone-0 → main) — first PR to exercise main's required checks; then make main the trunk.
+    2. Phase 5.1 — author `release.yml` + `release` script + `repo`/`changelog-github` in changesets config.
+    3. Owner registers npm trusted publisher on npmjs.com (blocks first publish).
+    4. Phase 5.2 — first publish `0.1.0` (OIDC; granular-token fallback if `pnpm publish` lacks OIDC).
+    5. Phase 5.3–5.5 — consume in the owner's existing Next.js app, republish loop, `docs/workflow.md`.
+    6. Dependabot PR #7 — deferred until post-#6, then rebase + fix CI.
+
 ---
 
 ## File Structure (decomposition lock-in)
