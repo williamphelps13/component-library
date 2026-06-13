@@ -1,0 +1,13 @@
+dist
+build
+storybook-static
+pnpm-lock.yaml
+
+# Planning + working artifacts — heavy markdown that exercises prettier's MD
+# parser quirks (e.g. inline code containing `**` inside bold context). These
+# aren't shipped prose; clarity > formatter conformance.
+docs/superpowers/plans/
+HANDOFF.md
+
+# User-local IDE/agent state (gitignored — should never be linted).
+.claude/

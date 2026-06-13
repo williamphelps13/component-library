@@ -1,0 +1,249 @@
+/*
+ * Button component styles.
+ *
+ * Co-located with `button.tsx`. Imported by `src/styles/index.css` into the
+ * precompiled `dist/styles.css`. Authored via Tailwind v4's `@utility` directive
+ * so the classes compile into Tailwind's `@layer utilities` for predictable
+ * low-specificity overrides; the `ui-` namespace prevents collisions with
+ * consumer Tailwind setups.
+ *
+ * Six interactive states — none silently rely on browser defaults:
+ *   idle / hover / active / focus-visible / disabled / loading.
+ */
+
+@utility ui-btn {
+  position: relative; /* anchor for absolutely-positioned spinner + click ripple */
+  overflow: hidden; /* contains the ::after ripple within the rounded button */
+  appearance: none;
+  border: 0;
+  margin: 0;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  /* Elevation is the focus/hover/active signal — no static focus ring.
+     Matches MUI: idle < hover < focus-visible < active, layered via box-shadow. */
+  --ui-btn-elevation: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: var(--ui-btn-elevation);
+  transition:
+    background-color 200ms,
+    box-shadow 200ms,
+    opacity 150ms;
+}
+
+/*
+ * Click ripple — CSS-only flash that expands on :active. Uses currentColor so
+ * the ripple is high-contrast against each intent (white over primary/danger,
+ * dark over neutral). No JS required; stays server-renderable. True click-point
+ * positioning would require a "use client" directive on button.tsx — opt-in
+ * later if needed; centered flash is the right default for a presentational
+ * component.
+ */
+.ui-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.5);
+}
+
+.ui-btn:active:not(:disabled)::after {
+  animation: ui-btn-ripple 350ms ease-out;
+}
+
+@keyframes ui-btn-ripple {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+@utility ui-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+@utility ui-btn-neutral {
+  background-color: var(--color-neutral-bg);
+  color: var(--color-neutral-fg);
+}
+@utility ui-btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-danger-fg);
+}
+@utility ui-btn-small {
+  height: 32px;
+  padding-inline: var(--spacing-2);
+  font-size: 0.8125rem;
+}
+@utility ui-btn-medium {
+  height: 36px;
+  padding-inline: var(--spacing-2);
+  font-size: 0.875rem;
+}
+@utility ui-btn-large {
+  height: 42px;
+  padding-inline: var(--spacing-3);
+  font-size: 0.9375rem;
+}
+
+/*
+ * Hover — MUI's pattern: bigger shadow (perceived lift) + slight color shift.
+ * Shadow does most of the visible work; color shift is reinforcement, not the
+ * sole signal. Suppressed on touch via @media (hover: hover). Dark theme flips
+ * the color-shift direction (lighten instead of darken) per Material guidance.
+ */
+@media (hover: hover) {
+  .ui-btn:hover:not(:disabled) {
+    --ui-btn-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+  }
+  .ui-btn-primary:hover:not(:disabled) {
+    background-color: oklch(from var(--color-primary) calc(l - 0.08) c h);
+  }
+  .ui-btn-neutral:hover:not(:disabled) {
+    background-color: oklch(from var(--color-neutral-bg) calc(l - 0.08) c h);
+  }
+  .ui-btn-danger:hover:not(:disabled) {
+    background-color: oklch(from var(--color-danger) calc(l - 0.08) c h);
+  }
+
+  /* Dark theme: primary and neutral bg lightness swaps between themes, so
+     lightening on hover keeps the bg-vs-fg gap. Danger bg is the same red in
+     both themes, so darkening (the light-mode rule above) is what preserves
+     white-on-red contrast — no [data-theme='dark'] override for danger. */
+  [data-theme='dark'] .ui-btn-primary:hover:not(:disabled) {
+    background-color: oklch(from var(--color-primary) calc(l + 0.08) c h);
+  }
+  [data-theme='dark'] .ui-btn-neutral:hover:not(:disabled) {
+    background-color: oklch(from var(--color-neutral-bg) calc(l + 0.08) c h);
+  }
+}
+
+/*
+ * Active — even bigger shadow + further color shift. The combined elevation +
+ * color makes the press unmistakable; this is the categorical gap from the
+ * prior attempt (which had neither shadow nor visible color change).
+ */
+.ui-btn:active:not(:disabled) {
+  --ui-btn-elevation: 0 8px 16px -4px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+}
+.ui-btn-primary:active:not(:disabled) {
+  background-color: oklch(from var(--color-primary) calc(l - 0.15) c h);
+}
+.ui-btn-neutral:active:not(:disabled) {
+  background-color: oklch(from var(--color-neutral-bg) calc(l - 0.15) c h);
+}
+.ui-btn-danger:active:not(:disabled) {
+  background-color: oklch(from var(--color-danger) calc(l - 0.15) c h);
+}
+
+[data-theme='dark'] .ui-btn-primary:active:not(:disabled) {
+  background-color: oklch(from var(--color-primary) calc(l + 0.12) c h);
+}
+[data-theme='dark'] .ui-btn-neutral:active:not(:disabled) {
+  background-color: oklch(from var(--color-neutral-bg) calc(l + 0.12) c h);
+}
+/* No [data-theme='dark'] danger override — see hover block above. */
+
+/*
+ * Focus-visible — elevation between hover and active. Matches MUI's contained
+ * Button (shadows[6]). The transparent `outline` preserves a focus indication
+ * in Forced Colors Mode, where box-shadow is dropped.
+ * Source-order placement after hover and before disabled means focus-visible
+ * wins over hover when both apply, and disabled flattens everything.
+ */
+.ui-btn:focus-visible:not(:disabled) {
+  outline: 2px solid transparent;
+  --ui-btn-elevation: 0 6px 10px -2px rgba(0, 0, 0, 0.14), 0 3px 6px -1px rgba(0, 0, 0, 0.09);
+}
+
+/* Disabled — flatten + dim + cursor. Native `disabled` already blocks clicks
+   and `:hover:not(:disabled)` suppresses the hover style; `pointer-events: none`
+   would suppress the cursor too. */
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  --ui-btn-elevation: 0 0 #0000;
+}
+
+/*
+ * Loading layout — absolute spinner over an opacity:0 content wrapper.
+ * opacity:0 (not visibility:hidden) keeps the label in the accessibility tree;
+ * see CLAUDE.md gotcha. The button itself sets aria-busy + HTML disabled.
+ */
+@utility ui-btn-spinner {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+@utility ui-btn-spinner-svg {
+  width: 16px;
+  height: 16px;
+  animation: ui-btn-spin 1s linear infinite;
+}
+@utility ui-btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+@utility ui-btn-content-loading {
+  opacity: 0;
+}
+@utility ui-btn-icon-start {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+@utility ui-btn-icon-end {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+@keyframes ui-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Reduced motion respect — zero transitions, spinner, and ripple when requested. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-btn {
+    transition: none;
+  }
+  .ui-btn-spinner-svg {
+    animation: none;
+  }
+  .ui-btn:active:not(:disabled)::after {
+    animation: none;
+  }
+}
+
+/*
+ * Forced Colors Mode (Windows High Contrast) — system colors collapse the
+ * intent backgrounds together, so add a ButtonText border to keep buttons
+ * visually distinct, and switch the focus ring to Highlight so it survives.
+ * Matches the milestone-0 accommodation; works because color-mix and box-shadow
+ * are all overridden by forced-colors but border + outline are honored.
+ */
+@media (forced-colors: active) {
+  .ui-btn {
+    border: 1px solid ButtonText;
+  }
+  .ui-btn:focus-visible {
+    outline-color: Highlight;
+  }
+}

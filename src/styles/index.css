@@ -1,0 +1,40 @@
+/*
+ * Precompiled CSS bundle for @williamphelps13/ui.
+ *
+ * Layered-import form (instead of a bare `@import "tailwindcss"`) so we control
+ * two things a precompiled COMPONENT library must own deliberately:
+ *   1. Source scanning  — what class names drive utility emission.
+ *   2. Preflight        — whether we ship a global browser reset to consumers.
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+/*
+ * Preflight (tailwindcss/preflight.css → layer(base)) is INTENTIONALLY omitted.
+ * A precompiled component lib must not impose a global reset on a consumer's
+ * <button>/<h1>/margins. Our component classes are self-contained instead.
+ *
+ * source(none) disables Tailwind's auto-scan of the whole repo (which was
+ * scraping class names out of docs/*.md and shipping them). @source re-adds
+ * ONLY our component code, so the output is minimal and doc-independent.
+ *
+ * No prefix(): prefix(tw) namespaces theme VARIABLES too (--color-* →
+ * --tw-color-*), which would break our consumer override contract
+ * (:root { --color-primary }). Collision-safety comes from the narrow source
+ * surface + our own `ui-` class names + Preflight being off — not from prefix().
+ */
+@source "../components";
+/* Exclude stories: inline-style literals (e.g. `display: 'grid'`) would otherwise ship as utility classes. */
+@source not "../components/**/*.stories.*";
+
+/* Generated token layers (Style Dictionary → build/). */
+@import '../../build/tokens.light.css'; /* :root primitives + semantic var() refs */
+@import '../../build/tokens.dark.css'; /* [data-theme="dark"] re-binds semantics */
+@import '../../build/theme.css'; /* @theme inline: maps --color-* utilities onto our vars */
+
+/* Zero-specificity dark variant — matches the token pipeline's selector. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Per-component styles. Add one @import line per new component. */
+@import '../components/button/button.css';

@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: ['**']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  correctness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Playwright browsers aren't preinstalled on GH runners; the storybook
+      # vitest project needs chromium (+ system deps) for the browser-mode tests.
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm knip
+      - run: pnpm spell
+      - run: pnpm format
+      - run: pnpm build
+      - run: pnpm assert:use-client
+      - run: pnpm test
+      - run: pnpm verify:pack
+
+  chromatic:
+    needs: correctness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Storybook's preview.tsx side-effect-imports ../dist/styles.css (the
+      # precompiled Tailwind output). Build the lib first so the file exists
+      # when chromaui/action runs `build-storybook`. dist/ is gitignored, so
+      # this is necessary in CI even though it's already present locally.
+      - run: pnpm build
+      - uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          # All other policy (onlyChanged, autoAcceptChanges, exitZeroOnChanges,
+          # buildScriptName) lives in chromatic.config.json so local
+          # `pnpm chromatic` and CI behave identically.
