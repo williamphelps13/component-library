@@ -200,7 +200,7 @@ An MCP server (`@storybook/addon-mcp`) exposes the library's real component docs
 
 ### Release
 
-Changesets (public access) with GitHub Actions and npm OIDC trusted publishing (no stored `NPM_TOKEN`) and automatic provenance. The `@changesets/changelog-github` formatter and the `release.yml` workflow land in Phase 5 (currently `.changeset/config.json` uses the default `@changesets/cli/changelog`).
+Changesets (public access) with automatic provenance and `@changesets/changelog-github` changelogs. `release.yml` runs on push to `main`: `changesets/action` opens a Version Packages PR, and merging it runs `pnpm release` (`pnpm build && changeset publish`). Publishing uses npm OIDC trusted publishing (no stored `NPM_TOKEN`), granted via the workflow's `id-token: write` permission.
 
 ### Quality gates
 
