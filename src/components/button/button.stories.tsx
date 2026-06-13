@@ -46,8 +46,10 @@ export const Primary = meta.story({ args: { intent: 'primary' } })
 export const Neutral = meta.story({ args: { intent: 'neutral' } })
 export const Danger = meta.story({ args: { intent: 'danger' } })
 
-// Size baseline.
-export const Small = meta.story({ args: { size: 'sm' } })
+// Size baselines.
+export const Small = meta.story({ args: { size: 'small' } })
+export const Medium = meta.story({ args: { size: 'medium' } })
+export const Large = meta.story({ args: { size: 'large' } })
 
 // State baselines.
 export const Disabled = meta.story({ args: { disabled: true } })
@@ -76,21 +78,21 @@ export const Clicks = meta.story({
 
 export const LoadingBlocksClicks = meta.story({
   args: { loading: true, onClick: fn() },
-  play: async ({ args, canvas }) => {
-    // userEvent.click refuses to fire on pointer-events:none (browser-realistic).
-    // Assert the disabled + aria-busy contract directly instead.
+  play: async ({ args, canvas, userEvent }) => {
     const button = canvas.getByRole('button', { name: 'Button' })
     await expect(button).toBeDisabled()
     await expect(button).toHaveAttribute('aria-busy', 'true')
+    await userEvent.click(button)
     await expect(args.onClick).not.toHaveBeenCalled()
   },
 })
 
 export const DisabledBlocksClicks = meta.story({
   args: { disabled: true, onClick: fn() },
-  play: async ({ args, canvas }) => {
+  play: async ({ args, canvas, userEvent }) => {
     const button = canvas.getByRole('button', { name: 'Button' })
     await expect(button).toBeDisabled()
+    await userEvent.click(button)
     await expect(args.onClick).not.toHaveBeenCalled()
   },
 })
@@ -141,7 +143,7 @@ export const DarkDanger = meta.story({
 })
 
 const intents = ['primary', 'neutral', 'danger'] as const
-const sizes = ['sm', 'md'] as const
+const sizes = ['small', 'medium', 'large'] as const
 
 export const AllVariants = meta.story({
   tags: ['!autodocs'],

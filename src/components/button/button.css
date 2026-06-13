@@ -27,11 +27,10 @@
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  /* Composable box-shadow: focus ring + elevation layered via CSS variables
-     so hover/active elevation and focus-visible ring don't trample each other. */
-  --ui-btn-ring: 0 0 #0000;
+  /* Elevation is the focus/hover/active signal — no static focus ring.
+     Matches MUI: idle < hover < focus-visible < active, layered via box-shadow. */
   --ui-btn-elevation: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-  box-shadow: var(--ui-btn-ring), var(--ui-btn-elevation);
+  box-shadow: var(--ui-btn-elevation);
   transition:
     background-color 200ms,
     box-shadow 200ms,
@@ -83,15 +82,20 @@
   background-color: var(--color-danger);
   color: var(--color-danger-fg);
 }
-@utility ui-btn-sm {
-  height: var(--spacing-4);
+@utility ui-btn-small {
+  height: 32px;
+  padding-inline: var(--spacing-2);
+  font-size: 0.8125rem;
+}
+@utility ui-btn-medium {
+  height: 36px;
   padding-inline: var(--spacing-2);
   font-size: 0.875rem;
 }
-@utility ui-btn-md {
-  height: var(--spacing-5);
-  padding-inline: var(--spacing-2);
-  font-size: 1rem;
+@utility ui-btn-large {
+  height: 42px;
+  padding-inline: var(--spacing-3);
+  font-size: 0.9375rem;
 }
 
 /*
@@ -154,20 +158,23 @@
 }
 
 /*
- * Focus ring — composes with elevation via the --ui-btn-ring CSS variable,
- * so hover/active elevation and focus-visible ring coexist. Transparent outline
- * preserves a visible focus indication in Forced Colors Mode (high-contrast).
+ * Focus-visible — elevation between hover and active. Matches MUI's contained
+ * Button (shadows[6]). The transparent `outline` preserves a focus indication
+ * in Forced Colors Mode, where box-shadow is dropped.
+ * Source-order placement after hover and before disabled means focus-visible
+ * wins over hover when both apply, and disabled flattens everything.
  */
-.ui-btn:focus-visible {
+.ui-btn:focus-visible:not(:disabled) {
   outline: 2px solid transparent;
-  --ui-btn-ring: 0 0 0 3px var(--color-ring);
+  --ui-btn-elevation: 0 6px 10px -2px rgba(0, 0, 0, 0.14), 0 3px 6px -1px rgba(0, 0, 0, 0.09);
 }
 
-/* Disabled — flatten + dim + cursor + pointer-events. */
+/* Disabled — flatten + dim + cursor. Native `disabled` already blocks clicks
+   and `:hover:not(:disabled)` suppresses the hover style; `pointer-events: none`
+   would suppress the cursor too. */
 .ui-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  pointer-events: none;
   --ui-btn-elevation: 0 0 #0000;
 }
 

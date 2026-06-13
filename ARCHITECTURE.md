@@ -126,12 +126,29 @@ The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole
 
 ### Component model — Button
 
-- `ref` is a plain prop (React 19) — `Button` is a plain function with `ref?: Ref<HTMLButtonElement>`;
-  no `forwardRef` (removed in React 19). An explicit `ReactElement` return type satisfies
-  `isolatedDeclarations`.
+Design target: MUI Material Button. When MUI does X, we do X unless the deviation has a named justification of one of two kinds: (a) a concrete user-visible UX improvement, or (b) alignment with the library's core positioning — React 19, Next.js App Router, RSC-first. Both bars are concrete: "modernization" alone is not (a), and "feels cleaner" alone is not (b). Surfaces that match MUI: hover and active color shifts (mechanism differs — oklch lightness vs alpha overlays — visual outcome aligned), focus-visible signaled by elevation depth (between hover and active; no static ring), disabled treatment, `@media (hover: hover)` suppression on touch, `forced-colors` border, `prefers-reduced-motion`, icon a11y, ripple existence. Sizes (`small | medium | large`) approximate MUI's perceptual scale.
+
+Deliberate deviations with named justifications. Each line names which bar the deviation clears — (a) user-visible UX win, or (b) React 19 / Next.js App Router / RSC alignment.
+
+- (b) `ref` is a plain prop — `Button` is a plain function with `ref?: Ref<HTMLButtonElement>`; no `forwardRef` (removed in React 19). An explicit `ReactElement` return type satisfies `isolatedDeclarations`. The whole library is React 19-only; using the React 19 idiom for ref is the alignment, not a deviation worth re-litigating.
 - Variants are a typed literal-class map (`variants.ts`): `Record<Intent,string>` and `Record<Size,string>` resolve to `ui-btn …` strings. Tailwind can't see dynamic names (`ui-btn-${intent}`), so each class must appear as a literal in scanned source; the `Record` makes TS enforce one class per variant — add a variant and TS forces its class to ship. The pure `buttonClasses()` is unit-testable on its own.
-- Purely visual → no `"use client"` (server-renderable). Native props spread via `...rest`; `className` merges with the variant classes.
+- Native HTML props spread via `...rest`; `className` merges with the variant classes.
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
+- (a) Default `type='button'` (MUI inherits browser default). Prevents accidental form submit when the Button is dropped inside a `<form>`.
+- (a) Explicit `aria-busy={loading || undefined}` (MUI relies on implicit busy semantics). One less semantic gap for screen readers.
+- (a) Hover/active color shift via `oklch(from var(--color-X) calc(l ± N) c h)` instead of MUI's `alpha(palette.main, 0.04)` overlay. Both work; ours is theme-token-portable and lets the same shift formula serve every intent. Marginal — kept because the override contract (point below) needs CSS-var inputs and oklch shifts compose with them.
+- (b) Semantic-token theming (`--color-primary`, `--color-primary-fg`, …) rather than a JS theme object. The whole library targets RSC and Next.js App Router; a JS theme object would require a Provider in every consumer's `layout.tsx` and forfeit server-renderability. CSS-var overrides need no JS, no Provider, and no rebuild.
+- (a) Color-alone warning in `intent` JSDoc: pair `danger` with an explicit destructive label. Concrete a11y improvement codified at the prop type rather than left as Material guidance.
+
+#### Server-renderable Button — the trade-off
+
+(b) `button.tsx` carries no `"use client"`. The component is presentational — no hooks, no event handlers wired internally, CSS-only ripple and spinner animations. This is a deliberate deviation from MUI (which requires `"use client"` because of its `useState`/`useRef` ripple machinery) and clears the React 19 / Next.js App Router / RSC alignment bar directly: the library exists to be RSC-native, and the Button is the most-used component in any app — making it server-renderable by default is the highest-leverage place to honor that positioning.
+
+Benefit (the user-visible one): zero JS shipped for the Button in any RSC consumer. No hydration cost. Pages where a Button only fires `onClick` after hydration (which the consumer wires via prop, not the library) get the static markup at first paint and stay interactive without the library contributing a single byte of JS. Static surfaces (marketing pages, docs, table action buttons, server-rendered admin tools) benefit directly.
+
+Cost (the user-visible one): the ripple is a centered scale flash, not a MUI-style click-point origin. MUI's ripple expands from `clientX`/`clientY`; ours starts from the button's geometric center. Reproducing MUI's behavior would require `"use client"` and `useState` to capture click coordinates — at which point we forfeit the SSR benefit above.
+
+Future agents: do not re-open this without a specific user-visible improvement that requires it. The architectural simplicity (no hooks, no client boundary) is what makes the "Button is free in RSC" claim true.
 
 ### Cross-cutting accessibility
 

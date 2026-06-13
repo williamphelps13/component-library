@@ -8,9 +8,11 @@ export type Intent =
 
 export type Size =
   /** Compact. */
-  | 'sm'
+  | 'small'
   /** Default. */
-  | 'md'
+  | 'medium'
+  /** Prominent. */
+  | 'large'
 
 // Literal class names per variant. Tailwind scans these statically, so the
 // precompiled CSS ships every variant's classes — independent of which
@@ -24,8 +26,9 @@ const intentClass: Record<Intent, string> = {
 }
 
 const sizeClass: Record<Size, string> = {
-  sm: 'ui-btn-sm',
-  md: 'ui-btn-md',
+  small: 'ui-btn-small',
+  medium: 'ui-btn-medium',
+  large: 'ui-btn-large',
 }
 
 /** Resolve the `@utility` class string for a Button variant. Pure → unit-testable. */

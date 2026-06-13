@@ -55,7 +55,7 @@ function DefaultSpinner(): ReactElement {
  */
 export function Button({
   intent = 'primary',
-  size = 'md',
+  size = 'medium',
   loading = false,
   loadingIndicator,
   startIcon,
@@ -78,7 +78,9 @@ export function Button({
       aria-busy={loading || undefined}
       {...rest}
     >
-      {loading && <span className="ui-btn-spinner">{loadingIndicator ?? <DefaultSpinner />}</span>}
+      <span className="ui-btn-spinner" aria-hidden={!loading}>
+        {loading && (loadingIndicator ?? <DefaultSpinner />)}
+      </span>
       <span className={contentClasses}>
         {startIcon && (
           <span className="ui-btn-icon-start" aria-hidden="true">
