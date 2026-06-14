@@ -190,6 +190,16 @@ genuinely changes scope/sequence — not for routine within-task choices.
     5. Phase 5.3–5.5 — consume in the owner's existing Next.js app, republish loop, `docs/workflow.md`.
     6. Dependabot PR #7 — deferred until post-#6, then rebase + fix CI.
 
+- **React Compiler — server components opt out for RSC safety (2026-06-14).** Branch `fix/rsc-scope-react-compiler`, Teaching Mode off. Consuming `0.1.0` in the pilot app (swfllive, React 19, App Router) surfaced that the Button throws in a Server Component: the compiler in `infer` mode injected `useMemoCache` (`react/compiler-runtime`) into the hookless Button, and that hook has no dispatcher in RSC. The "Button is free in RSC" guarantee was false in the shipped artifact, and every gate stayed green because they all run in a client context. Fix keeps the modern `infer` default (auto-memoize everything) and has server-renderable components opt out with a file-level `"use no memo"` (Button now carries it) — chosen over `compilationMode:'annotation'` because the eventual surface is majority-interactive, so most components get optimized for free with just `"use client"`, and a forgotten opt-out is a loud gate failure rather than a silent perf miss. `assert-use-client.mjs` strengthened to fail any non-`"use client"` dist file that imports `react/compiler-runtime` or calls a React hook (call-site detection, so namespace/default React imports can't slip past; verified it bites when `"use no memo"` is omitted). Docs corrected (ARCHITECTURE.md build + boundary sections; spec §3.2 + summary). Memoization is moot for server components, so opting them out loses nothing.
+
+  - **Pending (supersedes the list above):**
+    1. Stages 1–6 done — `0.1.0` published, `main` is trunk, pure-OIDC `release.yml`, no open PRs.
+    2. Publish `0.1.1` with this fix — first real OIDC fire; verify provenance attaches, then delete the `NPM_TOKEN` + bootstrap token. Trigger: green OIDC publish.
+    3. Phase 5.3 — re-consume `0.1.1` in swfllive; `/ui-bakeoff` server-renders; owner visual-verifies theming.
+    4. Phase 5.4–5.5 — ≥2 republish→update cycles, `docs/workflow.md`, bump ARCHITECTURE.md status ✅ Phase 5.
+    5. Phase 6 — Button bake-off vs swfllive's, `docs/component-conventions.md`, §4.1 gate.
+    6. First client component (Dialog, §4.2) — add `"use client"` (auto-memoized in `infer`) and populate the `assert-use-client.mjs` allowlist.
+
 ---
 
 ## File Structure (decomposition lock-in)
