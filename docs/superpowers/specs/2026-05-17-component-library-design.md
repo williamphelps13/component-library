@@ -32,25 +32,25 @@ before breadth.
 
 ## 2. Decisions at a Glance
 
-| Topic                | Decision                                                                           |
-| -------------------- | ---------------------------------------------------------------------------------- |
-| Language / UI / docs | TypeScript · React 19 · Storybook 10.x                                             |
-| Audience             | Owner + small team                                                                 |
-| Distribution         | Versioned public scoped npm package                                                |
-| Consumers            | Next.js App Router (RSC) + Vite SPAs                                               |
-| Repo structure       | Single repo, single package; tokens compiled internally                            |
-| Bundler              | tsdown (Rolldown/Oxc), ESM-only, per-module output                                 |
-| React optimization   | Ship React-Compiler-compiled output (`target: '19'`)                               |
-| Styling              | Tailwind v4 internally → precompiled CSS                                           |
-| Theming              | CSS-variable token overrides; zero-specificity contract                            |
-| Design tokens        | Code-first W3C/DTCG → Style Dictionary → CSS vars; Figma mirrors via Tokens Studio |
-| Primitives           | Radix (consolidated `radix-ui` package)                                            |
-| Package manager      | pnpm 11 (+ catalogs for framework pins)                                            |
-| Lint / format        | ESLint flat config + Prettier (optional oxlint pre-pass)                           |
-| Quality bar          | Unit + interaction + automated a11y + visual regression (Chromatic)                |
-| Release              | Changesets + GitHub Actions + npm OIDC trusted publishing                          |
-| Execution model      | Teaching Mode (§5)                                                                 |
-| First milestone      | Button-only vertical slice (§4.1)                                                  |
+| Topic                | Decision                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Language / UI / docs | TypeScript · React 19 · Storybook 10.x                                                                       |
+| Audience             | Owner + small team                                                                                           |
+| Distribution         | Versioned public scoped npm package                                                                          |
+| Consumers            | Next.js App Router (RSC) + Vite SPAs                                                                         |
+| Repo structure       | Single repo, single package; tokens compiled internally                                                      |
+| Bundler              | tsdown (Rolldown/Oxc), ESM-only, per-module output                                                           |
+| React optimization   | Ship compiler-optimized output (`infer`); server components opt out with `"use no memo"` and stay uncompiled |
+| Styling              | Tailwind v4 internally → precompiled CSS                                                                     |
+| Theming              | CSS-variable token overrides; zero-specificity contract                                                      |
+| Design tokens        | Code-first W3C/DTCG → Style Dictionary → CSS vars; Figma mirrors via Tokens Studio                           |
+| Primitives           | Radix (consolidated `radix-ui` package)                                                                      |
+| Package manager      | pnpm 11 (+ catalogs for framework pins)                                                                      |
+| Lint / format        | ESLint flat config + Prettier (optional oxlint pre-pass)                                                     |
+| Quality bar          | Unit + interaction + automated a11y + visual regression (Chromatic)                                          |
+| Release              | Changesets + GitHub Actions + npm OIDC trusted publishing                                                    |
+| Execution model      | Teaching Mode (§5)                                                                                           |
+| First milestone      | Button-only vertical slice (§4.1)                                                                            |
 
 Rationale for each lives in the relevant Architecture subsection; timing
 (what ships when) lives in §4.
@@ -98,10 +98,15 @@ independent of delivery order. What is built when is §4.
 - `dts: true`; JSX automatic runtime; `sourcemap: true`.
 - **React Compiler** (`babel-plugin-react-compiler` v1.x) via tsdown's
   recipe (`@rolldown/plugin-babel` + `reactCompilerPreset()`), compiler
-  `target: '19'`. The library ships compiler-optimized output — consumers
-  cannot compile already-built `dist`, so this is the only way components
-  get auto-memoization in any consumer. Compilation is idempotent (a
-  consumer also running the compiler is a documented non-issue).
+  `target: '19'`, default `infer` mode. Every component is auto-memoized and
+  shipped compiled — consumers cannot compile already-built `dist`, so this
+  is the only way components get auto-memoization in any consumer.
+  Server-renderable components opt out with a file-level `"use no memo"`
+  directive and stay uncompiled: the compiler's memoization is a hook
+  (`useMemoCache`) that would break RSC rendering, and memoization is moot
+  for a component that renders once on the server. Compilation is idempotent
+  (a consumer also running the compiler is a documented non-issue). See
+  ARCHITECTURE.md § "Server and client boundary".
 
 Why tsdown over alternatives:
 

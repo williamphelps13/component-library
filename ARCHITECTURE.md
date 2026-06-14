@@ -35,7 +35,7 @@ A versioned, public React component library published to npm and consumed by Nex
 tokens/tokens.json ──(Style Dictionary v5 with sd-transforms)──> build/tokens.{light,dark}.css (:root / [data-theme=dark])
                                                             └──> build/theme.css (@theme inline)
 src/styles/index.css ──(@tailwindcss/cli; source-scoped, Preflight omitted)──> dist/styles.css   (precompiled, controlled)
-src/**/*.tsx ──(tsdown: Rolldown/Oxc with babel-plugin-react-compiler)──> dist/*.mjs and dist/*.d.mts  (unbundled, RC-optimized)
+src/**/*.tsx ──(tsdown: Rolldown/Oxc with babel-plugin-react-compiler)──> dist/*.mjs and dist/*.d.mts  (unbundled; client components RC-optimized, server components hook-free)
 stories ──> Storybook 10 ──> Vitest browser mode (stories-as-tests, a11y) and Chromatic (visual gate)
 main ──> Changesets ──> GitHub Actions ──> npm (OIDC trusted publish, provenance)
 ```
@@ -56,7 +56,7 @@ When behavior-heavy components are added (combobox, dialog, menu, etc.), behavio
 - `exports`: `.` → `./dist/index.mjs` and `./dist/index.d.mts`; `./styles.css` → `./dist/styles.css`
 - `sideEffects: ["**/*.css","./dist/styles.css"]` so consumer bundlers never tree-shake the stylesheet
 - `files: ["dist","src"]` ships source for go-to-source
-- `react` and `react-dom` are peerdeps (`>=19`) — one copy in the consumer; React Compiler `target:'19'` needs no runtime dep
+- `react` and `react-dom` are peerdeps (`>=19`) — one copy in the consumer; React Compiler `target:'19'` uses React 19's built-in runtime, no extra dep
 - `publishConfig`: public access and provenance
 
 Why ESM-only: RSC and Vite both resolve ESM; CJS doubles surface and fights `"use client"`.
@@ -69,7 +69,7 @@ tsdown (Rolldown and Oxc) emits per-file ESM. Config:
 - `dts` and sourcemaps emitted
 - `target:'es2022'` set explicitly (tsdown otherwise infers it from `engines.node`)
 - Externals: `react`, `react-dom`, and `radix-ui` and `@radix-ui/*` (Radix entries pre-registered for component #2 — Dialog — per spec §4.2; no-op until the first Radix import lands)
-- React Compiler runs in-build via `@rolldown/plugin-babel` and `babel-plugin-react-compiler` (`target:'19'`) so every consumer gets memoized output for free
+- React Compiler runs in-build via `@rolldown/plugin-babel` and `babel-plugin-react-compiler` (`target:'19'`) in the default `infer` mode — every component is auto-memoized unless it opts out. Memoization is itself a hook (`useMemoCache`), so compiled output cannot render in RSC; server-renderable components add a file-level `"use no memo"` directive, stay uncompiled, and ship hook-free. Client components get precompiled, auto-memoized output for free (React's recommended library path); server components opt out and stay RSC-native. Memoization only matters where a component re-renders — i.e. on the client — so opting server components out loses nothing. `assert-use-client.mjs` enforces the split: a compiled file with no `"use client"` fails the build.
 - Emits `.mjs` and `.d.mts` — `exports` point there
 
 ### TypeScript — layered configs, TS 6.0
@@ -122,7 +122,7 @@ Direction: planned migration from Tailwind v4 to vanilla CSS using native `@laye
 
 ### Server and client boundary — `"use client"`
 
-The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole lib to the client). Interactive components get the directive per-file; purely-visual ones stay server-renderable. A build-time assertion (`scripts/assert-use-client.mjs`) scans `dist/` to catch directive stripping or hoisting — the highest-severity RSC failure mode.
+The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole lib to the client). Interactive components get the directive per-file and are auto-memoized by the compiler; purely-visual server-renderable components add a file-level `"use no memo"` to opt out of compilation and stay hook-free. `scripts/assert-use-client.mjs` scans `dist/` and enforces two invariants: the `"use client"` allowlist is symmetric (no stray or stripped directives), and every file lacking `"use client"` is genuinely hook-free — it imports no `react/compiler-runtime` and calls no React hook. The second check is the critical one: absence of a directive does not prove server-renderability, since the compiler silently injects `useMemoCache` into any component that didn't opt out. This is the highest-severity RSC failure mode, and it passes every client-context gate (Storybook, Vitest browser mode, typecheck, lint) — only this assertion and a real RSC render catch it.
 
 ### Component model — Button
 
@@ -215,7 +215,7 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 | `.nvmrc`, `package.json` `packageManager`                          | runtime and package-manager pins (exact, no ranges)                                                                                                                                                                                                      |
 | `tsconfig.build.json`                                              | strict publish contract: isolatedDeclarations, rootDir:src, src-only; tsdown emit and typecheck pass 1                                                                                                                                                   |
 | `tsconfig.json`                                                    | broad and lenient: `src` and `.storybook/**/*`; editor and typecheck pass 2                                                                                                                                                                              |
-| `tsdown.config.ts`                                                 | ESM, unbundle, externals, dts, React Compiler                                                                                                                                                                                                            |
+| `tsdown.config.ts`                                                 | ESM, unbundle, externals, dts, React Compiler (infer; server components opt out)                                                                                                                                                                         |
 | `eslint.config.ts`, `.prettierrc.json`, `cspell.json`, `knip.json` | lint, format, spell, dead-code                                                                                                                                                                                                                           |
 | `scripts/assert-use-client.mjs`                                    | build-time `"use client"` guardrail                                                                                                                                                                                                                      |
 | `tokens/tokens.json`, `tokens/README.md`                           | DTCG tokens (single-file sets) and sync contract                                                                                                                                                                                                         |
