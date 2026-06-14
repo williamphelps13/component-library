@@ -4,6 +4,12 @@
   "description": "React component library",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamphelps13/component-library.git"
+  },
+  "homepage": "https://github.com/williamphelps13/component-library#readme",
+  "bugs": "https://github.com/williamphelps13/component-library/issues",
   "sideEffects": [
     "**/*.css",
     "./dist/styles.css"
