@@ -17,9 +17,20 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
+      # Mint a short-lived token from a GitHub App so the Version Packages PR is
+      # authored by the App, not GITHUB_TOKEN. GITHUB_TOKEN events don't trigger
+      # workflows (anti-recursion), so a GITHUB_TOKEN-authored PR never runs the
+      # required CI checks and can't be merged. An App-authored PR does.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # changelog-github resolves commits to PRs via full history
+          token: ${{ steps.app-token.outputs.token }}
 
       - uses: pnpm/action-setup@v6
 
@@ -34,4 +45,4 @@ jobs:
         with:
           publish: pnpm release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
