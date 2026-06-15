@@ -16,6 +16,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   intent?: Intent
   /** Visual size. */
   size?: Size
+  /** When true, the button stretches to fill the width of its container. */
+  fullWidth?: boolean
   /** When true, shows a spinner, disables interaction, and sets `aria-busy="true"`. */
   loading?: boolean
   /** Optional override for the default 16px spinner. */
@@ -61,6 +63,7 @@ function DefaultSpinner(): ReactElement {
 export function Button({
   intent = 'primary',
   size = 'medium',
+  fullWidth = false,
   loading = false,
   loadingIndicator,
   startIcon,
@@ -72,7 +75,9 @@ export function Button({
   ref,
   ...rest
 }: ButtonProps): ReactElement {
-  const classes = [buttonClasses(intent, size), className].filter(Boolean).join(' ')
+  const classes = [buttonClasses(intent, size), fullWidth && 'ui-btn-full-width', className]
+    .filter(Boolean)
+    .join(' ')
   const contentClasses = loading ? 'ui-btn-content ui-btn-content-loading' : 'ui-btn-content'
   return (
     <button
