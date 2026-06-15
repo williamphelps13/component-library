@@ -97,6 +97,9 @@
   padding-inline: var(--spacing-3);
   font-size: 0.9375rem;
 }
+@utility ui-btn-full-width {
+  width: 100%;
+}
 
 /*
  * Hover — MUI's pattern: bigger shadow (perceived lift) + slight color shift.

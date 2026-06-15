@@ -51,6 +51,16 @@ export const Small = meta.story({ args: { size: 'small' } })
 export const Medium = meta.story({ args: { size: 'medium' } })
 export const Large = meta.story({ args: { size: 'large' } })
 
+// Layout modifier — stretches to fill the container.
+export const FullWidth = meta.story({
+  args: { fullWidth: true },
+  render: (args) => (
+    <div style={{ width: 320 }}>
+      <Button {...args} />
+    </div>
+  ),
+})
+
 // State baselines.
 export const Disabled = meta.story({ args: { disabled: true } })
 export const Loading = meta.story({ args: { loading: true } })
