@@ -34,9 +34,9 @@ Task scaffolds in the plan body (e.g. `### Task 4.2`) are historical execution g
 
 > **Most recent first** ↓ (the section below is chronological with newest at the BOTTOM; this pointer reverses the discovery order for fresh readers):
 >
-> 1. **Pre-merge review pass before milestone-0 → main (2026-05-26).** `attw` root-caused as environmental (fails on `zod@3.23.8` too — generic 0.18.2 bug, not TS 6.0); spec §3.6 `prefix(tw)` flagged superseded.
-> 2. **Task 5.1 validation pass — `release.yml` draft revisions (2026-05-26).** Action majors `@v4` → `@v6`, Node from `.nvmrc`, drop release-build cache, slim to `pnpm build` + publish (correctness already gates on same SHA), `publish: pnpm release` via new package.json script, OIDC-only with a planned token fallback, sequence as milestone-0 → main merge → publish from main.
-> 3. **Pre-Phase-5 debts cleared (2026-05-26).** `engines.node` right-sized to `>=22.12.0`; over-strict-settings audit kept every knob; 2 Dependabot PRs rebased.
+> 1. **Phase 5 closed — publish/consume loop proven (2026-07-04).** Two real change→publish→consume cycles through swfllive (`fullWidth` → 0.2.0, `success` intent → 0.3.0); App-token Version-PR fix + OIDC provenance proven twice; `docs/workflow.md` written; ARCHITECTURE.md → ✅ Phase 5.
+> 2. **React Compiler — server components opt out for RSC safety (2026-06-14).** Hookless Button threw in RSC because `infer` mode injected `useMemoCache`; fix keeps `infer` and opts server components out with file-level `"use no memo"`, gate strengthened to catch a miss.
+> 3. **June hardening + Button rebuild + contributor skill (2026-06-13).** Dark-danger contrast + `:where()` zero-specificity + pack/use-client guardrails; Button rebuilt (six states, icon/loading props); add-component skill shipped in-tree.
 >
 > For full text + sub-bullets, find each entry by its leading bold phrase in the chronological list below.
 
@@ -199,6 +199,12 @@ genuinely changes scope/sequence — not for routine within-task choices.
     4. Phase 5.4–5.5 — ≥2 republish→update cycles, `docs/workflow.md`, bump ARCHITECTURE.md status ✅ Phase 5.
     5. Phase 6 — Button bake-off vs swfllive's, `docs/component-conventions.md`, §4.1 gate.
     6. First client component (Dialog, §4.2) — add `"use client"` (auto-memoized in `infer`) and populate the `assert-use-client.mjs` allowlist.
+
+- **Phase 5 closed — publish/consume loop proven (2026-07-04).** Branch `docs/phase-5-workflow`, Teaching Mode off. Two real change→publish→consume cycles run through the pilot app (swfllive, Next 15 App Router, React 19): `fullWidth` prop → `0.2.0`, `success` intent (+ `--color-success`/`-fg` tokens, mirroring `danger`) → `0.3.0`. Both published via OIDC trusted publishing with provenance and consumed from the real registry in swfllive's throwaway `/ui-bakeoff` route (server-renders, `button.mjs` free of `react/compiler-runtime`). The prior session's App-token fix proved out both times: the Changesets Version Packages PR is App-authored (`williamphelps13-ui-release`), so its CI auto-runs and it merges without the `action_required` stall. `docs/workflow.md` written (maintainer publish loop + the `pnpm pack --force` local-test loop + OIDC/App-token notes); ARCHITECTURE.md status → ✅ Phase 5, Release section gained the App-token/`repository`-field detail, and the stale "release.yml pending" file-map row was corrected.
+
+  - Additive changes are semver-minor, so the cycles bumped `0.1.1` → `0.2.0` → `0.3.0` (the plan illustratively said "0.1.x patch"). npm's metadata cache returns `ETARGET` right after a publish — `--prefer-online` bypasses it. The spec's §4.1 optional pre-publish `pnpm pack` check is now the documented local loop.
+
+  - **Pending:** Phase 6 — Button bake-off vs swfllive's own Button, `docs/component-conventions.md`, §4.1 gate. First client component (Dialog, §4.2) — add `"use client"` and populate the `assert-use-client.mjs` allowlist.
 
 ---
 

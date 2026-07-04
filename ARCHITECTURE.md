@@ -20,7 +20,7 @@ Listed as most important first.
 - ✅ Phase 2 - Token slice
 - ✅ Phase 3 - Styling, Storybook, and visual-regression harness
 - ✅ Phase 4 - Button
-- Phase 5 - Workflow loop
+- ✅ Phase 5 - Workflow loop
 - Phase 6 - Comparison
 
 ---
@@ -202,6 +202,10 @@ An MCP server (`@storybook/addon-mcp`) exposes the library's real component docs
 
 Changesets (public access) with automatic provenance and `@changesets/changelog-github` changelogs. `release.yml` runs on push to `main`: `changesets/action` opens a Version Packages PR, and merging it runs `pnpm release` (`pnpm build && changeset publish`). Publishing uses npm OIDC trusted publishing (no stored `NPM_TOKEN`), granted via the workflow's `id-token: write` permission.
 
+The Version Packages PR is authored by a GitHub App (`williamphelps13-ui-release`), not `GITHUB_TOKEN`. A `GITHUB_TOKEN`-authored PR cannot trigger workflows (GitHub's anti-recursion rule), so its required checks never run and it can never merge; the App token (minted per-run via `actions/create-github-app-token`) makes the PR App-authored so CI runs automatically. The `repository` field in `package.json` is required for OIDC provenance to attach.
+
+The full maintainer publish loop, the `pnpm pack` local-test loop, and the consumer update loop are documented in [`docs/workflow.md`](./docs/workflow.md).
+
 ### Quality gates
 
 ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x), Prettier, knip (scoped via `project: src/`; CSS-only and peer deps in `ignoreDependencies`), cspell, and publint. `attw` is split into `verify:types` and not gating yet — `@arethetypeswrong/cli@0.18.2` is broken on this Node 24 / pnpm 11 environment regardless of project (reproduces against any npm package). See CLAUDE.md "Gotchas" entry for the diagnostic and re-enable trigger.
@@ -229,7 +233,7 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 | `.github/workflows/ci.yml`                                         | `correctness` job (typecheck, lint, knip, spell, format, build, assert:use-client, test, publint, and playwright install) → `chromatic` job (needs:correctness; `chromaui/action@latest`, TurboSnap via config). Concurrency cancel-in-progress per ref. |
 | `chromatic.config.json`                                            | Chromatic policy: TurboSnap (`onlyChanged`), `autoAcceptChanges:"main"`, `exitZeroOnChanges:false`. Token never here — GitHub Actions secret only.                                                                                                       |
 | `.github/dependabot.yml`                                           | Weekly grouped PRs: npm minor and patch updates, plus gh-actions. Storybook majors ignored (CSF Next experimental).                                                                                                                                      |
-| `.github/workflows/release.yml`, `.changeset/`                     | Changesets and OIDC publish — pending (not yet built)                                                                                                                                                                                                    |
+| `.github/workflows/release.yml`, `.changeset/`                     | Changesets release: Version Packages PR (App-token authored) → OIDC trusted publish with provenance                                                                                                                                                      |
 
 ## Invariants and contracts
 
