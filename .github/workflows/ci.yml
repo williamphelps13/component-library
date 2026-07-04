@@ -3,7 +3,10 @@ name: CI
 on:
   pull_request:
   push:
-    branches: ['**']
+    branches: [main]
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,9 +15,10 @@ concurrency:
 jobs:
   correctness:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
@@ -22,6 +26,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Playwright browsers aren't preinstalled on GH runners; the storybook
       # vitest project needs chromium (+ system deps) for the browser-mode tests.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm typecheck
       - run: pnpm lint
@@ -35,23 +43,27 @@ jobs:
 
   chromatic:
     needs: correctness
+    # Fork PRs can't read CHROMATIC_PROJECT_TOKEN (secrets are repo-scoped), so
+    # the job would hard-fail; skip it there instead of blocking the PR.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       # Storybook's preview.tsx side-effect-imports ../dist/styles.css (the
-      # precompiled Tailwind output). Build the lib first so the file exists
+      # precompiled CSS output). Build the lib first so the file exists
       # when chromaui/action runs `build-storybook`. dist/ is gitignored, so
       # this is necessary in CI even though it's already present locally.
       - run: pnpm build
-      - uses: chromaui/action@latest
+      - uses: chromaui/action@94713c544284a14195de3b50ef24301579f1877e # v18.0.1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           # All other policy (onlyChanged, autoAcceptChanges, exitZeroOnChanges,
