@@ -13,7 +13,8 @@ Listed as most important first.
 3. `docs/workflow.md` — the publish, local-test, and consumer update loops
 4. Spec (`docs/superpowers/specs/`) — original design exploration and alternatives considered; may lag this file
 5. Plan (`docs/superpowers/plans/`) — execution steps (what was planned) and the live deviation log (why we changed course)
-6. `AGENTS.md` — thin `CLAUDE.md` redirect for non-Claude-Code agents
+6. Reviews (`docs/reviews/`) — dated audits and decision inputs, frozen at their date; each carries a status line saying what happened to it. Settled outcomes live in this file, never there
+7. `AGENTS.md` — thin `CLAUDE.md` redirect for non-Claude-Code agents
 
 ### Status
 
@@ -22,13 +23,30 @@ Listed as most important first.
 - ✅ Phase 3 - Styling, Storybook, and visual-regression harness
 - ✅ Phase 4 - Button
 - ✅ Phase 5 - Workflow loop
-- Phase 6 - Comparison
+- ⏭️ Phase 6 - Comparison — superseded by the swfllive component assessment (`docs/reviews/2026-07-04-swfllive-component-assessment.md`); Milestone 0 closes via the foundation-components plan (`docs/superpowers/plans/2026-07-04-foundation-components.md`)
 
 ---
 
 ## Purpose and shape
 
 A versioned, public React component library published to npm and consumed by Next.js (App Router, RSC) and Vite apps. Everything follows from four library constraints: small, precisely typed, debuggable from outside, and adaptable.
+
+### Positioning — why this library exists instead of MUI
+
+MUI is the design target for interaction quality, so the question deserves a standing answer. This library is justified by four things MUI structurally cannot do:
+
+- Server-first. MUI generates CSS at runtime (Emotion), themes through a context provider, and implements interaction with hooks — every MUI component forces a `"use client"` boundary and ships hydration JavaScript. Components here render on the server with zero JavaScript where possible, and `assert-use-client.mjs` proves it on every build
+- MUI's interaction quality without Material's look. Using MUI means a product looks like Material Design until its generated styles are overridden, which is the notorious time sink of MUI projects. Here the look lives entirely in `--ui-*` variables: rebranding a product is one CSS file of overrides, no rebuild, no provider
+- An API surface exactly as large as the products need. A prop enters the library because a real product needed it. A small surface can be held in one person's head, which compounds across every consuming app
+- Change on the owner's schedule. Pre-1.0 corrections happen freely; 1.0 becomes a contract consumers can trust indefinitely, with no upstream forcing migrations
+
+The strategy that follows: narrow and deep. Ten to twelve components at MUI-grade depth, server-first and token-skinned, beat a broad shallow catalog. Components that exist to serve one app's workflow (data tables with editable cells, date pickers) stay in that app until a second consumer needs them.
+
+### Component growth — rebuild with a requirements source
+
+Components are built fresh through the add-component flow, not migrated from earlier codebases. The owner's prior set (swfllive, Tailwind Plus-derived) serves as the requirements source: it says what each component must do — which props earned their place in production, which edge cases occurred — never how it looks or what it is named. Full analysis and roadmap: `docs/reviews/2026-07-04-swfllive-component-assessment.md`.
+
+Reference discipline, in authority order: (1) this library's conventions — tokens, this file, `docs/component-conventions.md` — settle questions permanently; (2) MUI is the single design target for interaction depth, deviations only via the two named bars in §Component model; (3) the swfllive counterpart supplies requirements; (4) shadcn/Chakra and similar are gap-finding cross-checks, never a source of naming or styling. Styling decisions come from the token system alone — a question tokens cannot answer escalates to the token layer for a system-wide answer.
 
 ## Pipeline and data flow
 

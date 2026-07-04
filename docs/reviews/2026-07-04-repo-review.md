@@ -1,5 +1,7 @@
 # Repository review — 2026-07-04
 
+Status: HISTORICAL — every finding below was remediated the same day (`docs/superpowers/plans/2026-07-04-remediation.md`, PRs #31–#43). The problems described no longer exist; the doc is preserved as the audit record. Current state lives in `ARCHITECTURE.md`.
+
 Full-repo audit of `@williamphelps13/ui` covering packaging, build pipeline, CI/release, tooling config, styling and token architecture, and documentation. Reviewed at commit `ab6d90e` plus the uncommitted `docs/phase-5-workflow` changes. Method: five parallel review agents (one per dimension), with all Critical and Important claims re-verified directly against the working tree.
 
 Scope note: the Button component's API and visual design were deliberately out of scope (it may be replaced). Button files appear below only where they exemplify repo-wide patterns.

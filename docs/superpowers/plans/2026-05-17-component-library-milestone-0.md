@@ -34,9 +34,10 @@ Task scaffolds in the plan body (e.g. `### Task 4.2`) are historical execution g
 
 > **Most recent first** ↓ (the section below is chronological with newest at the BOTTOM; this pointer reverses the discovery order for fresh readers):
 >
-> 1. **Phase 5 closed — publish/consume loop proven (2026-07-04).** Two real change→publish→consume cycles through swfllive (`fullWidth` → 0.2.0, `success` intent → 0.3.0); App-token Version-PR fix + OIDC provenance proven twice; `docs/workflow.md` written; ARCHITECTURE.md → ✅ Phase 5.
-> 2. **React Compiler — server components opt out for RSC safety (2026-06-14).** Hookless Button threw in RSC because `infer` mode injected `useMemoCache`; fix keeps `infer` and opts server components out with file-level `"use no memo"`, gate strengthened to catch a miss.
-> 3. **June hardening + Button rebuild + contributor skill (2026-06-13).** Dark-danger contrast + `:where()` zero-specificity + pack/use-client guardrails; Button rebuilt (six states, icon/loading props); add-component skill shipped in-tree.
+> 1. **Phase 6 SUPERSEDED — bake-off replaced by whole-set assessment + foundation-components plan (2026-07-04).** Rebuild decision made from `docs/reviews/2026-07-04-swfllive-component-assessment.md`; conventions doc now emerges from the foundation build (`docs/superpowers/plans/2026-07-04-foundation-components.md`).
+> 2. **Phase 5 closed — publish/consume loop proven (2026-07-04).** Two real change→publish→consume cycles through swfllive (`fullWidth` → 0.2.0, `success` intent → 0.3.0); App-token Version-PR fix + OIDC provenance proven twice; `docs/workflow.md` written; ARCHITECTURE.md → ✅ Phase 5.
+> 3. **React Compiler — server components opt out for RSC safety (2026-06-14).** Hookless Button threw in RSC because `infer` mode injected `useMemoCache`; fix keeps `infer` and opts server components out with file-level `"use no memo"`, gate strengthened to catch a miss.
+> 4. **June hardening + Button rebuild + contributor skill (2026-06-13).** Dark-danger contrast + `:where()` zero-specificity + pack/use-client guardrails; Button rebuilt (six states, icon/loading props); add-component skill shipped in-tree.
 >
 > For full text + sub-bullets, find each entry by its leading bold phrase in the chronological list below.
 
@@ -205,6 +206,9 @@ genuinely changes scope/sequence — not for routine within-task choices.
   - Additive changes are semver-minor, so the cycles bumped `0.1.1` → `0.2.0` → `0.3.0` (the plan illustratively said "0.1.x patch"). npm's metadata cache returns `ETARGET` right after a publish — `--prefer-online` bypasses it. The spec's §4.1 optional pre-publish `pnpm pack` check is now the documented local loop.
 
   - **Pending:** Phase 6 — Button bake-off vs swfllive's own Button, `docs/component-conventions.md`, §4.1 gate. First client component (Dialog, §4.2) — add `"use client"` and populate the `assert-use-client.mjs` allowlist.
+
+- **Phase 6 SUPERSEDED — bake-off replaced by whole-set assessment + foundation-components plan (2026-07-04).** Between Phase 5 and Phase 6, the owner ran a full-repo review and remediation (see `docs/superpowers/plans/2026-07-04-remediation.md`: vanilla-CSS migration, `--ui-*` token contract, gate hardening). The bake-off's question — whose conventions win — was then answered at the whole-set level by assessing all ~20 swfllive components (`docs/reviews/2026-07-04-swfllive-component-assessment.md`): rebuild through the add-component flow with the swfllive set as requirements source, MUI as single design target, styling only from tokens. A one-Button head-to-head would have produced a weaker version of the same conclusion, so Task 6.1's harness and the rendered comparison are dropped. `docs/component-conventions.md` (the bake-off's deliverable) is instead produced incrementally by building the foundation set — Badge, field system, Checkbox/Radio, Dialog on native `<dialog>` — per `docs/superpowers/plans/2026-07-04-foundation-components.md`. The §4.1 gate closes when that plan's conventions doc lands; its publish/consume item was already proven in Phase 5 and re-validates at the next release.
+  - **Pending:** execute the foundation-components plan; evaluate the §4.1 checklist at its closure phase.
 
 ---
 
