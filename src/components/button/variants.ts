@@ -16,11 +16,11 @@ export type Size =
   /** Prominent. */
   | 'large'
 
-// Literal class names per variant. Tailwind scans these statically, so the
-// precompiled CSS ships every variant's classes — independent of which
-// stories/tests happen to reference them. The Record<…> types force a class
-// per Intent/Size: add a variant → TS makes you add its class → it ships.
-// (Tailwind can't resolve dynamically-built names like `ui-btn-${intent}`.)
+// Literal class names per variant. The Record<…> types force a class per
+// Intent/Size: add a variant and TS makes you add its class — and
+// scripts/assert-css-imports.mjs plus the story tests confirm the CSS side
+// ships. Literal strings (not `ui-btn-${intent}`) keep the class ↔
+// stylesheet pairing searchable in both directions.
 const intentClass: Record<Intent, string> = {
   primary: 'ui-btn-primary',
   neutral: 'ui-btn-neutral',
@@ -34,7 +34,7 @@ const sizeClass: Record<Size, string> = {
   large: 'ui-btn-large',
 }
 
-/** Resolve the `@utility` class string for a Button variant. Pure → unit-testable. */
+/** Resolve the class string for a Button variant. Pure → unit-testable. */
 export function buttonClasses(intent: Intent, size: Size): string {
   return `ui-btn ${intentClass[intent]} ${sizeClass[size]}`
 }

@@ -33,41 +33,28 @@ function mergeSets(...sets) {
 const isSemantic = (token) =>
   typeof token.original?.$value === 'string' && token.original.$value.startsWith('{')
 
-// Primitive scales that Tailwind utilities resolve through (spacing-1, rounded-md, etc.).
-// Not semantic-themable (no light/dark variant) but part of the public override surface.
-const isTailwindPrimitive = (token) => token.path[0] === 'spacing' || token.path[0] === 'radius'
-
-const isThemeArtifact = (token) => isSemantic(token) || isTailwindPrimitive(token)
+// Every published variable carries the ui- prefix (--ui-color-primary-bg).
+// Unprefixed names collide with consumer theme systems — Tailwind v4 reserves
+// --color-*/--radius-*/--spacing-* for its own theme, so an unprefixed token
+// silently overrides the consumer's utilities app-wide.
+StyleDictionary.registerTransform({
+  name: 'name/ui-prefix',
+  type: 'name',
+  transform: (token) => `ui-${token.name}`,
+})
 
 // CSS custom properties under a configurable selector (SD v5 pattern).
 StyleDictionary.registerFormat({
   name: 'css/themed',
   format: ({ dictionary, options }) => {
-    const { selector = ':root', outputReferences = true } = options
+    const { selector = ':root', outputReferences = true, prepend = '' } = options
     const vars = formattedVariables({
       format: propertyFormatNames.css,
       dictionary,
       outputReferences,
       usesDtcg: true,
     })
-    return `${selector} {\n${vars}\n}\n`
-  },
-})
-
-// Tailwind v4 @theme inline: map utility variables onto our CSS vars.
-// Emits one line per token; the variable prefix comes from path[0] (color / spacing / radius).
-// Hardcoding `--color-` would silently emit future non-color semantics under the wrong prefix.
-StyleDictionary.registerFormat({
-  name: 'tailwind/theme-inline',
-  format: ({ dictionary }) => {
-    const lines = dictionary.allTokens
-      .map((t) => {
-        const ns = t.path[0]
-        const rest = t.path.slice(1).join('-')
-        return `  --${ns}-${rest}: var(--${t.name});`
-      })
-      .join('\n')
-    return `@theme inline {\n${lines}\n}\n`
+    return `${selector} {\n${prepend}${vars}\n}\n`
   },
 })
 
@@ -80,7 +67,7 @@ function makeSD(tokens, files, config = {}) {
     platforms: {
       css: {
         transformGroup: 'tokens-studio',
-        transforms: ['name/kebab'],
+        transforms: ['name/kebab', 'name/ui-prefix'],
         buildPath: 'build/',
         files,
       },
@@ -91,11 +78,9 @@ function makeSD(tokens, files, config = {}) {
 // :where() keeps token-selector specificity at zero so consumer `:root` overrides
 // win regardless of bundler hoist order. Bare selectors at (0,1,0) silently invert.
 
-// Light: :root with all primitives (raw) + semantic vars (as var() references),
-// plus the Tailwind @theme artifact (semantic + Tailwind-primitive names only).
+// Light: :root with all primitives (raw) + semantic vars (as var() references).
 const lightSD = makeSD(mergeSets(core, light), [
   { destination: 'tokens.light.css', format: 'css/themed', options: { selector: ':where(:root)' } },
-  { destination: 'theme.css', format: 'tailwind/theme-inline', filter: isThemeArtifact },
 ])
 
 // Dark: re-bind the semantic vars only (primitives stay defined in :root).
@@ -107,13 +92,17 @@ const lightSD = makeSD(mergeSets(core, light), [
 // "filtered references" WARNING — an expected false positive here. Silence that
 // one warning, but keep genuinely broken references FATAL so real mistakes still
 // fail the build (errors are not affected by `warnings: 'disabled'`).
+// color-scheme: dark makes native form controls/scrollbars match the theme.
 const darkSD = makeSD(
   mergeSets(core, dark),
   [
     {
       destination: 'tokens.dark.css',
       format: 'css/themed',
-      options: { selector: ':where([data-theme="dark"])' },
+      options: {
+        selector: ':where([data-theme="dark"])',
+        prepend: '  color-scheme: dark;\n',
+      },
       filter: isSemantic,
     },
   ],

@@ -9,7 +9,7 @@ const DISALLOWED = [
   { pattern: /\.test\.(ts|tsx|js|jsx|mjs)$/, why: 'test files import vitest' },
   {
     pattern: /^package\/src\/styles\//,
-    why: 'src/styles/* uses build-time @import/@source that only resolves in this repo',
+    why: 'src/styles/* uses build-time @import paths that only resolve in this repo',
   },
 ]
 

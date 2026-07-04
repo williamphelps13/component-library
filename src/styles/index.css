@@ -1,40 +1,29 @@
 /*
- * Precompiled CSS bundle for @williamphelps13/ui.
+ * Precompiled CSS bundle for @williamphelps13/ui (vanilla CSS, no framework).
  *
- * Layered-import form (instead of a bare `@import "tailwindcss"`) so we control
- * two things a precompiled COMPONENT library must own deliberately:
- *   1. Source scanning  — what class names drive utility emission.
- *   2. Preflight        — whether we ship a global browser reset to consumers.
+ * Everything ships inside named cascade layers — and the names deliberately
+ * match Tailwind v4's (theme / base / components / utilities). Same-named
+ * layers merge across stylesheets, so in a Tailwind consumer app the cascade
+ * slots in correctly IN EITHER IMPORT ORDER: Preflight (their `base`) stays
+ * below our component styles, and their utility classes stay above them —
+ * that's what lets `<Button className="rounded-full">` work. A private layer
+ * name (e.g. `ui`) fails one way or the other: declared before Tailwind,
+ * Preflight's button reset beats our components; declared after, consumer
+ * utilities lose to us. Non-Tailwind consumers: any unlayered CSS or any
+ * layer they declare after this import beats everything here.
+ *
+ * All published custom properties carry the `--ui-` prefix and all class
+ * names the `ui-` prefix: the library must never collide with consumer
+ * theme variables (Tailwind reserves --color-*, --spacing-*, --radius-*) or
+ * utility class names. No global reset ships; component classes are
+ * self-contained (appearance/border/margin/font).
  */
 @layer theme, base, components, utilities;
 
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities) source(none);
-/*
- * Preflight (tailwindcss/preflight.css → layer(base)) is INTENTIONALLY omitted.
- * A precompiled component lib must not impose a global reset on a consumer's
- * <button>/<h1>/margins. Our component classes are self-contained instead.
- *
- * source(none) disables Tailwind's auto-scan of the whole repo (which was
- * scraping class names out of docs/*.md and shipping them). @source re-adds
- * ONLY our component code, so the output is minimal and doc-independent.
- *
- * No prefix(): prefix(tw) namespaces theme VARIABLES too (--color-* →
- * --tw-color-*), which would break our consumer override contract
- * (:root { --color-primary }). Collision-safety comes from the narrow source
- * surface + our own `ui-` class names + Preflight being off — not from prefix().
- */
-@source "../components";
-/* Exclude stories: inline-style literals (e.g. `display: 'grid'`) would otherwise ship as utility classes. */
-@source not "../components/**/*.stories.*";
-
 /* Generated token layers (Style Dictionary → build/). */
-@import '../../build/tokens.light.css'; /* :root primitives + semantic var() refs */
-@import '../../build/tokens.dark.css'; /* [data-theme="dark"] re-binds semantics */
-@import '../../build/theme.css'; /* @theme inline: maps --color-* utilities onto our vars */
+@import '../../build/tokens.light.css' layer(theme); /* :root primitives + semantic var() refs */
+@import '../../build/tokens.dark.css' layer(theme); /* [data-theme="dark"] re-binds semantics */
 
-/* Zero-specificity dark variant — matches the token pipeline's selector. */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
-/* Per-component styles. Add one @import line per new component. */
-@import '../components/button/button.css';
+/* Per-component styles. Add one @import line per new component —
+   scripts/assert-css-imports.mjs fails the css build if one is missing. */
+@import '../components/button/button.css' layer(components);
