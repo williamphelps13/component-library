@@ -1,5 +1,11 @@
 # @williamphelps13/ui
 
+## 0.2.0
+
+### Minor Changes
+
+- [#22](https://github.com/williamphelps13/component-library/pull/22) [`e9cc573`](https://github.com/williamphelps13/component-library/commit/e9cc5730a21b0151e4898c32a6921cfe944fd66e) Thanks [@williamphelps13](https://github.com/williamphelps13)! - Add `fullWidth` prop to `Button` — stretches the button to fill its container.
+
 ## 0.1.1
 
 ### Patch Changes
