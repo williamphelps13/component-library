@@ -1,5 +1,9 @@
 # @williamphelps13/ui
 
+[![npm version](https://img.shields.io/npm/v/%40williamphelps13%2Fui)](https://www.npmjs.com/package/@williamphelps13/ui)
+[![CI](https://github.com/williamphelps13/component-library/actions/workflows/ci.yml/badge.svg)](https://github.com/williamphelps13/component-library/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/%40williamphelps13%2Fui)](./LICENSE)
+
 A focused React component library for React 19 and the Next.js App Router.
 
 - ESM-only
@@ -11,7 +15,8 @@ A focused React component library for React 19 and the Next.js App Router.
 ## Install
 
 ```bash
-pnpm add @williamphelps13/ui
+npm install @williamphelps13/ui
+# or: pnpm add @williamphelps13/ui
 ```
 
 ```tsx

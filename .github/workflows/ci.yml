@@ -40,6 +40,7 @@ jobs:
       - run: pnpm assert:use-client
       - run: pnpm test
       - run: pnpm verify:pack
+      - run: pnpm verify:types
 
   chromatic:
     needs: correctness

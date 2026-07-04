@@ -32,9 +32,15 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['src/**/*.test.ts'],
+          include: ['src/**/*.test.{ts,tsx}'],
         },
       },
     ],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      exclude: ['src/**/*.stories.tsx', 'src/**/*.test.*'],
+      thresholds: { statements: 90, branches: 85, functions: 90, lines: 90 },
+    },
   },
 })

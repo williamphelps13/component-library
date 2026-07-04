@@ -5,13 +5,15 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import eslintReact from '@eslint-react/eslint-plugin'
 import importX from 'eslint-plugin-import-x'
 import storybook from 'eslint-plugin-storybook'
+import prettierConfig from 'eslint-config-prettier'
 
 export default tseslint.config(
   { ignores: ['dist', 'build', 'storybook-static', 'coverage'] },
   js.configs.recommended,
-  // Library source: full type-aware + React/a11y/import linting.
+  // Library source + Storybook preview/decorators: full type-aware +
+  // React/a11y/import linting (.storybook/*.tsx defines React components).
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}', '.storybook/**/*.tsx'],
     extends: [
       ...tseslint.configs.recommendedTypeChecked,
       jsxA11y.flatConfigs.strict,
@@ -27,11 +29,12 @@ export default tseslint.config(
       'import-x/no-duplicates': 'error',
     },
   },
-  // Config files, scripts, Storybook/Vitest config: plain lint, no type info.
-  // (.storybook/*.ts(x) match none of the type-aware globs, so they need a TS
-  // parser block here or eslint's default parser chokes on TS syntax.)
+  // Config files, scripts, and .storybook/*.ts (main.ts, globals.d.ts): plain
+  // lint, no type info — they need a TS parser block or eslint's default
+  // parser chokes on TS syntax. .storybook/*.tsx (preview decorators) is
+  // deliberately NOT here: it gets the full type-aware React config above.
   {
-    files: ['*.config.{ts,mjs,js}', 'scripts/**/*.{mjs,js,ts}', '.storybook/**/*.{ts,tsx}'],
+    files: ['*.config.{ts,mjs,js}', 'scripts/**/*.{mjs,js,ts}', '.storybook/**/*.ts'],
     extends: [...tseslint.configs.recommended],
   },
   // Storybook story linting (flat config; targets *.stories.*).
@@ -50,4 +53,6 @@ export default tseslint.config(
       ],
     },
   },
+  // Last: disable any rule that would fight Prettier's formatting.
+  prettierConfig,
 )

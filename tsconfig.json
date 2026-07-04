@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
@@ -11,6 +11,10 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
     "noEmit": true
   },
   // ".storybook/**/*" — NOT bare ".storybook". TS's include globber silently
@@ -19,5 +23,5 @@
   // "/**/*" forces it to glob into the dot-dir.
   // (This file is JSONC: tsc / typescript-eslint / knip / publint all parse it
   // via the TS API; only a plain JSON.parse would throw.)
-  "include": ["src", ".storybook/**/*"]
+  "include": ["src", ".storybook/**/*", "vitest.shims.d.ts"]
 }

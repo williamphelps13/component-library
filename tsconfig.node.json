@@ -1,0 +1,17 @@
+{
+  // Type-checks the root Node-context config files, which belong to no other
+  // TS program — without this pass, a type error in vitest/tsdown/eslint
+  // config surfaces only as a runtime load failure.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["*.config.ts", "eslint-plugins.d.ts"]
+}

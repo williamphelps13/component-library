@@ -9,7 +9,7 @@ import { definePreview, type Decorator } from '@storybook/react-vite'
 // same trap had silently disabled the **a11y gate** (`parameters.a11y.test:
 // 'error'` below was a no-op until `addonA11y()` was added — proven by seeding
 // a button-name violation that passed all 7 tests until the fix landed).
-// `withThemeByDataAttribute` stays a named import in addon-themes 10.4.1.
+// `withThemeByDataAttribute` stays a named import in addon-themes.
 import addonChromatic from '@chromatic-com/storybook'
 import addonA11y from '@storybook/addon-a11y'
 import addonDocs from '@storybook/addon-docs'

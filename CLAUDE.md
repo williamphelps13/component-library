@@ -22,7 +22,7 @@ Teaching Mode is the default but per-feature switchable. The owner can explicitl
 
 ## Documentation
 
-Three docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md.
+Four docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md, docs/workflow.md.
 
 ### Core principles
 
@@ -48,11 +48,12 @@ Three docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md.
 
 - ARCHITECTURE.md — what the architecture is, why each decision was made, status line, file and module map
 - CLAUDE.md — how we work, operational rules, gotchas, commit discipline, documentation principles (this section)
-- README.md — consumer-facing view (install, usage, override contract); pointers to the other two
+- README.md — consumer-facing view (install, usage, override contract); pointers to the others
+- docs/workflow.md — maintainer publish loop, local-test loop, consumer update loop
 
 ### Update protocol
 
-When touching any of the three persisting docs, re-read the other two end-to-end before committing. Drift hides in lines you don't think to look at — the reviewer subagent catches code drift; this re-read catches doc drift.
+When touching any of the four persisting docs, re-read the others end-to-end before committing. Drift hides in lines you don't think to look at — the reviewer subagent catches code drift; this re-read catches doc drift.
 
 ## Comments
 
@@ -119,7 +120,7 @@ When adding a Storybook addon: if its default export is a `definePreviewAddon(..
 Log ruthlessly. Add a line here only if all three hold: (1) likely to recur, (2) it cost real time because the symptom was cryptic or silent (no error), and (3) the tooling won't clearly catch it next time. If the raw error already states the fix, don't log it. This file loads every session — keep it short.
 
 - Corepack pins must be exact. A `^range` in `packageManager` breaks every pnpm or npx command in the repo — including `pnpm -v` itself (bootstrap trap). Use `"packageManager": "pnpm@11.1.2"`.
-- tsdown needs Node ≥ 24.11.1. On older Node 24, loading `tsdown.config.ts` fails with the misleading `Unexpected module status 3` ("known Node.js bug"). Fix: upgrade Node (not the `--config-loader tsx` workaround); `engines.node` enforces the floor.
+- tsdown needs Node ≥ 24.11.1. On older Node 24, loading `tsdown.config.ts` fails with the misleading `Unexpected module status 3` ("known Node.js bug"). Fix: upgrade Node (not the `--config-loader tsx` workaround). `devEngines.runtime` enforces the contributor floor at install (`engines.node` stays lower — it's the consumer floor).
 - tsdown infers JS `target` from `engines.node` silently, no tool catches it. Set `target` explicitly (`'es2022'`) so a browser or React lib isn't built Node-targeted.
 - tsdown emits `.mjs` and `.d.mts`. Point `package.json` `exports` (and path-reading scripts) at those, not `.js` or `.d.ts`.
 - pnpm 11 silently ignores `.npmrc` for non-auth settings. `saveExact`, `strictPeerDependencies`, `engineStrict`, etc. only work in `pnpm-workspace.yaml` as camelCase keys (no warning if you put them in `.npmrc`). `.npmrc` is for auth and registry only.
@@ -130,6 +131,5 @@ Log ruthlessly. Add a line here only if all three hold: (1) likely to recur, (2)
 - TS `include` silently skips dot-directories. A bare `.storybook` (or any `.dir`) entry in tsconfig `include` matches zero files — no error, build green — so `.d.ts` ambient declarations and config files inside never load. Symptom: `.storybook/globals.d.ts`'s `declare module '*.css'` didn't register, causing `TS2882` on the precompiled-CSS side-effect import (a check that only became default-on in TS 6.0 via `noUncheckedSideEffectImports`). Files imported from elsewhere still resolve, which masks the gap. Fix: glob into the dot-dir explicitly — `'.storybook/**/*'`. Diagnose include scope with `tsc --showConfig` (read the resolved `files` array), not by guessing.
 - CSF Next: every addon you use must be in `definePreview.addons: [factory()]`. Listing an addon in `.storybook/main.ts addons` registers it on the manager side, but the preview-side wiring (globalTypes registration, URL `?globals=…` parsing, channel `updateGlobals` propagation) only connects when the addon's factory is also in `definePreview({ addons: [addonThemes(), addonDocs(), …] })`. Omitting it leaves named-import decorators (`withThemeByDataAttribute`) silently calling into nothing — they run on every render but fall back to `defaultTheme` because `context.globals.theme` is undefined. Tests, typecheck, lint, and MCP `get-documentation` all pass; only a real visual or runtime check catches it. Symptom: the dark-theme toolbar (and the equivalent URL `?globals=theme:dark`) has zero effect on the rendered component.
 - Optional union props (`intent?: 'primary' | 'neutral' | 'danger'`) inflate the inferred Controls panel with an `undefined` option, because `react-docgen-typescript` reports the type as `… | undefined`. Set `shouldRemoveUndefinedFromOptional: true` in `.storybook/main.ts`'s `reactDocgenTypescriptOptions` to strip it globally — one knob, applies to every component. Without it, each new component re-needs a per-meta `argTypes.<prop>.options` override (~6 LOC) to remove the `undefined` row. Tests, typecheck, and lint all pass while the bogus option is present; only opening the Controls panel reveals it. (`shouldExtractLiteralValuesFromEnum: true` is also required for any of this to auto-derive.)
-- `@arethetypeswrong/cli` (`attw`) 0.18.2 is broken on this Node 24 / pnpm 11 environment regardless of the package under test. `pnpm verify:types` errors with the generic `Cannot read properties of undefined (reading 'filename')`; reproduces against `zod@3.23.8` and other published packages from npm too. The cryptic message suggests a project-specific types-export bug — it isn't. Confirm by running `pnpm exec attw --from-npm zod@3.23.8`: same error → environmental; different error → real types problem worth chasing. Until upstream ships a fix, `pnpm verify:types` is not in the CI gate (`publint` still gates via `pnpm verify:pack`). Don't burn an hour re-diagnosing.
 - `visibility:hidden` on content also removes it from the accessibility tree, so axe-core's "button has no accessible name" rule fails on a loading button whose label is hidden that way. Use `opacity:0` to visually hide content that must remain in the a11y tree (the label still announces; `aria-busy` plus HTML `disabled` covers the busy semantics). Layout space is preserved either way. Tests, typecheck, and lint all pass; only an a11y story run catches it.
 - Dependency updates are Renovate-only (`renovate.json`) — do not re-add Dependabot. Dependabot could neither regenerate a pnpm-`catalog:` lockfile (every grouped bump touching the catalog failed `--frozen-lockfile`) nor read Actions-scoped secrets (its PRs use a separate secrets namespace, so the Chromatic job broke until each secret was duplicated with `gh secret set NAME --app dependabot`). Renovate has native catalog support and its PRs are ordinary same-repo branches, which dissolves both failure modes.
