@@ -108,14 +108,14 @@ export const DisabledBlocksClicks = meta.story({
   },
 })
 
-// Override token pairs — overriding `--color-primary` alone leaves `--color-primary-fg` sub-AA.
+// Override token pairs — overriding `--ui-color-primary-bg` alone leaves `--ui-color-primary-fg` sub-AA.
 export const BrandPalette = meta.story({
   render: (args) => (
     <div
       style={
         {
-          '--color-primary': 'oklch(0.55 0.2 320)',
-          '--color-primary-fg': 'oklch(1 0 0)',
+          '--ui-color-primary-bg': 'oklch(0.55 0.2 320)',
+          '--ui-color-primary-fg': 'oklch(1 0 0)',
         } as CSSProperties
       }
     >
@@ -126,7 +126,7 @@ export const BrandPalette = meta.story({
 
 export const SpacingOverride = meta.story({
   render: (args) => (
-    <div style={{ '--spacing-5': '28px' } as CSSProperties}>
+    <div style={{ '--ui-spacing-2': '2rem' } as CSSProperties}>
       <Button {...args} intent="primary" />
     </div>
   ),

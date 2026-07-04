@@ -32,19 +32,19 @@ import '../dist/styles.css'
 // src/styles/index.css). Without this, the dark-theme toggle re-skins the
 // component but leaves the canvas browser-default white.
 const withCanvasSurface: Decorator = (Story) => {
-  document.body.style.backgroundColor = 'var(--color-neutral-bg)'
-  document.body.style.color = 'var(--color-neutral-fg)'
+  document.body.style.backgroundColor = 'var(--ui-color-neutral-bg)'
+  document.body.style.color = 'var(--ui-color-neutral-fg)'
   return Story()
 }
 
 // Palette toolbar: overrides a semantic token at runtime, proving the
-// zero-rebuild theming contract (consumer sets --color-primary in :root).
+// zero-rebuild theming contract (consumer sets --ui-color-primary-bg in :root).
 const withPalette: Decorator = (Story, context) => {
   const root = document.documentElement
   if (context.globals.palette === 'brand') {
-    root.style.setProperty('--color-primary', 'oklch(0.55 0.2 320)')
+    root.style.setProperty('--ui-color-primary-bg', 'oklch(0.55 0.2 320)')
   } else {
-    root.style.removeProperty('--color-primary')
+    root.style.removeProperty('--ui-color-primary-bg')
   }
   return Story()
 }

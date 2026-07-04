@@ -5,8 +5,8 @@ allowBuilds:
   unrs-resolver: true
   '@parcel/watcher': true
   esbuild: true
+  lightningcss-cli: true
 catalog:
   react: 19.2.7
   react-dom: 19.2.7
   typescript: 6.0.3
-  tailwindcss: 4.3.2

@@ -57,8 +57,8 @@ function DefaultSpinner(): ReactElement {
 
 /**
  * Presentational button. Re-skin at runtime by overriding semantic CSS variables
- * (e.g. `--color-primary`, `--spacing-2`, `--radius-md`) on any ancestor — no
- * rebuild required.
+ * (e.g. `--ui-color-primary-bg`, `--ui-spacing-2`, `--ui-radius-md`) on any
+ * ancestor — no rebuild required.
  */
 export function Button({
   intent = 'primary',

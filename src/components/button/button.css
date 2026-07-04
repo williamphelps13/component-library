@@ -1,17 +1,16 @@
 /*
  * Button component styles.
  *
- * Co-located with `button.tsx`. Imported by `src/styles/index.css` into the
- * precompiled `dist/styles.css`. Authored via Tailwind v4's `@utility` directive
- * so the classes compile into Tailwind's `@layer utilities` for predictable
- * low-specificity overrides; the `ui-` namespace prevents collisions with
- * consumer Tailwind setups.
+ * Co-located with `button.tsx`. Imported by `src/styles/index.css` into
+ * `layer(components)`, so every rule here — states and media queries
+ * included — sits above consumer Preflight but below consumer utilities
+ * and any unlayered consumer CSS.
  *
  * Six interactive states — none silently rely on browser defaults:
  *   idle / hover / active / focus-visible / disabled / loading.
  */
 
-@utility ui-btn {
+.ui-btn {
   position: relative; /* anchor for absolutely-positioned spinner + click ripple */
   overflow: hidden; /* contains the ::after ripple within the rounded button */
   appearance: none;
@@ -21,20 +20,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-1);
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  gap: var(--ui-spacing-1);
+  border-radius: var(--ui-radius-md);
+  font-weight: var(--ui-font-weight-semibold);
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  /* Elevation is the focus/hover/active signal — no static focus ring.
-     Matches MUI: idle < hover < focus-visible < active, layered via box-shadow. */
-  --ui-btn-elevation: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+  /* Elevation layers via box-shadow: idle < hover < focus-visible < active
+     (MUI's pattern). The focus ring below is additive, not a replacement. */
+  --ui-btn-elevation: var(--ui-shadow-resting);
   box-shadow: var(--ui-btn-elevation);
   transition:
-    background-color 200ms,
-    box-shadow 200ms,
-    opacity 150ms;
+    background-color var(--ui-duration-base),
+    box-shadow var(--ui-duration-base),
+    opacity var(--ui-duration-fast);
 }
 
 /*
@@ -57,7 +56,7 @@
 }
 
 .ui-btn:active:not(:disabled)::after {
-  animation: ui-btn-ripple 350ms ease-out;
+  animation: ui-btn-ripple var(--ui-duration-slow) ease-out;
 }
 
 @keyframes ui-btn-ripple {
@@ -70,38 +69,42 @@
     transform: scale(1.5);
   }
 }
-@utility ui-btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-primary-fg);
+
+.ui-btn-primary {
+  background-color: var(--ui-color-primary-bg);
+  color: var(--ui-color-primary-fg);
 }
-@utility ui-btn-neutral {
-  background-color: var(--color-neutral-bg);
-  color: var(--color-neutral-fg);
+.ui-btn-neutral {
+  background-color: var(--ui-color-neutral-bg);
+  color: var(--ui-color-neutral-fg);
 }
-@utility ui-btn-danger {
-  background-color: var(--color-danger);
-  color: var(--color-danger-fg);
+.ui-btn-danger {
+  background-color: var(--ui-color-danger-bg);
+  color: var(--ui-color-danger-fg);
 }
-@utility ui-btn-success {
-  background-color: var(--color-success);
-  color: var(--color-success-fg);
+.ui-btn-success {
+  background-color: var(--ui-color-success-bg);
+  color: var(--ui-color-success-fg);
 }
-@utility ui-btn-small {
-  height: 32px;
-  padding-inline: var(--spacing-2);
-  font-size: 0.8125rem;
+
+/* min-height (not height) so text-only zoom can grow the label without
+   clipping it — WCAG 1.4.4. */
+.ui-btn-small {
+  min-height: 2rem;
+  padding-inline: var(--ui-spacing-2);
+  font-size: var(--ui-font-size-sm);
 }
-@utility ui-btn-medium {
-  height: 36px;
-  padding-inline: var(--spacing-2);
-  font-size: 0.875rem;
+.ui-btn-medium {
+  min-height: 2.25rem;
+  padding-inline: var(--ui-spacing-2);
+  font-size: var(--ui-font-size-md);
 }
-@utility ui-btn-large {
-  height: 42px;
-  padding-inline: var(--spacing-3);
-  font-size: 0.9375rem;
+.ui-btn-large {
+  min-height: 2.625rem;
+  padding-inline: var(--ui-spacing-3);
+  font-size: var(--ui-font-size-lg);
 }
-@utility ui-btn-full-width {
+.ui-btn-full-width {
   width: 100%;
 }
 
@@ -113,73 +116,74 @@
  */
 @media (hover: hover) {
   .ui-btn:hover:not(:disabled) {
-    --ui-btn-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+    --ui-btn-elevation: var(--ui-shadow-raised);
   }
   .ui-btn-primary:hover:not(:disabled) {
-    background-color: oklch(from var(--color-primary) calc(l - 0.08) c h);
+    background-color: oklch(from var(--ui-color-primary-bg) calc(l - 0.08) c h);
   }
   .ui-btn-neutral:hover:not(:disabled) {
-    background-color: oklch(from var(--color-neutral-bg) calc(l - 0.08) c h);
+    background-color: oklch(from var(--ui-color-neutral-bg) calc(l - 0.08) c h);
   }
   .ui-btn-danger:hover:not(:disabled) {
-    background-color: oklch(from var(--color-danger) calc(l - 0.08) c h);
+    background-color: oklch(from var(--ui-color-danger-bg) calc(l - 0.08) c h);
   }
   .ui-btn-success:hover:not(:disabled) {
-    background-color: oklch(from var(--color-success) calc(l - 0.08) c h);
+    background-color: oklch(from var(--ui-color-success-bg) calc(l - 0.08) c h);
   }
 
   /* Dark theme: primary and neutral bg lightness swaps between themes, so
      lightening on hover keeps the bg-vs-fg gap. Danger and success bg stay
      constant across themes (same red/green, white fg), so darkening (the
      light-mode rule above) is what preserves white-on-color contrast — no
-     [data-theme='dark'] override for either. */
-  [data-theme='dark'] .ui-btn-primary:hover:not(:disabled) {
-    background-color: oklch(from var(--color-primary) calc(l + 0.08) c h);
+     dark override for either. */
+  :where([data-theme='dark']) .ui-btn-primary:hover:not(:disabled) {
+    background-color: oklch(from var(--ui-color-primary-bg) calc(l + 0.08) c h);
   }
-  [data-theme='dark'] .ui-btn-neutral:hover:not(:disabled) {
-    background-color: oklch(from var(--color-neutral-bg) calc(l + 0.08) c h);
+  :where([data-theme='dark']) .ui-btn-neutral:hover:not(:disabled) {
+    background-color: oklch(from var(--ui-color-neutral-bg) calc(l + 0.08) c h);
   }
 }
 
 /*
- * Active — even bigger shadow + further color shift. The combined elevation +
- * color makes the press unmistakable; this is the categorical gap from the
- * prior attempt (which had neither shadow nor visible color change).
+ * Active — even bigger shadow + further color shift, so the press is
+ * unmistakable.
  */
 .ui-btn:active:not(:disabled) {
-  --ui-btn-elevation: 0 8px 16px -4px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+  --ui-btn-elevation: var(--ui-shadow-pressed);
 }
 .ui-btn-primary:active:not(:disabled) {
-  background-color: oklch(from var(--color-primary) calc(l - 0.15) c h);
+  background-color: oklch(from var(--ui-color-primary-bg) calc(l - 0.15) c h);
 }
 .ui-btn-neutral:active:not(:disabled) {
-  background-color: oklch(from var(--color-neutral-bg) calc(l - 0.15) c h);
+  background-color: oklch(from var(--ui-color-neutral-bg) calc(l - 0.15) c h);
 }
 .ui-btn-danger:active:not(:disabled) {
-  background-color: oklch(from var(--color-danger) calc(l - 0.15) c h);
+  background-color: oklch(from var(--ui-color-danger-bg) calc(l - 0.15) c h);
 }
 .ui-btn-success:active:not(:disabled) {
-  background-color: oklch(from var(--color-success) calc(l - 0.15) c h);
+  background-color: oklch(from var(--ui-color-success-bg) calc(l - 0.15) c h);
 }
 
-[data-theme='dark'] .ui-btn-primary:active:not(:disabled) {
-  background-color: oklch(from var(--color-primary) calc(l + 0.12) c h);
+:where([data-theme='dark']) .ui-btn-primary:active:not(:disabled) {
+  background-color: oklch(from var(--ui-color-primary-bg) calc(l + 0.12) c h);
 }
-[data-theme='dark'] .ui-btn-neutral:active:not(:disabled) {
-  background-color: oklch(from var(--color-neutral-bg) calc(l + 0.12) c h);
+:where([data-theme='dark']) .ui-btn-neutral:active:not(:disabled) {
+  background-color: oklch(from var(--ui-color-neutral-bg) calc(l + 0.12) c h);
 }
-/* No [data-theme='dark'] danger or success override — see hover block above. */
+/* No dark danger or success override — see hover block above. */
 
 /*
- * Focus-visible — elevation between hover and active. Matches MUI's contained
- * Button (shadows[6]). The transparent `outline` preserves a focus indication
- * in Forced Colors Mode, where box-shadow is dropped.
+ * Focus-visible — a real ring on --ui-color-ring (the consumer-overridable
+ * focus color) plus an elevation step between hover and active. The ring is
+ * the primary indicator (WCAG focus-appearance; shadow-only focus is too
+ * subtle); outline also survives Forced Colors Mode, where box-shadow drops.
  * Source-order placement after hover and before disabled means focus-visible
  * wins over hover when both apply, and disabled flattens everything.
  */
 .ui-btn:focus-visible:not(:disabled) {
-  outline: 2px solid transparent;
-  --ui-btn-elevation: 0 6px 10px -2px rgba(0, 0, 0, 0.14), 0 3px 6px -1px rgba(0, 0, 0, 0.09);
+  outline: 2px solid var(--ui-color-ring);
+  outline-offset: 2px;
+  --ui-btn-elevation: var(--ui-shadow-focus);
 }
 
 /* Disabled — flatten + dim + cursor. Native `disabled` already blocks clicks
@@ -188,7 +192,7 @@
 .ui-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  --ui-btn-elevation: 0 0 #0000;
+  --ui-btn-elevation: var(--ui-shadow-flat);
 }
 
 /*
@@ -196,32 +200,32 @@
  * opacity:0 (not visibility:hidden) keeps the label in the accessibility tree;
  * see CLAUDE.md gotcha. The button itself sets aria-busy + HTML disabled.
  */
-@utility ui-btn-spinner {
+.ui-btn-spinner {
   position: absolute;
   inset: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-@utility ui-btn-spinner-svg {
-  width: 16px;
-  height: 16px;
+.ui-btn-spinner-svg {
+  width: 1rem;
+  height: 1rem;
   animation: ui-btn-spin 1s linear infinite;
 }
-@utility ui-btn-content {
+.ui-btn-content {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-1);
+  gap: var(--ui-spacing-1);
 }
-@utility ui-btn-content-loading {
+.ui-btn-content-loading {
   opacity: 0;
 }
-@utility ui-btn-icon-start {
+.ui-btn-icon-start {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
 }
-@utility ui-btn-icon-end {
+.ui-btn-icon-end {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
@@ -250,8 +254,8 @@
  * Forced Colors Mode (Windows High Contrast) — system colors collapse the
  * intent backgrounds together, so add a ButtonText border to keep buttons
  * visually distinct, and switch the focus ring to Highlight so it survives.
- * Matches the milestone-0 accommodation; works because color-mix and box-shadow
- * are all overridden by forced-colors but border + outline are honored.
+ * Works because color-mix and box-shadow are overridden by forced-colors but
+ * border + outline are honored.
  */
 @media (forced-colors: active) {
   .ui-btn {

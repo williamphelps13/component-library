@@ -32,8 +32,11 @@ the merged tree at build time.
 `tokens.json`, merges `core`+`light` and `core`+`dark`, and emits to `build/`:
 
 - `tokens.light.css` — `:root { … }` (primitives raw + semantics as `var()`)
-- `tokens.dark.css` — `[data-theme="dark"] { … }` (semantics re-bound)
-- `theme.css` — Tailwind v4 `@theme inline { … }` mapping
+- `tokens.dark.css` — `[data-theme="dark"] { … }` (semantics re-bound, plus `color-scheme: dark`)
+
+Every emitted variable carries the `--ui-` prefix (a name transform in
+`style-dictionary.config.mjs`) so library tokens never collide with consumer
+theme systems.
 
 ## Figma sync (Tokens Studio, free tier)
 
