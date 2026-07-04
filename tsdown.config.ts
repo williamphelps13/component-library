@@ -9,7 +9,10 @@ export default defineConfig({
   dts: { sourcemap: true },
   sourcemap: true,
   deps: {
-    neverBundle: [/^react($|\/)/, /^react-dom($|\/)/, /^radix-ui($|\/)/, /^@radix-ui\//],
+    // Only declared peers. Pre-listing future externals (radix-ui was here once)
+    // lets a component import an undeclared package without any gate failing —
+    // add the external and the peer dep in the same change.
+    neverBundle: [/^react($|\/)/, /^react-dom($|\/)/],
   },
   plugins: [
     babel({

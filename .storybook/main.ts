@@ -1,6 +1,6 @@
 import type { StorybookConfig } from '@storybook/react-vite'
 
-// Note: `defineMain` is a `next`-branch API not exported in 10.4.1 — use the typed
+// Note: `defineMain` is a `next`-branch API not exported in this Storybook major — use the typed
 // config object. CSF Next stories work off `definePreview` in preview.tsx, not main.
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],

@@ -167,6 +167,11 @@ Then Phase 6 (bake-off) proceeds on the fixed foundation.
 
 ## Execution deviations log
 
+- Phases 3–5 combined into one PR (owner-directed): all three are non-breaking config/test/docs work, so one branch, one review checkpoint, one CI cycle — thoroughness unchanged, ceremony reduced.
+- Phase 3: attw 0.18.3 fixed the environmental crash — `verify:types` re-gated in CI with `--profile esm-only` (accepts no-CJS/no-node10 as intended for an ESM-only package) and `--exclude-entrypoints styles.css` (non-JS subpath). The CLAUDE.md gotcha is deleted; ARCHITECTURE's quality-gates section records the profile rationale.
+- Phase 4: the new `tsconfig.node.json` pass immediately caught `eslint-plugin-jsx-a11y` shipping no types — `eslint-plugins.d.ts` ambient declaration added.
+- Phase 4: coverage measured 100% across the board; thresholds set at 90/85 as a ratchet floor, wired into `pnpm test` so local and CI gate identically.
+
 - Phase 2: shipped layers are named `theme, base, components, utilities` (matching Tailwind v4), NOT the planned private `@layer ui.*`. The collision-proof page exposed a dilemma the plan missed: a private layer declared before the consumer's Tailwind loses to Preflight's button reset (their `base` outranks our components), and declared after, it beats their utility overrides. Same-named layers merge across stylesheets, giving correct composition in both import orders — verified empirically against a stock Tailwind v4 build both ways.
 - Phase 2: shadow tokens are core primitives (`shadow.level-1…4`, `none`) referenced by light/dark semantics (`shadow.resting/raised/focus/pressed/flat`), instead of the plan's raw-valued semantic set — the dark build's `isSemantic` filter only emits reference-valued tokens, so raw dark shadow values would have been silently dropped.
 - Phase 2: `SpacingOverride` story was overriding `--spacing-5`, which no Button rule consumes — the proportion-rebrand demo was a silent no-op. Now overrides `--ui-spacing-2` (medium/small padding), which visibly demonstrates the contract; expected Chromatic diff.

@@ -7,3 +7,5 @@ storybook-static/
 coverage/
 *.tgz
 .playwright-mcp/
+.env*
+.claude/settings.local.json

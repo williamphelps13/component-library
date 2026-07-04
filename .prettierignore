@@ -9,6 +9,7 @@ pnpm-lock.yaml
 docs/superpowers/plans/
 HANDOFF.md
 
-# User-local IDE/agent state (gitignored — should never be linted).
+# User-local IDE/agent state — should never be linted. (.claude/settings.json
+# and .claude/skills/ are tracked; only settings.local.json is gitignored.)
 .claude/
 .remember/
