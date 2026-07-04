@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
-    "@babel/core": "^7.29.7",
+    "@babel/core": "^8.0.0",
     "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.31.0",
     "@chromatic-com/storybook": "^5.2.1",
