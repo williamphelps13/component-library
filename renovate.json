@@ -3,6 +3,7 @@
   "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
   "enabledManagers": ["npm", "github-actions"],
   "schedule": ["* 0-8 * * 5"],
+  "minimumReleaseAge": "1 day",
   "prConcurrentLimit": 5,
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
