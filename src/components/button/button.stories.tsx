@@ -45,6 +45,7 @@ function ArrowRightIcon(): ReactElement {
 export const Primary = meta.story({ args: { intent: 'primary' } })
 export const Neutral = meta.story({ args: { intent: 'neutral' } })
 export const Danger = meta.story({ args: { intent: 'danger' } })
+export const Success = meta.story({ args: { intent: 'success' } })
 
 // Size baselines.
 export const Small = meta.story({ args: { size: 'small' } })
@@ -151,8 +152,14 @@ export const DarkDanger = meta.story({
   tags: ['!autodocs'],
   parameters: { chromatic: { disable: true } },
 })
+export const DarkSuccess = meta.story({
+  args: { intent: 'success' },
+  globals: { theme: 'dark' },
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+})
 
-const intents = ['primary', 'neutral', 'danger'] as const
+const intents = ['primary', 'neutral', 'danger', 'success'] as const
 const sizes = ['small', 'medium', 'large'] as const
 
 export const AllVariants = meta.story({
@@ -163,7 +170,7 @@ export const AllVariants = meta.story({
   },
   render: () => (
     <div style={{ display: 'grid', gap: '1.5rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, max-content)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, max-content)', gap: '1rem' }}>
         {sizes.flatMap((size) =>
           intents.map((intent) => (
             <Button key={`${intent}-${size}`} intent={intent} size={size}>
@@ -172,7 +179,7 @@ export const AllVariants = meta.story({
           )),
         )}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, max-content)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, max-content)', gap: '1rem' }}>
         {intents.map((intent) => (
           <Button
             key={`${intent}-icons`}
@@ -184,14 +191,14 @@ export const AllVariants = meta.story({
           </Button>
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, max-content)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, max-content)', gap: '1rem' }}>
         {intents.map((intent) => (
           <Button key={`${intent}-loading`} intent={intent} loading>
             {`${intent} / loading`}
           </Button>
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, max-content)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, max-content)', gap: '1rem' }}>
         {intents.map((intent) => (
           <Button key={`${intent}-disabled`} intent={intent} disabled>
             {`${intent} / disabled`}

@@ -82,6 +82,10 @@
   background-color: var(--color-danger);
   color: var(--color-danger-fg);
 }
+@utility ui-btn-success {
+  background-color: var(--color-success);
+  color: var(--color-success-fg);
+}
 @utility ui-btn-small {
   height: 32px;
   padding-inline: var(--spacing-2);
@@ -120,11 +124,15 @@
   .ui-btn-danger:hover:not(:disabled) {
     background-color: oklch(from var(--color-danger) calc(l - 0.08) c h);
   }
+  .ui-btn-success:hover:not(:disabled) {
+    background-color: oklch(from var(--color-success) calc(l - 0.08) c h);
+  }
 
   /* Dark theme: primary and neutral bg lightness swaps between themes, so
-     lightening on hover keeps the bg-vs-fg gap. Danger bg is the same red in
-     both themes, so darkening (the light-mode rule above) is what preserves
-     white-on-red contrast — no [data-theme='dark'] override for danger. */
+     lightening on hover keeps the bg-vs-fg gap. Danger and success bg stay
+     constant across themes (same red/green, white fg), so darkening (the
+     light-mode rule above) is what preserves white-on-color contrast — no
+     [data-theme='dark'] override for either. */
   [data-theme='dark'] .ui-btn-primary:hover:not(:disabled) {
     background-color: oklch(from var(--color-primary) calc(l + 0.08) c h);
   }
@@ -150,6 +158,9 @@
 .ui-btn-danger:active:not(:disabled) {
   background-color: oklch(from var(--color-danger) calc(l - 0.15) c h);
 }
+.ui-btn-success:active:not(:disabled) {
+  background-color: oklch(from var(--color-success) calc(l - 0.15) c h);
+}
 
 [data-theme='dark'] .ui-btn-primary:active:not(:disabled) {
   background-color: oklch(from var(--color-primary) calc(l + 0.12) c h);
@@ -157,7 +168,7 @@
 [data-theme='dark'] .ui-btn-neutral:active:not(:disabled) {
   background-color: oklch(from var(--color-neutral-bg) calc(l + 0.12) c h);
 }
-/* No [data-theme='dark'] danger override — see hover block above. */
+/* No [data-theme='dark'] danger or success override — see hover block above. */
 
 /*
  * Focus-visible — elevation between hover and active. Matches MUI's contained
