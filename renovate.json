@@ -8,16 +8,27 @@
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
+  "configMigration": true,
+  "osvVulnerabilityAlerts": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": ["* 0-8 * * 5"]
+  },
+  "major": {
+    "description": "Majors are opt-in from the Dependency Dashboard — includes Storybook majors, which get a manual CSF Next audit per CLAUDE.md",
+    "dependencyDashboardApproval": true
+  },
   "packageRules": [
     {
       "groupName": "minor and patch dependencies",
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
     },
     {
-      "description": "CSF Next is experimental; Storybook majors get audited manually per CLAUDE.md",
-      "matchPackageNames": ["storybook", "@storybook/**"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
+      "description": "Action digest-pin maintenance is mechanical — automerge",
+      "matchUpdateTypes": ["pin", "digest", "pinDigest"],
+      "automerge": true
     }
   ]
 }
