@@ -8,11 +8,7 @@ A focused React component library for React 19 and the Next.js App Router.
 - Ships one precompiled stylesheet (no Tailwind install on your end)
 - Runtime theming via CSS-variable override — set `--color-*` on `:root`; no rebuild needed
 
-## Status
-
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md) (status line at the top) for the canonical phase state.
-
-## Install (once published)
+## Install
 
 ```bash
 pnpm add @williamphelps13/ui
