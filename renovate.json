@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "enabledManagers": ["npm", "github-actions"],
+  "schedule": ["* 0-8 * * 5"],
+  "prConcurrentLimit": 5,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "packageRules": [
+    {
+      "groupName": "minor and patch dependencies",
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "description": "CSF Next is experimental; Storybook majors get audited manually per CLAUDE.md",
+      "matchPackageNames": ["storybook", "@storybook/**"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ]
+}

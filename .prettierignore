@@ -11,3 +11,4 @@ HANDOFF.md
 
 # User-local IDE/agent state (gitignored — should never be linted).
 .claude/
+.remember/
