@@ -1,5 +1,11 @@
 # @williamphelps13/ui
 
+## 0.3.0
+
+### Minor Changes
+
+- [#28](https://github.com/williamphelps13/component-library/pull/28) [`d98163a`](https://github.com/williamphelps13/component-library/commit/d98163ab917c25fc0409cab65ee58df7b9ad3b26) Thanks [@williamphelps13](https://github.com/williamphelps13)! - Add `success` intent to `Button` — a positive/confirming action variant, themed via new `--color-success` / `--color-success-fg` tokens.
+
 ## 0.2.0
 
 ### Minor Changes
