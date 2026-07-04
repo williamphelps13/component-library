@@ -5,6 +5,8 @@ export type Intent =
   | 'neutral'
   /** Destructive action. */
   | 'danger'
+  /** Positive or confirming action. */
+  | 'success'
 
 export type Size =
   /** Compact. */
@@ -23,6 +25,7 @@ const intentClass: Record<Intent, string> = {
   primary: 'ui-btn-primary',
   neutral: 'ui-btn-neutral',
   danger: 'ui-btn-danger',
+  success: 'ui-btn-success',
 }
 
 const sizeClass: Record<Size, string> = {

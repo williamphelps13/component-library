@@ -29,7 +29,7 @@ export default function Page() {
 
 ## Theming
 
-Seven semantic CSS variables drive every component's colors. Override them in your own `:root` (and `[data-theme="dark"]` for dark mode) to re-theme without rebuilding the library.
+Nine semantic CSS variables drive every component's colors. Override them in your own `:root` (and `[data-theme="dark"]` for dark mode) to re-theme without rebuilding the library.
 
 | Variable             | Role                                     |
 | -------------------- | ---------------------------------------- |
@@ -39,6 +39,8 @@ Seven semantic CSS variables drive every component's colors. Override them in yo
 | `--color-neutral-fg` | Foreground on `--color-neutral-bg`       |
 | `--color-danger`     | Danger intent background                 |
 | `--color-danger-fg`  | Foreground on `--color-danger`           |
+| `--color-success`    | Success intent background                |
+| `--color-success-fg` | Foreground on `--color-success`          |
 | `--color-ring`       | Focus ring on every intent               |
 
 Current default values live in [`tokens/tokens.json`](./tokens/tokens.json) (canonical) and the published `dist/styles.css` (compiled).
