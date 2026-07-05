@@ -22,7 +22,7 @@ Teaching Mode is the default but per-feature switchable. The owner can explicitl
 
 ## Documentation
 
-Four docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md, docs/workflow.md.
+Five docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md, docs/workflow.md, docs/component-conventions.md.
 
 ### Core principles
 
@@ -50,10 +50,11 @@ Four docs persist long-term: README.md, CLAUDE.md, ARCHITECTURE.md, docs/workflo
 - CLAUDE.md — how we work, operational rules, gotchas, commit discipline, documentation principles (this section)
 - README.md — consumer-facing view (install, usage, override contract); pointers to the others
 - docs/workflow.md — maintainer publish loop, local-test loop, consumer update loop
+- docs/component-conventions.md — the canonical component pattern; grows only with proven conventions
 
 ### Update protocol
 
-When touching any of the four persisting docs, re-read the others end-to-end before committing. Drift hides in lines you don't think to look at — the reviewer subagent catches code drift; this re-read catches doc drift.
+When touching any of the five persisting docs, re-read the others end-to-end before committing. Drift hides in lines you don't think to look at — the reviewer subagent catches code drift; this re-read catches doc drift.
 
 ## Comments
 

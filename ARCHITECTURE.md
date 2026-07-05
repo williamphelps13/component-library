@@ -10,11 +10,12 @@ Listed as most important first.
 
 1. `ARCHITECTURE.md` — what the architecture is now and why
 2. `CLAUDE.md` — always-loaded operating rules and hard-won gotchas
-3. `docs/workflow.md` — the publish, local-test, and consumer update loops
-4. Spec (`docs/superpowers/specs/`) — original design exploration and alternatives considered; may lag this file
-5. Plan (`docs/superpowers/plans/`) — execution steps (what was planned) and the live deviation log (why we changed course)
-6. Reviews (`docs/reviews/`) — dated audits and decision inputs, frozen at their date; each carries a status line saying what happened to it. Settled outcomes live in this file, never there
-7. `AGENTS.md` — thin `CLAUDE.md` redirect for non-Claude-Code agents
+3. `docs/component-conventions.md` — the canonical component pattern; authority layer 1 for component decisions
+4. `docs/workflow.md` — the publish, local-test, and consumer update loops
+5. Spec (`docs/superpowers/specs/`) — original design exploration and alternatives considered; may lag this file
+6. Plan (`docs/superpowers/plans/`) — execution steps (what was planned) and the live deviation log (why we changed course)
+7. Reviews (`docs/reviews/`) — dated audits and decision inputs, frozen at their date; each carries a status line saying what happened to it. Settled outcomes live in this file, never there
+8. `AGENTS.md` — thin `CLAUDE.md` redirect for non-Claude-Code agents
 
 ### Status
 
@@ -183,13 +184,7 @@ Authoring source-of-truth split:
 - `.storybook/modes.ts` — Chromatic mode definitions (`allModes.{light,dark}`).
 - `.storybook/main.ts` — `reactDocgenTypescriptOptions.shouldRemoveUndefinedFromOptional: true` (strips `undefined` from optional union props in inferred controls); `propFilter` excludes `ref` globally (React 19 ref-as-prop is implementation detail, not consumer surface).
 
-Per-story shape, in order:
-
-1. Variant baselines — one one-liner per public variant (`export const Primary = meta.story({ args: { intent: 'primary' } })`). Story names carry the meaning; no `parameters.docs.description.story` blocks.
-2. State baselines — render-only one-liners for visually-distinct states (`Disabled`, `Loading`). Captured by Chromatic; scanned by addon-a11y.
-3. Interaction test — one `play` story per user interaction the component owns. Skip native HTML behavior the component doesn't customize (e.g., browser-default Enter/Space activation on a plain `<button>`).
-4. Override demo — one story wrapping the component in an ancestor that sets a `--ui-color-*` token, proving the runtime override contract per-component.
-5. `AllVariants` matrix — `tags: ['!autodocs']`, `controls: { disable: true }`, `parameters.chromatic.modes: { light, dark }`. The Chromatic multi-theme baseline.
+Per-story shape: the five-story set defined in `docs/component-conventions.md` § "Stories and tests" (variant baselines, state baselines, interaction plays, override demo, `AllVariants` dual-theme matrix) — that document is the single copy.
 
 Deferred (re-evaluate at component #3 — Rule of Three):
 
@@ -248,7 +243,9 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 | `chromatic.config.json`                                                                                 | Chromatic policy: TurboSnap (`onlyChanged`), `autoAcceptChanges:"main"`, `exitZeroOnChanges:false`. Token never here — GitHub Actions secret only.                                                                                                                                |
 | `renovate.json`                                                                                         | Weekly grouped PRs: npm + github-actions minor and patch updates, SHA-pin digest maintenance. Storybook majors ignored (CSF Next experimental).                                                                                                                                   |
 | `.github/workflows/release.yml`, `.changeset/`                                                          | Changesets release: Version Packages PR (App-token authored) → OIDC trusted publish with provenance                                                                                                                                                                               |
-| `docs/workflow.md`                                                                                      | publish, local-test, and consumer update loops (persistent doc #4)                                                                                                                                                                                                                |
+| `docs/workflow.md`                                                                                      | publish, local-test, and consumer update loops (persistent doc)                                                                                                                                                                                                                   |
+| `docs/component-conventions.md`                                                                         | canonical component pattern — authority layer 1 for component decisions (persistent doc)                                                                                                                                                                                          |
+| `.claude/skills/add-component/SKILL.md`                                                                 | the add-component flow: reference discipline, scaffold, RSC decision, gates, owner gate                                                                                                                                                                                           |
 
 ## Invariants and contracts
 
