@@ -17,13 +17,13 @@ one semantic set at a time) — neither of which our code build needs.
 
 Top-level keys are **token sets**:
 
-- `core` — raw palette scales (`color.blue.500`, …). Never consumed directly.
+- `core` — raw palette scales, values verbatim from Radix Colors (`color.slate.6`, `color.blue.11`, …). Never consumed directly.
 - `light` / `dark` — intent tokens (`color.primary`, …) that **reference**
   `core`. This is the **consumer override surface** and the layer that flips
   for dark mode.
 - `$metadata.tokenSetOrder` — set order. `$themes` is empty (Pro feature).
 
-References are written `{color.blue.500}` (no set name) — they resolve against
+References are written `{color.blue.11}` (no set name) — they resolve against
 the merged tree at build time.
 
 ## Build
