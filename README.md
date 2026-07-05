@@ -34,17 +34,28 @@ Every visual decision resolves through `--ui-*` CSS variables. Override them in 
 
 Semantic color variables (the primary override surface):
 
-| Variable                | Role                               |
-| ----------------------- | ---------------------------------- |
-| `--ui-color-primary-bg` | Primary intent background          |
-| `--ui-color-primary-fg` | Foreground on primary surfaces     |
-| `--ui-color-neutral-bg` | Neutral intent background          |
-| `--ui-color-neutral-fg` | Foreground on neutral surfaces     |
-| `--ui-color-danger-bg`  | Danger intent background           |
-| `--ui-color-danger-fg`  | Foreground on danger surfaces      |
-| `--ui-color-success-bg` | Success intent background          |
-| `--ui-color-success-fg` | Foreground on success surfaces     |
-| `--ui-color-ring`       | Focus-visible ring on every intent |
+| Variable                    | Role                               |
+| --------------------------- | ---------------------------------- |
+| `--ui-color-primary-bg`     | Primary intent background          |
+| `--ui-color-primary-fg`     | Foreground on primary surfaces     |
+| `--ui-color-neutral-bg`     | Neutral intent background          |
+| `--ui-color-neutral-fg`     | Foreground on neutral surfaces     |
+| `--ui-color-danger-bg`      | Danger intent background           |
+| `--ui-color-danger-fg`      | Foreground on danger surfaces      |
+| `--ui-color-success-bg`     | Success intent background          |
+| `--ui-color-success-fg`     | Foreground on success surfaces     |
+| `--ui-color-ring`           | Focus-visible ring on every intent |
+| `--ui-color-surface-bg`     | Page background                    |
+| `--ui-color-surface-fg`     | Default text on the page           |
+| `--ui-color-raised-bg`      | Cards, dialogs, raised panels      |
+| `--ui-color-raised-fg`      | Text on raised panels              |
+| `--ui-color-muted-fg`       | Secondary text                     |
+| `--ui-color-border`         | Separators and subtle edges        |
+| `--ui-color-border-strong`  | Emphasized edges                   |
+| `--ui-color-input-bg`       | Form field background              |
+| `--ui-color-input-border`   | Form field border                  |
+| `--ui-color-placeholder-fg` | Form field placeholder text        |
+| `--ui-color-overlay`        | Dialog backdrop                    |
 
 Also public and override-stable — dimensions, elevation, and motion:
 
@@ -54,7 +65,7 @@ Also public and override-stable — dimensions, elevation, and motion:
 - `--ui-duration-fast/base/slow` — transition and animation timing
 - `--ui-font-size-sm/md/lg`, `--ui-font-weight-semibold` — component type scale
 
-Current default values live in [`tokens/tokens.json`](./tokens/tokens.json) (canonical) and the published `dist/styles.css` (compiled).
+Current default values live in [`tokens/tokens.json`](./tokens/tokens.json) (canonical) and the published `dist/styles.css` (compiled). The default palette values come verbatim from [Radix Colors](https://www.radix-ui.com/colors) (slate neutrals, blue primary), with every text pair verified at WCAG AA in both themes.
 
 Two rules for safe overrides:
 

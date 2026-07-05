@@ -90,4 +90,9 @@ Rough scale: 6–8 working sessions across the eight phases; Phases 0+2 are smal
 
 ## Execution deviations log
 
-- (none yet)
+- Phase 1 redefined from "token vocabulary extension" to a full default-theme design pass (owner-caught): the existing palette values were placeholders from the milestone build, and the original Phase 1 proposal interpolated new grays between placeholder endpoints. All color values are now designed from a named source — Radix Colors 3.0.0, verbatim, version-pinned. Names and semantic structure kept from the original proposal.
+- Radix's step-9 "solid background" guidance fails WCAG AA with white text on every scale used (blue 3.26:1, red 3.91:1, green 3.16:1). Solid intents use step 11 instead; dark intents flip to light solids with near-black text (no dark step passes with white). Documented in ARCHITECTURE §Tokens.
+- The dark-intent flip changes Button's dark hover/active rules: all four intents now lighten in dark mode (previously danger/success reused the light-mode darken because their placeholder solids were theme-constant). `button.css` comments updated; expected Chromatic diffs.
+- `tokens/README.md` sync note: Tokens Studio single-file sync unchanged; primitive names now carry Radix step numbers.
+- Owner visual pass surfaced a requirements signal: swfllive's secondary button is outline-style (transparent + ring), while this library's `neutral` intent is a filled subtle surface (Radix step 3, kept as-is). An `outline` Button variant goes to the conventions/ergonomics discussion in Phase 2 — named trigger: when a consuming product needs the outlined style.
+- Storybook stale-CSS zombie-server incident during the visual gate (old 2:33 PM server kept port 6006 and served boot-time styles; "restart" silently prompted for port 6007). Logged as a CLAUDE.md gotcha.

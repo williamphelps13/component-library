@@ -1,0 +1,16 @@
+/*
+ * swfllive brand preset — Storybook-only proof of the rebrand contract:
+ * one CSS file of --ui-* overrides re-skins every component with no rebuild.
+ * This is the file shape a consuming product ships. Values are AA-checked
+ * (cyan-700 holds 5.4:1 with white; cyan-300 holds ~11:1 with near-black).
+ */
+.brand-swfllive {
+  --ui-color-primary-bg: #0e7490;
+  --ui-color-primary-fg: #ffffff;
+  --ui-color-ring: #06b6d4;
+}
+
+[data-theme='dark'] .brand-swfllive {
+  --ui-color-primary-bg: #67e8f9;
+  --ui-color-primary-fg: #111113;
+}

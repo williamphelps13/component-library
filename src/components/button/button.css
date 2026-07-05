@@ -131,16 +131,21 @@
     background-color: oklch(from var(--ui-color-success-bg) calc(l - 0.08) c h);
   }
 
-  /* Dark theme: primary and neutral bg lightness swaps between themes, so
-     lightening on hover keeps the bg-vs-fg gap. Danger and success bg stay
-     constant across themes (same red/green, white fg), so darkening (the
-     light-mode rule above) is what preserves white-on-color contrast — no
-     dark override for either. */
+  /* Dark theme: every intent's solid is light-colored with near-black text
+     (Radix step 11; matches MUI's dark palette, which lightens primary and
+     darkens its contrast text). Darkening a light solid would close the gap
+     with its dark text, so dark mode lightens on hover for all intents. */
   :where([data-theme='dark']) .ui-btn-primary:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-primary-bg) calc(l + 0.08) c h);
   }
   :where([data-theme='dark']) .ui-btn-neutral:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-neutral-bg) calc(l + 0.08) c h);
+  }
+  :where([data-theme='dark']) .ui-btn-danger:hover:not(:disabled) {
+    background-color: oklch(from var(--ui-color-danger-bg) calc(l + 0.08) c h);
+  }
+  :where([data-theme='dark']) .ui-btn-success:hover:not(:disabled) {
+    background-color: oklch(from var(--ui-color-success-bg) calc(l + 0.08) c h);
   }
 }
 
@@ -170,7 +175,12 @@
 :where([data-theme='dark']) .ui-btn-neutral:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-neutral-bg) calc(l + 0.12) c h);
 }
-/* No dark danger or success override — see hover block above. */
+:where([data-theme='dark']) .ui-btn-danger:active:not(:disabled) {
+  background-color: oklch(from var(--ui-color-danger-bg) calc(l + 0.12) c h);
+}
+:where([data-theme='dark']) .ui-btn-success:active:not(:disabled) {
+  background-color: oklch(from var(--ui-color-success-bg) calc(l + 0.12) c h);
+}
 
 /*
  * Focus-visible — a real ring on --ui-color-ring (the consumer-overridable

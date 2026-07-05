@@ -24,27 +24,30 @@ import addonThemes, { withThemeByDataAttribute } from '@storybook/addon-themes'
 
 // Ship-shaped: import the SAME precompiled stylesheet consumers get.
 import '../dist/styles.css'
+// Brand preset for the Palette toolbar — the consumer-shaped rebrand proof.
+import './brand-swfllive.css'
 
-// Canvas surface: tracks the active theme by binding the iframe body to our
-// neutral tokens (gray.100 in light, gray.900 in dark — already flipped per
-// theme by .storybook/tokens). Storybook-only — the shipped library doesn't
-// impose a page background (Preflight is intentionally omitted; see
-// src/styles/index.css). Without this, the dark-theme toggle re-skins the
-// component but leaves the canvas browser-default white.
+// Canvas surface: binds the iframe body to the surface tokens (the page
+// background/text semantics), which the dark rebinding flips automatically.
+// Storybook-only — the shipped library doesn't impose a page background
+// (no global reset ships; see src/styles/index.css). Without this, the
+// dark-theme toggle re-skins the component but leaves the canvas white.
 const withCanvasSurface: Decorator = (Story) => {
-  document.body.style.backgroundColor = 'var(--ui-color-neutral-bg)'
-  document.body.style.color = 'var(--ui-color-neutral-fg)'
+  document.body.style.backgroundColor = 'var(--ui-color-surface-bg)'
+  document.body.style.color = 'var(--ui-color-surface-fg)'
   return Story()
 }
 
-// Palette toolbar: overrides a semantic token at runtime, proving the
-// zero-rebuild theming contract (consumer sets --ui-color-primary-bg in :root).
+// Palette toolbar: applies a real brand-preset stylesheet at runtime, proving
+// the zero-rebuild theming contract — a consumer re-skins the library by
+// shipping one CSS file of --ui-* overrides (see brand-swfllive.css).
 const withPalette: Decorator = (Story, context) => {
-  const root = document.documentElement
-  if (context.globals.palette === 'brand') {
-    root.style.setProperty('--ui-color-primary-bg', 'oklch(0.55 0.2 320)')
-  } else {
-    root.style.removeProperty('--ui-color-primary-bg')
+  if (context.globals.palette === 'swfllive') {
+    return (
+      <div className="brand-swfllive">
+        <Story />
+      </div>
+    )
   }
   return Story()
 }
@@ -86,7 +89,7 @@ export default definePreview({
         title: 'Palette',
         items: [
           { value: 'default', title: 'Default' },
-          { value: 'brand', title: 'Brand override' },
+          { value: 'swfllive', title: 'swfllive brand' },
         ],
       },
     },
