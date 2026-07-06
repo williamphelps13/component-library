@@ -15,13 +15,23 @@
   align-items: center;
   gap: var(--ui-spacing-1);
   max-width: 100%;
-  min-height: 1.5rem;
-  padding-inline: var(--ui-spacing-1);
   border-radius: var(--ui-radius-full);
-  font-size: var(--ui-font-size-sm);
   font-weight: var(--ui-font-weight-medium);
   line-height: 1;
   cursor: default;
+}
+
+/* min-height (not height) so text-only zoom can grow the label without
+   clipping it — WCAG 1.4.4. Dimensions match MUI Chip small/medium. */
+.ui-badge-small {
+  min-height: 1.5rem;
+  padding-inline: var(--ui-spacing-1);
+  font-size: var(--ui-font-size-xs);
+}
+.ui-badge-medium {
+  min-height: 2rem;
+  padding-inline: var(--ui-spacing-1-5);
+  font-size: var(--ui-font-size-sm);
 }
 
 .ui-badge-neutral {

@@ -8,8 +8,14 @@ export type BadgeIntent =
   /** Positive or confirming status. */
   | 'success'
 
-// Literal class names per variant. The Record<…> type forces a class per
-// BadgeIntent: add a variant and TS makes you add its class — and
+export type BadgeSize =
+  /** Compact — MUI Chip small metrics (24px). */
+  | 'small'
+  /** Default — MUI Chip medium metrics (32px). */
+  | 'medium'
+
+// Literal class names per variant. The Record<…> types force a class per
+// BadgeIntent/BadgeSize: add a variant and TS makes you add its class — and
 // scripts/assert-css-imports.mjs plus the story tests confirm the CSS side
 // ships. Literal strings keep the class ↔ stylesheet pairing searchable.
 const intentClass: Record<BadgeIntent, string> = {
@@ -19,7 +25,12 @@ const intentClass: Record<BadgeIntent, string> = {
   success: 'ui-badge-success',
 }
 
+const sizeClass: Record<BadgeSize, string> = {
+  small: 'ui-badge-small',
+  medium: 'ui-badge-medium',
+}
+
 /** Resolve the class string for a Badge variant. Pure → unit-testable. */
-export function badgeClasses(intent: BadgeIntent): string {
-  return `ui-badge ${intentClass[intent]}`
+export function badgeClasses(intent: BadgeIntent, size: BadgeSize): string {
+  return `ui-badge ${intentClass[intent]} ${sizeClass[size]}`
 }

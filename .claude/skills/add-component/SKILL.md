@@ -23,6 +23,7 @@ become a TaskCreate todo on entry.
 2. Gather references — reading sequence below; authority order is ARCHITECTURE § "Component growth" (conventions/tokens outrank everything, then MUI, then swfllive, then cross-checks)
    - Requirements: read the swfllive counterpart (`../swfllive/src/components/<Name>/`) — its model.ts prop surface, its test scenarios, its edge cases. This says WHAT the component must do, never how it looks or what props are named
    - Design target: read MUI's implementation (`https://github.com/mui/material-ui/tree/master/packages/mui-material/src/<Component>`) for interaction depth, state behavior, and a11y edge cases. When MUI does X, we do X unless the deviation clears one of ARCHITECTURE's two named bars
+   - Extract the target's concrete metrics (heights, paddings, font sizes per size variant) into the phase notes before writing CSS — invented dimensions read as plausible and pass every review; only a numeric diff against the target catches them. The review checkpoint diffs shipped values against these notes
    - Cross-checks only if a gap is suspected: shadcn/Chakra for edge cases the others miss — never for naming or styling
    - Styling questions are not answered by any reference: they resolve through the `--ui-*` tokens, or escalate to the token layer
 

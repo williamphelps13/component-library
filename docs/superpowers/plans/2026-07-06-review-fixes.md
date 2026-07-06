@@ -589,7 +589,7 @@ Fixes: D8, D9, D10, D11, D12, D13, D14. One commit: `docs: deduplicate cross-doc
 Step 2 body →
 
 ```markdown
-2. Gather references in authority order — the hierarchy lives in ARCHITECTURE § "Component growth" (single copy). Read the swfllive counterpart for requirements, MUI's implementation as design target, cross-checks only for suspected gaps
+2. Gather references in authority order — the hierarchy lives in ARCHITECTURE § "Component growth" (single copy). Read the swfllive counterpart for requirements, MUI's implementation as design target (extracting its concrete metrics into the phase notes before writing CSS — keep this clause, it was added after invented badge dimensions passed every review), cross-checks only for suspected gaps
 ```
 
 Step 3 body →

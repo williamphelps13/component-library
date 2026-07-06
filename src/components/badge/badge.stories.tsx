@@ -25,6 +25,10 @@ export const Primary = meta.story({ args: { intent: 'primary' } })
 export const Danger = meta.story({ args: { intent: 'danger' } })
 export const Success = meta.story({ args: { intent: 'success' } })
 
+// Size baselines.
+export const Small = meta.story({ args: { size: 'small' } })
+export const Medium = meta.story({ args: { size: 'medium' } })
+
 // State baselines.
 export const WithIcon = meta.story({
   args: { intent: 'success', startIcon: <DotIcon />, children: 'Active' },
@@ -112,6 +116,7 @@ export const DarkSuccess = meta.story({
 })
 
 const intents = ['neutral', 'primary', 'danger', 'success'] as const
+const sizes = ['small', 'medium'] as const
 
 export const AllVariants = meta.story({
   tags: ['!autodocs'],
@@ -121,12 +126,14 @@ export const AllVariants = meta.story({
   },
   render: () => (
     <div style={{ display: 'grid', gap: '1rem' }}>
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        {intents.map((intent) => (
-          <Badge key={intent} intent={intent}>
-            {intent}
-          </Badge>
-        ))}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, max-content)', gap: '1rem' }}>
+        {sizes.flatMap((size) =>
+          intents.map((intent) => (
+            <Badge key={`${intent}-${size}`} intent={intent} size={size}>
+              {`${intent} / ${size}`}
+            </Badge>
+          )),
+        )}
       </div>
       <div style={{ display: 'flex', gap: '1rem' }}>
         {intents.map((intent) => (

@@ -3,4 +3,4 @@
 export { Button, type ButtonProps } from './components/button/button'
 export type { ButtonIntent, ButtonSize } from './components/button/variants'
 export { Badge, type BadgeProps } from './components/badge/badge'
-export type { BadgeIntent } from './components/badge/variants'
+export type { BadgeIntent, BadgeSize } from './components/badge/variants'

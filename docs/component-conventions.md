@@ -67,7 +67,6 @@ The authority hierarchy lives in ARCHITECTURE § "Component growth" — that lis
 
 - Tonal (subtle-tint) badge/chip styling — swfllive's badges are tonal, but MUI Chip's filled-solid is the design target and tonal needs a new token tier (per-intent subtle bg/fg, which Radix steps 3/11 per hue would supply). Trigger: a consuming product needs the subtle look
 - Sub-8px spacing step (badge internals currently use `--ui-spacing-1` = 0.5rem as the smallest gap). Trigger: owner visual gate finds compact components too loose twice
-- Badge `size` prop — MUI Chip ships `small | medium`; cut under ARCHITECTURE's "API surface exactly as large as the products need". Trigger: a consuming product needs a second badge size
 - Badge remove-icon override — Button's `loadingIndicator` precedent. Trigger: a consuming product needs a custom remove glyph
 - `outline` Button variant (swfllive's secondary is transparent-with-ring) — trigger: a consuming product needs the outlined style
 - Dual-theme axe automation replacing hand-authored `Dark*` stories — trigger: component #3

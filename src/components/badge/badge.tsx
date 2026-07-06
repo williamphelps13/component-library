@@ -9,7 +9,7 @@ import type {
   Ref,
 } from 'react'
 
-import { badgeClasses, type BadgeIntent } from './variants'
+import { badgeClasses, type BadgeIntent, type BadgeSize } from './variants'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   /**
@@ -18,6 +18,8 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
    * that carries the same meaning.
    */
   intent?: BadgeIntent
+  /** Visual size. */
+  size?: BadgeSize
   /** Icon rendered before the label. Sized by the consumer (1em fits the text line). */
   startIcon?: ReactNode
   /**
@@ -45,6 +47,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
  */
 export function Badge({
   intent = 'neutral',
+  size = 'medium',
   startIcon,
   onRemove,
   removeLabel = 'Remove',
@@ -53,7 +56,7 @@ export function Badge({
   ref,
   ...rest
 }: BadgeProps): ReactElement {
-  const classes = [badgeClasses(intent), className].filter(Boolean).join(' ')
+  const classes = [badgeClasses(intent, size), className].filter(Boolean).join(' ')
 
   return (
     <span ref={ref} className={classes} {...rest}>
