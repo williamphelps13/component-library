@@ -158,6 +158,18 @@ export const DarkSuccess = meta.story({
   tags: ['!autodocs'],
   parameters: { chromatic: { disable: true } },
 })
+export const DarkLoading = meta.story({
+  args: { loading: true },
+  globals: { theme: 'dark' },
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+})
+export const DarkDisabled = meta.story({
+  args: { disabled: true },
+  globals: { theme: 'dark' },
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+})
 
 const intents = ['primary', 'neutral', 'danger', 'success'] as const
 const sizes = ['small', 'medium', 'large'] as const
