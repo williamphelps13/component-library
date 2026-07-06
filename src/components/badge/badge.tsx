@@ -1,3 +1,4 @@
+// Server-renderable: opts out of React Compiler, whose memoization injects hooks that throw in RSC.
 'use no memo'
 
 import type {

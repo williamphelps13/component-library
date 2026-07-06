@@ -1,6 +1,4 @@
-// Server-renderable: opt out of React Compiler. Its memoization is a hook
-// (useMemoCache) that throws in RSC; the build runs the compiler in infer mode,
-// so this directive is what keeps the Button hook-free. assert-use-client enforces it.
+// Server-renderable: opts out of React Compiler, whose memoization injects hooks that throw in RSC.
 'use no memo'
 
 import type { ButtonHTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
