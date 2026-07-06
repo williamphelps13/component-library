@@ -90,6 +90,10 @@ Rough scale: 6–8 working sessions across the eight phases; Phases 0+2 are smal
 
 ## Execution deviations log
 
+- Phase 3: Badge consumes no surface/border/muted tokens — the plan's "first consumer" line assumed a bordered/tonal badge, but the MUI Chip target is filled-solid, so Badge rides the intent bg/fg pairs; the surface/border semantics wait for the field system (Phase 4)
+- Phase 3: Badge is server-renderable with an optional `onRemove` callback (hybrid RSC posture) — recorded in conventions § Server and client; `onRemove` receives the click event (MUI `onDelete(event)` parity)
+- Phase 3: 2026-07-06 library review ran mid-phase (`docs/reviews/2026-07-06-library-review.md`); its Batch 1 landed in this PR, and `core.font-weight.medium` (500) was added for the badge's self-contained weight
+
 - Phase 2: conventions doc seeded strictly from proven-in-merged-code patterns (Button + remediation era); the three known open items (outline Button variant, dual-theme axe automation, dark elevation strategy) are listed in the doc with named triggers rather than pre-decided. The skill's reference step now encodes the authority hierarchy instead of the old MUI/shadcn/Chakra panel; the temp-dir example-fetch step is gone (references are read in place, in authority order).
 
 - Phase 1 redefined from "token vocabulary extension" to a full default-theme design pass (owner-caught): the existing palette values were placeholders from the milestone build, and the original Phase 1 proposal interpolated new grays between placeholder endpoints. All color values are now designed from a named source — Radix Colors 3.0.0, verbatim, version-pinned. Names and semantic structure kept from the original proposal.

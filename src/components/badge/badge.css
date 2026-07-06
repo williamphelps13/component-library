@@ -1,0 +1,115 @@
+/*
+ * Badge component styles.
+ *
+ * Co-located with `badge.tsx`. Imported by `src/styles/index.css` into
+ * `layer(components)`, so every rule here sits above consumer Preflight but
+ * below consumer utilities and any unlayered consumer CSS.
+ *
+ * The badge body is never interactive; the optional remove button is a real
+ * <button> (deviation from MUI Chip's svg-with-handler — native keyboard and
+ * assistive-tech semantics for free).
+ */
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-spacing-1);
+  max-width: 100%;
+  min-height: 1.5rem;
+  padding-inline: var(--ui-spacing-1);
+  border-radius: var(--ui-radius-full);
+  font-size: var(--ui-font-size-sm);
+  font-weight: var(--ui-font-weight-medium);
+  line-height: 1;
+  cursor: default;
+}
+
+.ui-badge-neutral {
+  background-color: var(--ui-color-neutral-bg);
+  color: var(--ui-color-neutral-fg);
+}
+.ui-badge-primary {
+  background-color: var(--ui-color-primary-bg);
+  color: var(--ui-color-primary-fg);
+}
+.ui-badge-danger {
+  background-color: var(--ui-color-danger-bg);
+  color: var(--ui-color-danger-fg);
+}
+.ui-badge-success {
+  background-color: var(--ui-color-success-bg);
+  color: var(--ui-color-success-fg);
+}
+
+.ui-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ui-badge-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Remove button — inherits the intent's foreground via currentColor, so it
+ * stays legible under any consumer token override with no per-intent rules.
+ */
+.ui-badge-remove {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  /* ≥24px hit area (WCAG 2.5.8) — the glyph stays small; the button doesn't. */
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  border-radius: var(--ui-radius-full);
+  transition: opacity var(--ui-duration-fast);
+}
+
+.ui-badge-remove-svg {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+@media (hover: hover) {
+  .ui-badge-remove:hover {
+    opacity: 1;
+  }
+}
+
+.ui-badge-remove:focus-visible {
+  outline: 2px solid var(--ui-color-ring);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-badge-remove {
+    transition: none;
+  }
+}
+
+/* Forced Colors Mode — backgrounds collapse, so keep the badge boundary and
+   the remove control visible via honored properties (border, outline). */
+@media (forced-colors: active) {
+  .ui-badge {
+    border: 1px solid CanvasText;
+  }
+  .ui-badge-remove {
+    opacity: 1; /* forced-colors honors opacity — never ship a dimmed control there */
+  }
+  .ui-badge-remove:focus-visible {
+    outline-color: Highlight;
+  }
+}

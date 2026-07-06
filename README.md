@@ -63,7 +63,7 @@ Also public and override-stable — dimensions, elevation, and motion:
 - `--ui-radius-none/sm/md/lg/full` — corner radii
 - `--ui-shadow-resting/raised/focus/pressed/flat` — elevation states
 - `--ui-duration-fast/base/slow` — transition and animation timing
-- `--ui-font-size-sm/md/lg`, `--ui-font-weight-semibold` — component type scale
+- `--ui-font-size-sm/md/lg`, `--ui-font-weight-medium/semibold` — component type scale
 
 Current default values live in [`tokens/tokens.json`](./tokens/tokens.json) (canonical) and the published `dist/styles.css` (compiled). The default palette values come verbatim from [Radix Colors](https://www.radix-ui.com/colors) (slate neutrals, blue primary), with every text pair verified at WCAG AA in both themes.
 

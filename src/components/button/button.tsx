@@ -5,7 +5,7 @@
 
 import type { ButtonHTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
 
-import { buttonClasses, type Intent, type Size } from './variants'
+import { buttonClasses, type ButtonIntent, type ButtonSize } from './variants'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
@@ -13,9 +13,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    * label — color alone is not enough to convey destructive intent to users
    * who can't see color.
    */
-  intent?: Intent
+  intent?: ButtonIntent
   /** Visual size. */
-  size?: Size
+  size?: ButtonSize
   /** When true, the button stretches to fill the width of its container. */
   fullWidth?: boolean
   /** When true, shows a spinner, disables interaction, and sets `aria-busy="true"`. */

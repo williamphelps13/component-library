@@ -27,3 +27,4 @@
 /* Per-component styles. Add one @import line per new component —
    scripts/assert-css-imports.mjs fails the css build if one is missing. */
 @import '../components/button/button.css' layer(components);
+@import '../components/badge/badge.css' layer(components);
