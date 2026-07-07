@@ -4,7 +4,7 @@
 
 Source of truth for the current architecture and the reasoning behind it. When an architecture decision is made or changed, update this file with the what and why.
 
-### See Also
+### See also
 
 Listed as most important first.
 
@@ -19,12 +19,9 @@ Listed as most important first.
 
 ### Status
 
-- ✅ Phase 1 - Foundation
-- ✅ Phase 2 - Token slice
-- ✅ Phase 3 - Styling, Storybook, and visual-regression harness
-- ✅ Phase 4 - Button
-- ✅ Phase 5 - Workflow loop
-- ⏭️ Phase 6 - Comparison — superseded by the swfllive component assessment (`docs/reviews/2026-07-04-swfllive-component-assessment.md`); Milestone 0 closes via the foundation-components plan (`docs/superpowers/plans/2026-07-04-foundation-components.md`)
+- ✅ Milestone 0 — foundation, tokens, styling and test harness, Button, workflow loop (its Phase 6 comparison was superseded by the swfllive component assessment)
+- Active: foundation-components plan (`docs/superpowers/plans/2026-07-04-foundation-components.md`) — ✅ Phase 0 docs, ✅ Phase 1 default theme, ✅ Phase 2 conventions and skill, ✅ Phase 3 Badge; next: Phase 4 field system
+- 2026-07-06 library review remediation in progress (`docs/reviews/2026-07-06-library-review.md`): batches 1–2 merged, docs and rename batches remain
 
 ---
 
@@ -87,7 +84,7 @@ tsdown (Rolldown and Oxc) emits per-file ESM. Config:
 - `unbundle:true` — keeps `"use client"` boundaries granular and tree-shaking maximal
 - `dts` and sourcemaps emitted
 - `target:'es2022'` set explicitly (tsdown otherwise infers it from `engines.node`)
-- Externals: `react` and `react-dom` only — declared peers, nothing else. A pre-registered external for a not-yet-declared package would let a component import it with no gate failing; the external and the peer dep land in the same change (Dialog will add Radix both places, spec §4.2)
+- Externals: `react` and `react-dom` only — declared peers, nothing else. A pre-registered external for a not-yet-declared package would let a component import it with no gate failing; a component that needs a runtime dependency adds the external and the peer dep in the same change (none planned — Dialog builds on the native `<dialog>` element per the foundation plan)
 - React Compiler runs in-build via `@rolldown/plugin-babel` and `babel-plugin-react-compiler` (`target:'19'`) in the default `infer` mode — every component is auto-memoized unless it opts out. Memoization is itself a hook (`useMemoCache`), so compiled output cannot render in RSC; server-renderable components add a file-level `"use no memo"` directive, stay uncompiled, and ship hook-free. Client components get precompiled, auto-memoized output for free (React's recommended library path); server components opt out and stay RSC-native. Memoization only matters where a component re-renders — i.e. on the client — so opting server components out loses nothing. `assert-use-client.mjs` enforces the split: a compiled file with no `"use client"` fails the build.
 - Emits `.mjs` and `.d.mts` — `exports` point there
 
@@ -121,7 +118,7 @@ The broad `include` uses the glob `'.storybook/**/*'`, not bare `'.storybook'` �
 
 ### Styling and theming — vanilla CSS in cascade layers (`src/styles/index.css`)
 
-The most-corrected area. The 2026-07 remediation executed the long-planned Tailwind→vanilla migration (its three verification premises held: no JIT utility classes in JSX, `@utility` used only as block sugar, `@theme inline` single-purpose) — component CSS is plain `.class { … }` rules and the bundle is produced by Lightning CSS (`--bundle --minify`). Decisions:
+Component CSS is plain `.class { … }` rules and the bundle is produced by Lightning CSS (`--bundle --minify`). Decisions:
 
 - Everything ships inside named cascade layers, and the names deliberately match Tailwind v4's (`theme, base, components, utilities`). Same-named layers merge across stylesheets, so in a Tailwind consumer app the cascade composes correctly in either import order: Preflight (their `base`) stays below our `components`, and their utility classes stay above (so `className="rounded-full"` overrides work). A private layer name fails one way or the other — declared before Tailwind, Preflight's button reset beats our components; declared after, consumer utilities lose. Verified empirically in both import orders against a stock Tailwind v4 build.
 - Every published variable carries the `--ui-` prefix and every class the `ui-` prefix — the library never collides with consumer theme variables or utility names (see §Tokens).
@@ -135,11 +132,11 @@ Per-component CSS layout: each component's styles live in `src/components/<name>
 
 ### Server and client boundary — `"use client"`
 
-The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole lib to the client). Interactive components get the directive per-file and are auto-memoized by the compiler; purely-visual server-renderable components add a file-level `"use no memo"` to opt out of compilation and stay hook-free. `scripts/assert-use-client.mjs` scans `dist/` and enforces two invariants: the `"use client"` allowlist is symmetric (no stray or stripped directives), and every file lacking `"use client"` is genuinely hook-free — it imports no `react/compiler-runtime` and calls no React hook. The second check is the critical one: absence of a directive does not prove server-renderability, since the compiler silently injects `useMemoCache` into any component that didn't opt out. This is the highest-severity RSC failure mode, and it passes every client-context gate (Storybook, Vitest browser mode, typecheck, lint) — only this assertion and a real RSC render catch it.
+The barrel (`src/index.ts`) must not carry `"use client"` (would force the whole lib to the client). Components that create their own interactivity get the directive per-file and are auto-memoized by the compiler; server-renderable components add a file-level `"use no memo"` to opt out of compilation and stay hook-free (mechanism in § Build). A server-renderable component may still expose optional callback props — forwarding a consumer-supplied function is not owning interactivity (Badge's `onRemove`; rule in conventions § Server and client). `scripts/assert-use-client.mjs` scans `dist/` and enforces two invariants: the `"use client"` allowlist is symmetric (no stray or stripped directives), and every file lacking `"use client"` is genuinely hook-free — it imports no `react/compiler-runtime` and calls no React hook. The second check is the critical one: absence of a directive does not prove server-renderability, since the compiler silently injects `useMemoCache` into any component that didn't opt out. This is the highest-severity RSC failure mode, and it passes every client-context gate (Storybook, Vitest browser mode, typecheck, lint) — only this assertion and a real RSC render catch it.
 
 ### Component model — Button
 
-Design target: MUI Material Button. When MUI does X, we do X unless the deviation has a named justification of one of two kinds: (a) a concrete user-visible UX improvement, or (b) alignment with the library's core positioning — React 19, Next.js App Router, RSC-first. Both bars are concrete: "modernization" alone is not (a), and "feels cleaner" alone is not (b). Surfaces that match MUI: hover and active color shifts (mechanism differs — oklch lightness vs alpha overlays — visual outcome aligned), focus-visible signaled by elevation depth (between hover and active; no static ring), disabled treatment, `@media (hover: hover)` suppression on touch, `forced-colors` border, `prefers-reduced-motion`, icon a11y, ripple existence. Sizes (`small | medium | large`) approximate MUI's perceptual scale.
+Design target: MUI Material Button. When MUI does X, we do X unless the deviation has a named justification of one of two kinds: (a) a concrete user-visible UX improvement, or (b) alignment with the library's core positioning — React 19, Next.js App Router, RSC-first. Both bars are concrete: "modernization" alone is not (a), and "feels cleaner" alone is not (b). Surfaces that match MUI: hover and active color shifts (mechanism differs — oklch lightness vs alpha overlays — visual outcome aligned), a focus-visible elevation step (between hover and active) reinforcing the 2px `--ui-color-ring` outline (see § Styling), disabled treatment, `@media (hover: hover)` suppression on touch, `forced-colors` border, `prefers-reduced-motion`, icon a11y, ripple existence. Sizes (`small | medium | large`) approximate MUI's perceptual scale.
 
 Deliberate deviations with named justifications. Each line names which bar the deviation clears — (a) user-visible UX win, or (b) React 19 / Next.js App Router / RSC alignment.
 
@@ -168,9 +165,9 @@ Future agents: do not re-open this without a specific user-visible improvement t
 Three policies every component honors. Documented here so the first component to need each one inherits the convention rather than re-discovering it.
 
 - Survive `forced-colors` (Windows HCM). Token colors collapse to system colors under `@media (forced-colors: active)`, so each component adds an explicit `border: 1px solid ButtonText` (or equivalent) and a `Highlight` focus outline. Button is the reference.
-- Respect `prefers-reduced-motion`. Animations and transitions are gated behind `@media (prefers-reduced-motion: no-preference)` (or kept short and non-essential). No current component needs this; the first one with a transition is the trigger.
+- Respect `prefers-reduced-motion`. Every transition and animation is disabled under `@media (prefers-reduced-motion: reduce)` — Button (transitions, spinner, ripple) and Badge (remove-control transition) are the references.
 - Never rely on color alone. Destructive intent pairs with an explicit label; status indicators pair with an icon or text. Documented per-component in JSDoc.
-- Right-to-left support deferred. `modes.ts` exports only `light` and `dark` today. Add an `rtl: { dir: 'rtl' }` mode there when the first directional component lands (likely Tabs, Menu, or Tooltip post-§4.1).
+- Right-to-left support deferred. `modes.ts` exports only `light` and `dark` today. Add an `rtl: { dir: 'rtl' }` mode there when the first directional component lands (none in the foundation set).
 
 ### Story pattern
 
@@ -207,7 +204,7 @@ An MCP server (`@storybook/addon-mcp`) exposes the library's real component docs
 
 ### Release
 
-Changesets (public access) with automatic provenance and `@changesets/changelog-github` changelogs. `release.yml` runs on push to `main`: `changesets/action` opens a Version Packages PR, and merging it runs `pnpm release` (`pnpm build && changeset publish`). Publishing uses npm OIDC trusted publishing (no stored `NPM_TOKEN`), granted via the workflow's `id-token: write` permission.
+Changesets (public access) with automatic provenance and `@changesets/changelog-github` changelogs. `release.yml` runs on push to `main`: after the gate suite (typecheck, lint, build, test) passes, `changesets/action` opens a Version Packages PR, and merging it runs `pnpm release` (`changeset publish`; the build and verifications run in `prepublishOnly`). Publishing uses npm OIDC trusted publishing (no stored `NPM_TOKEN`), granted via the workflow's `id-token: write` permission.
 
 The Version Packages PR is App-authored so its required checks run (see [`docs/workflow.md`](./docs/workflow.md) for the why and the full mechanics). The `repository` field in `package.json` is required for OIDC provenance to attach. `prepublishOnly` rebuilds and re-verifies (`verify:pack`, `assert:use-client`) on every publish path, manual or CI.
 
@@ -215,7 +212,7 @@ The full maintainer publish loop, the `pnpm pack` local-test loop, and the consu
 
 ### Quality gates
 
-ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x; type-aware config also covers `.storybook/**/*.tsx`; `eslint-config-prettier` last; `--max-warnings 0` so warnings gate), Prettier, knip, cspell (all markdown and source), publint, and `attw` (`verify:types`, in CI; `--profile esm-only` accepts no-CJS/no-node10 as intended, `--exclude-entrypoints styles.css` skips the non-JS subpath — the 0.18.2 environmental crash was fixed upstream in 0.18.3). Vitest runs with v8 coverage thresholds; the `unit` project covers pure logic (`variants.test.ts`) alongside the browser-mode story tests. Root config files are type-checked by `tsconfig.node.json` (typecheck pass 3).
+ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x; type-aware config also covers `.storybook/**/*.tsx`; `eslint-config-prettier` last; `--max-warnings 0` so warnings gate), Prettier, knip, cspell (all markdown and source), publint, and `attw` (`verify:types`, in CI; `--profile esm-only` accepts no-CJS/no-node10 as intended, `--exclude-entrypoints styles.css` skips the non-JS subpath). Vitest runs with v8 coverage thresholds; the `unit` project covers pure logic (`variants.test.ts`) alongside the browser-mode story tests. Root config files are type-checked by `tsconfig.node.json` (typecheck pass 3).
 
 ## File and module map
 
@@ -226,6 +223,7 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 | `.nvmrc`, `package.json` `packageManager`                                                               | runtime and package-manager pins (exact, no ranges)                                                                                                                                                                                                                               |
 | `tsconfig.build.json`                                                                                   | strict publish contract: isolatedDeclarations, rootDir:src, src-only; tsdown emit and typecheck pass 1                                                                                                                                                                            |
 | `tsconfig.json`                                                                                         | broad and lenient: `src` and `.storybook/**/*`; editor and typecheck pass 2                                                                                                                                                                                                       |
+| `tsconfig.node.json`                                                                                    | root `*.config.ts` type-checking (typecheck pass 3)                                                                                                                                                                                                                               |
 | `tsdown.config.ts`                                                                                      | ESM, unbundle, externals, dts, React Compiler (infer; server components opt out)                                                                                                                                                                                                  |
 | `eslint.config.ts`, `.prettierrc.json`, `cspell.json`, `knip.json`                                      | lint, format, spell, dead-code                                                                                                                                                                                                                                                    |
 | `scripts/assert-use-client.mjs`                                                                         | build-time `"use client"` guardrail                                                                                                                                                                                                                                               |
@@ -238,6 +236,7 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 | `src/components/button/**`                                                                              | Button: `button.tsx`, `variants.ts`, `button.css`, `*.stories.tsx`, `variants.test.ts`                                                                                                                                                                                            |
 | `src/components/badge/**`                                                                               | Badge: same file shape as Button (the add-component scaffold)                                                                                                                                                                                                                     |
 | `.storybook/main.ts`, `.storybook/preview.tsx`, `.storybook/modes.ts`                                   | Storybook 10 config (CSF Next `definePreview`; addon-themes, addon-docs, addon-a11y, addon-vitest, addon-mcp, addon-pseudo-states; react-docgen-typescript) and Chromatic mode definitions                                                                                        |
+| `.storybook/brand-swfllive.css`                                                                         | brand-preset override sheet for the Palette toolbar (runtime rebrand proof)                                                                                                                                                                                                       |
 | `.mcp.json`, `AGENTS.md`                                                                                | Storybook MCP wiring (Claude Code) and cross-tool agent guidance (verify props via MCP)                                                                                                                                                                                           |
 | `vitest.config.ts`                                                                                      | Vitest: `storybook` browser project and `node`-env `unit` project                                                                                                                                                                                                                 |
 | `.github/workflows/ci.yml`                                                                              | `correctness` job (typecheck, lint, knip, spell, format, build, assert:use-client, test, publint, and playwright install) → `chromatic` job (needs:correctness; skipped on fork PRs; `chromaui/action` SHA-pinned, TurboSnap via config). Concurrency cancel-in-progress per ref. |
@@ -256,5 +255,5 @@ ESLint flat (typescript-eslint, react-hooks, jsx-a11y, `@eslint-react`, import-x
 - `exports` resolve to `.mjs` and `.d.mts` (tsdown's output extensions).
 - Build order is `tokens && tsdown && css` (tsdown wipes `dist/`).
 - `engines.node` floor is `>=22.12.0` — the consumer floor (Vite 6's floor; satisfies React 19, Next.js, and Active LTS Node 22). The contributor build floor is separate: `devEngines.runtime` (`>=24.11.1`, `onFail: error`) fails install on a Node too old to load `tsdown.config.ts`; `.nvmrc` (24.16.0 exact) is the dev pin.
-- `peerDependencies` for `react` and `react-dom` are `>=19` while pre-1.0. Tighten to `^19.0.0` before the first `1.0.0` publish; expand to `^19.0.0 || ^20.0.0` after React 20 is verified. React Compiler `target: '19'` is baked into the emit, so accepting unverified majors silently is a real risk at v1.
+- `peerDependencies` for `react` and `react-dom` are `>=19` while pre-1.0. Tighten to `^19.0.0` before the first `1.0.0` publish; expand to `^19.0.0 || ^20.0.0` after React 20 is verified. React Compiler `target: '19'` is fixed at build time, so accepting unverified majors silently is a real risk at v1.
 - `--ui-spacing-*` and `--ui-radius-*` are part of the public override surface alongside the semantic colors — consumers can rebrand proportions without rebuild.

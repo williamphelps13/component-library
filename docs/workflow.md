@@ -34,7 +34,7 @@ The spec listed `pnpm pack` as an optional pre-publish check; it is now the stan
 
 ## How releases work
 
-- Changesets drives versioning and publishing. `release.yml` runs on every push to `main`: with pending changesets it opens the Version Packages PR; with none it runs `pnpm release` (`pnpm build && changeset publish`)
+- Changesets drives versioning and publishing. `release.yml` runs on every push to `main`: after its gate steps pass, with pending changesets it opens the Version Packages PR; with none it runs `pnpm release` (`changeset publish` — the build and verifications run in `prepublishOnly`)
 - npm publishing uses OIDC trusted publishing — no stored `NPM_TOKEN`. The workflow's `id-token: write` permission lets npm mint a short-lived credential, and provenance attaches automatically (the run logs `using npm trusted publishing`)
 - the Version Packages PR is authored by a GitHub App (`williamphelps13-ui-release`), not `GITHUB_TOKEN`. A `GITHUB_TOKEN`-authored PR cannot trigger workflows (GitHub's anti-recursion rule), so its required checks never run and it can never merge. The App token (minted via `actions/create-github-app-token`) makes the PR App-authored, so CI runs automatically and it merges like any other PR
 

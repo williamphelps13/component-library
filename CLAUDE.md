@@ -84,7 +84,7 @@ Three kinds this codebase does not keep:
 
 - `pnpm build` — full pipeline: tokens, bundle, precompiled CSS
 - `pnpm tokens` — Style Dictionary only (rebuilds `build/*.css`)
-- `pnpm exec tsdown` — bundle only (skips tokens and CSS)
+- `pnpm exec tsdown --tsconfig tsconfig.build.json` — bundle only (skips tokens and CSS; the flag matches the build script — bare `tsdown` emits from the lenient default tsconfig)
 - `pnpm css` — CSS only (asserts component imports, then Lightning CSS bundles `dist/styles.css`; requires tokens to have run)
 - `pnpm css:watch` — rebuild `dist/styles.css` on CSS edits (Storybook consumes dist, so edits are invisible without this)
 - `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm chromatic` — gates
