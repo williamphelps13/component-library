@@ -20,7 +20,8 @@ Settled by Button and the 2026-07 remediation. Sections note which component set
 ## Variants and styling
 
 - `variants.ts`: typed `Record<Variant, string>` maps joined by one pure function (`buttonClasses(intent, size)`). TS forces a class per union member; the pure function gets a unit test
-- Class names are `ui-`-prefixed literals using the full component name (`ui-badge-primary`), never abbreviations — searchable in both directions between TSX and CSS (settled by Badge; Button's `ui-btn` renames in the review-fixes cleanup)
+- Class names are `ui-`-prefixed literals using the full component name (`ui-button-primary`), never abbreviations — searchable in both directions between TSX and CSS
+- Component-internal custom properties use the `--_ui-` prefix (`--_ui-button-elevation`) — everything under `--ui-*` is the public override surface, and an element-level re-declaration there would silently defeat consumer `:root` overrides (settled by Button)
 - All styling lives in the co-located `<name>.css`, imported into `layer(components)` by `src/styles/index.css` (one line; `assert-css-imports.mjs` fails the build if missing)
 - Every visual value resolves through a `--ui-*` token — no hardcoded colors, spacing, radii, shadows, durations, or font sizes in component CSS. A styling need the tokens cannot express escalates to the token layer for a system-wide answer
 - Disabled states use `opacity: 0.5` + `cursor: not-allowed`, not dedicated disabled tokens (Button precedent)

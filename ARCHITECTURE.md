@@ -20,7 +20,7 @@ Listed as most important first.
 
 - ✅ Milestone 0 — foundation, tokens, styling and test harness, Button, workflow loop (its Phase 6 comparison was superseded by the swfllive component assessment)
 - Active: foundation-components plan (`docs/superpowers/plans/2026-07-04-foundation-components.md`) — ✅ Phase 0 docs, ✅ Phase 1 default theme, ✅ Phase 2 conventions and skill, ✅ Phase 3 Badge; next: Phase 4 field system
-- 2026-07-06 library review remediation in progress (`docs/reviews/2026-07-06-library-review.md`): batches 1–4 done; batch 5 (component and token polish) remains
+- ✅ 2026-07-06 library review remediated in full (`docs/reviews/2026-07-06-library-review.md`, HISTORICAL)
 
 ---
 
@@ -145,7 +145,7 @@ Deliberate deviations with named justifications. Each line names which bar the d
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
 - (a) Default `type='button'` (MUI inherits browser default). Prevents accidental form submit when the Button is dropped inside a `<form>`.
 - (a) Explicit `aria-busy={loading || undefined}` (MUI relies on implicit busy semantics). One less semantic gap for screen readers.
-- (a) Hover/active color shift via `oklch(from var(--ui-color-X-bg) calc(l ± N) c h)` instead of MUI's `alpha(palette.main, 0.04)` overlay. Both work; ours is theme-token-portable and lets the same shift formula serve every intent. Marginal — kept because the override contract (point below) needs CSS-var inputs and oklch shifts compose with them.
+- (a) Hover/active color shift via `oklch(from var(--ui-color-X-bg) calc(l ± N) c h)` instead of MUI's `alpha(palette.main, 0.04)` overlay. Both work; ours is theme-token-portable and lets the same shift formula serve every intent. Marginal — kept because the override contract (point below) needs CSS-var inputs and oklch shifts compose with them: one `-bg` override re-derives its own hover/active shifts, where Radix-style hover tokens would turn pair overrides into triples. Browsers without relative-color support drop the shift; the elevation change still signals state.
 - (b) Semantic-token theming (`--ui-color-primary-bg`, `--ui-color-primary-fg`, …) rather than a JS theme object. The whole library targets RSC and Next.js App Router; a JS theme object would require a Provider in every consumer's `layout.tsx` and forfeit server-renderability. CSS-var overrides need no JS, no Provider, and no rebuild.
 - (a) Color-alone warning in `intent` JSDoc: pair `danger` with an explicit destructive label. Concrete a11y improvement codified at the prop type rather than left as Material guidance.
 

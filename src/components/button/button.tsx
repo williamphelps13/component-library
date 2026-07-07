@@ -32,7 +32,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 function DefaultSpinner(): ReactElement {
   return (
-    <svg viewBox="0 0 24 24" className="ui-btn-spinner-svg" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className="ui-button-spinner-svg" aria-hidden="true">
       <circle
         cx="12"
         cy="12"
@@ -73,10 +73,12 @@ export function Button({
   ref,
   ...rest
 }: ButtonProps): ReactElement {
-  const classes = [buttonClasses(intent, size), fullWidth && 'ui-btn-full-width', className]
+  const classes = [buttonClasses(intent, size), fullWidth && 'ui-button-full-width', className]
     .filter(Boolean)
     .join(' ')
-  const contentClasses = loading ? 'ui-btn-content ui-btn-content-loading' : 'ui-btn-content'
+  const contentClasses = loading
+    ? 'ui-button-content ui-button-content-loading'
+    : 'ui-button-content'
   return (
     <button
       ref={ref}
@@ -86,18 +88,18 @@ export function Button({
       aria-busy={loading || undefined}
       {...rest}
     >
-      <span className="ui-btn-spinner" aria-hidden={!loading}>
+      <span className="ui-button-spinner" aria-hidden={!loading}>
         {loading && (loadingIndicator ?? <DefaultSpinner />)}
       </span>
       <span className={contentClasses}>
         {startIcon && (
-          <span className="ui-btn-icon-start" aria-hidden="true">
+          <span className="ui-button-icon-start" aria-hidden="true">
             {startIcon}
           </span>
         )}
         {children}
         {endIcon && (
-          <span className="ui-btn-icon-end" aria-hidden="true">
+          <span className="ui-button-icon-end" aria-hidden="true">
             {endIcon}
           </span>
         )}

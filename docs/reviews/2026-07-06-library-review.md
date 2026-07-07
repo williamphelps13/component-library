@@ -1,6 +1,6 @@
 # Library review — 2026-07-06
 
-Status: OPEN — fixes planned in batches in `docs/superpowers/plans/2026-07-06-review-fixes.md`. Batch 1 lands in the `feat/badge` PR; later batches land as commits to `main`.
+Status: HISTORICAL — all findings remediated via `docs/superpowers/plans/2026-07-06-review-fixes.md` (batches 1–5; PRs #47, #48, #50, and the rename PR). C1 verified end-to-end by probe PR #49. Deliberately open with named triggers: T5's dual-theme axe automation (fires at component #3) and the hover-token revisit recorded in ARCHITECTURE § Component model. D12's remediation-plan finding resolved by deleting the plan (batch 4). The problems described below no longer exist; the doc is preserved as the audit record.
 
 Full-library audit before component #3: documentation accuracy and DRY-ness, testing infrastructure (silent-regression coverage), component implementation (Button and the staged Badge), and the token/CSS contract. Reviewed on branch `feat/badge` with the Badge work staged but uncommitted. Method: four parallel review agents (one per dimension); every finding below was then re-verified directly against the working tree — file and line references are firsthand, not agent claims. Claims that failed re-verification were dropped (listed at the end).
 
