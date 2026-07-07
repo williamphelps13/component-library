@@ -12,7 +12,7 @@ Requirements sources are the swfllive counterparts (prop surfaces, edge cases, a
 
 - Commit `docs/reviews/2026-07-04-swfllive-component-assessment.md` (already written, untracked)
 - ARCHITECTURE: add a Positioning section (condensed why-not-MUI: server-first vs Emotion's client-only architecture, MUI depth without Material's look, exact API surface, change sovereignty; narrow-and-deep strategy) and a Component growth section (rebuild decision, reference-discipline hierarchy, roadmap pointer to the assessment)
-- Milestone plan deviation log: Phase 6 superseded by the assessment + this plan; ARCHITECTURE status line: Phase 6 → superseded, foundation-components plan active
+- Milestone plan deviation log: Phase 6 superseded by the assessment + this plan; ARCHITECTURE status line: Phase 6 → superseded, foundation-components plan active (milestone plan since deleted; history in git)
 - Copy this plan to `docs/superpowers/plans/2026-07-04-foundation-components.md` with an execution deviations log
 
 ## Phase 1 — Token vocabulary extension (PR `feat(tokens)`)

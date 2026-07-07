@@ -12,10 +12,9 @@ Listed as most important first.
 2. `CLAUDE.md` — always-loaded operating rules and hard-won gotchas
 3. `docs/component-conventions.md` — the canonical component pattern; authority layer 1 for component decisions
 4. `docs/workflow.md` — the publish, local-test, and consumer update loops
-5. Spec (`docs/superpowers/specs/`) — original design exploration and alternatives considered; may lag this file
-6. Plan (`docs/superpowers/plans/`) — execution steps (what was planned) and the live deviation log (why we changed course)
-7. Reviews (`docs/reviews/`) — dated audits and decision inputs, frozen at their date; each carries a status line saying what happened to it. Settled outcomes live in this file, never there
-8. `AGENTS.md` — thin `CLAUDE.md` redirect for non-Claude-Code agents
+5. Active plan (`docs/superpowers/plans/`) — execution steps and the live deviation log (why we changed course); superseded plans and specs are deleted, git history is the archive
+6. Reviews (`docs/reviews/`) — dated audits and decision inputs, frozen at their date; each carries a status line saying what happened to it. Settled outcomes live in this file, never there
+7. `AGENTS.md` — thin `CLAUDE.md` redirect for non-Claude-Code agents
 
 ### Status
 

@@ -38,7 +38,7 @@ Every interactive component ships all of these; none rely on browser defaults si
 - Text zoom safety: `min-height`, never fixed `height`, on text-bearing controls (WCAG 1.4.4)
 - Interactive sub-controls have a ≥24×24px hit area (WCAG 2.5.8) even when the glyph is smaller — pad the button, not the icon (settled by Badge)
 - Content hidden during loading uses `opacity: 0`, not `visibility: hidden` — the label must stay in the accessibility tree; pair with `aria-busy` and `disabled`
-- axe runs as a failing test (`parameters.a11y.test: 'error'`) on every story, both themes via the hand-authored `Dark*` stories (automation trigger: component #3)
+- axe runs as a failing test (`parameters.a11y.test: 'error'`) on every story, both themes via the hand-authored `Dark*` stories
 
 ## Server and client
 
@@ -61,7 +61,7 @@ Unit tests cover pure logic (`variants.test.ts` pattern): exhaustive variant enu
 
 ## Reference discipline (per component build)
 
-The authority hierarchy lives in ARCHITECTURE § "Component growth" — that list is the single copy. Short version for daily use: a convention written here ends the question; MUI is the sole design target; the swfllive counterpart supplies requirements only; everything else is a cross-check; styling resolves through tokens or escalates to the token layer.
+The authority hierarchy lives in ARCHITECTURE § "Component growth" — that list is the single copy.
 
 ## Open items with named triggers
 

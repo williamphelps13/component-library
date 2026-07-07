@@ -1,11 +1,11 @@
 # Workflow — publishing and consuming @williamphelps13/ui
 
-The maintainer publish loop and the consumer update loop, plus the local-test loop that verifies a change before it ships. Written from two real change→publish→consume cycles (`fullWidth` → 0.2.0, `success` intent → 0.3.0).
+The maintainer publish loop and the consumer update loop, plus the local-test loop that verifies a change before it ships.
 
 ## Publishing a change
 
 1. Branch off `main`, make the change, add a changeset — `pnpm changeset`, pick the bump (minor for an additive prop or variant, patch for a fix), write a one-line consumer-facing summary
-2. Run the gates locally — `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, then `pnpm assert:use-client` and `grep` the new class in `dist/styles.css`
+2. Run the gate suite locally (CLAUDE.md § "Common commands")
 3. Verify in a real consumer with the local-test loop below
 4. Open a PR — CI runs `correctness` then `chromatic`; accept any new Chromatic snapshots in the Chromatic UI (new stories flag as baseline changes)
 5. Merge the PR to `main` — this triggers `release.yml`, which opens a "Version Packages" PR
@@ -29,8 +29,6 @@ npm run dev
 - `--force` is required — npm caches tarballs by name, and the tarball name carries the pre-bump `package.json` version (unchanged until the Version PR merges), so a same-name reinstall serves the stale cache without it
 - iterate by rebuilding: edit → `pnpm build && pnpm pack` → reinstall with `--force`
 - `npm link` is avoided — it symlinks the source tree and pulls in a second copy of React, which breaks a React peer-dependency library; a packed tarball uses the consumer's own React
-
-The spec listed `pnpm pack` as an optional pre-publish check; it is now the standing local-iterate loop.
 
 ## How releases work
 
