@@ -10,7 +10,7 @@ describe('buttonClasses', () => {
     'returns base + intent + size classes for %s/%s',
     (intent, size) => {
       const classes = buttonClasses(intent, size)
-      expect(classes).toBe(`ui-btn ui-btn-${intent} ui-btn-${size}`)
+      expect(classes).toBe(`ui-button ui-button-${intent} ui-button-${size}`)
     },
   )
 
@@ -18,10 +18,10 @@ describe('buttonClasses', () => {
     const { readFileSync } = await import('node:fs')
     const css = readFileSync('src/components/button/button.css', 'utf8')
     for (const intent of intents) {
-      expect(css).toContain(`.ui-btn-${intent}`)
+      expect(css).toContain(`.ui-button-${intent}`)
     }
     for (const size of sizes) {
-      expect(css).toContain(`.ui-btn-${size}`)
+      expect(css).toContain(`.ui-button-${size}`)
     }
   })
 
@@ -29,10 +29,10 @@ describe('buttonClasses', () => {
     const { readFileSync } = await import('node:fs')
     const css = readFileSync('src/components/button/button.css', 'utf8')
     expect(css).toContain('@media (hover: hover)')
-    expect(css).toContain('.ui-btn:focus-visible')
-    expect(css).toContain('.ui-btn:active')
+    expect(css).toContain('.ui-button:focus-visible')
+    expect(css).toContain('.ui-button:active')
     for (const intent of intents) {
-      expect(css).toContain(`.ui-btn-${intent}:hover`)
+      expect(css).toContain(`.ui-button-${intent}:hover`)
     }
   })
 })

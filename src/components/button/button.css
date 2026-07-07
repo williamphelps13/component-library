@@ -10,7 +10,7 @@
  *   idle / hover / active / focus-visible / disabled / loading.
  */
 
-.ui-btn {
+.ui-button {
   position: relative; /* anchor for absolutely-positioned spinner + click ripple */
   overflow: hidden; /* contains the ::after ripple within the rounded button */
   appearance: none;
@@ -28,8 +28,8 @@
   cursor: pointer;
   /* Elevation layers via box-shadow: idle < hover < focus-visible < active
      (MUI's pattern). The focus ring below is additive, not a replacement. */
-  --ui-btn-elevation: var(--ui-shadow-resting);
-  box-shadow: var(--ui-btn-elevation);
+  --_ui-button-elevation: var(--ui-shadow-resting);
+  box-shadow: var(--_ui-button-elevation);
   transition:
     background-color var(--ui-duration-base),
     box-shadow var(--ui-duration-base),
@@ -44,7 +44,7 @@
  * later if needed; centered flash is the right default for a presentational
  * component.
  */
-.ui-btn::after {
+.ui-button::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -55,11 +55,11 @@
   transform: scale(0.5);
 }
 
-.ui-btn:active:not(:disabled)::after {
-  animation: ui-btn-ripple var(--ui-duration-slow) ease-out;
+.ui-button:active:not(:disabled)::after {
+  animation: ui-button-ripple var(--ui-duration-slow) ease-out;
 }
 
-@keyframes ui-btn-ripple {
+@keyframes ui-button-ripple {
   0% {
     opacity: 0.3;
     transform: scale(0.5);
@@ -70,41 +70,41 @@
   }
 }
 
-.ui-btn-primary {
+.ui-button-primary {
   background-color: var(--ui-color-primary-bg);
   color: var(--ui-color-primary-fg);
 }
-.ui-btn-neutral {
+.ui-button-neutral {
   background-color: var(--ui-color-neutral-bg);
   color: var(--ui-color-neutral-fg);
 }
-.ui-btn-danger {
+.ui-button-danger {
   background-color: var(--ui-color-danger-bg);
   color: var(--ui-color-danger-fg);
 }
-.ui-btn-success {
+.ui-button-success {
   background-color: var(--ui-color-success-bg);
   color: var(--ui-color-success-fg);
 }
 
 /* min-height (not height) so text-only zoom can grow the label without
    clipping it — WCAG 1.4.4. */
-.ui-btn-small {
+.ui-button-small {
   min-height: 2rem;
   padding-inline: var(--ui-spacing-2);
   font-size: var(--ui-font-size-sm);
 }
-.ui-btn-medium {
+.ui-button-medium {
   min-height: 2.25rem;
   padding-inline: var(--ui-spacing-2);
   font-size: var(--ui-font-size-md);
 }
-.ui-btn-large {
+.ui-button-large {
   min-height: 2.625rem;
   padding-inline: var(--ui-spacing-3);
   font-size: var(--ui-font-size-lg);
 }
-.ui-btn-full-width {
+.ui-button-full-width {
   width: 100%;
 }
 
@@ -115,19 +115,19 @@
  * the color-shift direction (lighten instead of darken) per Material guidance.
  */
 @media (hover: hover) {
-  .ui-btn:hover:not(:disabled) {
-    --ui-btn-elevation: var(--ui-shadow-raised);
+  .ui-button:hover:not(:disabled) {
+    --_ui-button-elevation: var(--ui-shadow-raised);
   }
-  .ui-btn-primary:hover:not(:disabled) {
+  .ui-button-primary:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-primary-bg) calc(l - 0.08) c h);
   }
-  .ui-btn-neutral:hover:not(:disabled) {
+  .ui-button-neutral:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-neutral-bg) calc(l - 0.08) c h);
   }
-  .ui-btn-danger:hover:not(:disabled) {
+  .ui-button-danger:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-danger-bg) calc(l - 0.08) c h);
   }
-  .ui-btn-success:hover:not(:disabled) {
+  .ui-button-success:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-success-bg) calc(l - 0.08) c h);
   }
 
@@ -135,16 +135,16 @@
      (Radix step 11; matches MUI's dark palette, which lightens primary and
      darkens its contrast text). Darkening a light solid would close the gap
      with its dark text, so dark mode lightens on hover for all intents. */
-  :where([data-theme='dark']) .ui-btn-primary:hover:not(:disabled) {
+  :where([data-theme='dark']) .ui-button-primary:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-primary-bg) calc(l + 0.08) c h);
   }
-  :where([data-theme='dark']) .ui-btn-neutral:hover:not(:disabled) {
+  :where([data-theme='dark']) .ui-button-neutral:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-neutral-bg) calc(l + 0.08) c h);
   }
-  :where([data-theme='dark']) .ui-btn-danger:hover:not(:disabled) {
+  :where([data-theme='dark']) .ui-button-danger:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-danger-bg) calc(l + 0.08) c h);
   }
-  :where([data-theme='dark']) .ui-btn-success:hover:not(:disabled) {
+  :where([data-theme='dark']) .ui-button-success:hover:not(:disabled) {
     background-color: oklch(from var(--ui-color-success-bg) calc(l + 0.08) c h);
   }
 }
@@ -153,32 +153,32 @@
  * Active — even bigger shadow + further color shift, so the press is
  * unmistakable.
  */
-.ui-btn:active:not(:disabled) {
-  --ui-btn-elevation: var(--ui-shadow-pressed);
+.ui-button:active:not(:disabled) {
+  --_ui-button-elevation: var(--ui-shadow-pressed);
 }
-.ui-btn-primary:active:not(:disabled) {
+.ui-button-primary:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-primary-bg) calc(l - 0.15) c h);
 }
-.ui-btn-neutral:active:not(:disabled) {
+.ui-button-neutral:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-neutral-bg) calc(l - 0.15) c h);
 }
-.ui-btn-danger:active:not(:disabled) {
+.ui-button-danger:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-danger-bg) calc(l - 0.15) c h);
 }
-.ui-btn-success:active:not(:disabled) {
+.ui-button-success:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-success-bg) calc(l - 0.15) c h);
 }
 
-:where([data-theme='dark']) .ui-btn-primary:active:not(:disabled) {
+:where([data-theme='dark']) .ui-button-primary:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-primary-bg) calc(l + 0.12) c h);
 }
-:where([data-theme='dark']) .ui-btn-neutral:active:not(:disabled) {
+:where([data-theme='dark']) .ui-button-neutral:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-neutral-bg) calc(l + 0.12) c h);
 }
-:where([data-theme='dark']) .ui-btn-danger:active:not(:disabled) {
+:where([data-theme='dark']) .ui-button-danger:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-danger-bg) calc(l + 0.12) c h);
 }
-:where([data-theme='dark']) .ui-btn-success:active:not(:disabled) {
+:where([data-theme='dark']) .ui-button-success:active:not(:disabled) {
   background-color: oklch(from var(--ui-color-success-bg) calc(l + 0.12) c h);
 }
 
@@ -190,19 +190,19 @@
  * Source-order placement after hover and before disabled means focus-visible
  * wins over hover when both apply, and disabled flattens everything.
  */
-.ui-btn:focus-visible:not(:disabled) {
+.ui-button:focus-visible:not(:disabled) {
   outline: 2px solid var(--ui-color-ring);
   outline-offset: 2px;
-  --ui-btn-elevation: var(--ui-shadow-focus);
+  --_ui-button-elevation: var(--ui-shadow-focus);
 }
 
 /* Disabled — flatten + dim + cursor. Native `disabled` already blocks clicks
    and `:hover:not(:disabled)` suppresses the hover style; `pointer-events: none`
    would suppress the cursor too. */
-.ui-btn:disabled {
+.ui-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  --ui-btn-elevation: var(--ui-shadow-flat);
+  --_ui-button-elevation: var(--ui-shadow-flat);
 }
 
 /*
@@ -210,38 +210,38 @@
  * opacity:0 (not visibility:hidden) keeps the label in the accessibility tree;
  * see CLAUDE.md gotcha. The button itself sets aria-busy + HTML disabled.
  */
-.ui-btn-spinner {
+.ui-button-spinner {
   position: absolute;
   inset: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.ui-btn-spinner-svg {
+.ui-button-spinner-svg {
   width: 1rem;
   height: 1rem;
-  animation: ui-btn-spin 1s linear infinite;
+  animation: ui-button-spin 1s linear infinite;
 }
-.ui-btn-content {
+.ui-button-content {
   display: inline-flex;
   align-items: center;
   gap: var(--ui-spacing-1);
 }
-.ui-btn-content-loading {
+.ui-button-content-loading {
   opacity: 0;
 }
-.ui-btn-icon-start {
+.ui-button-icon-start {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
 }
-.ui-btn-icon-end {
+.ui-button-icon-end {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-@keyframes ui-btn-spin {
+@keyframes ui-button-spin {
   to {
     transform: rotate(360deg);
   }
@@ -249,13 +249,13 @@
 
 /* Reduced motion respect — zero transitions, spinner, and ripple when requested. */
 @media (prefers-reduced-motion: reduce) {
-  .ui-btn {
+  .ui-button {
     transition: none;
   }
-  .ui-btn-spinner-svg {
+  .ui-button-spinner-svg {
     animation: none;
   }
-  .ui-btn:active:not(:disabled)::after {
+  .ui-button:active:not(:disabled)::after {
     animation: none;
   }
 }
@@ -268,10 +268,10 @@
  * border + outline are honored.
  */
 @media (forced-colors: active) {
-  .ui-btn {
+  .ui-button {
     border: 1px solid ButtonText;
   }
-  .ui-btn:focus-visible {
+  .ui-button:focus-visible {
     outline-color: Highlight;
   }
 }

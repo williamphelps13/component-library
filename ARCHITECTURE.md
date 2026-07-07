@@ -20,7 +20,7 @@ Listed as most important first.
 
 - ✅ Milestone 0 — foundation, tokens, styling and test harness, Button, workflow loop (its Phase 6 comparison was superseded by the swfllive component assessment)
 - Active: foundation-components plan (`docs/superpowers/plans/2026-07-04-foundation-components.md`) — ✅ Phase 0 docs, ✅ Phase 1 default theme, ✅ Phase 2 conventions and skill, ✅ Phase 3 Badge; next: Phase 4 field system
-- 2026-07-06 library review remediation in progress (`docs/reviews/2026-07-06-library-review.md`): batches 1–4 done; batch 5 (component and token polish) remains
+- ✅ 2026-07-06 library review remediated in full (`docs/reviews/2026-07-06-library-review.md`, HISTORICAL)
 
 ---
 
@@ -121,7 +121,7 @@ Component CSS is plain `.class { … }` rules and the bundle is produced by Ligh
 
 - Everything ships inside named cascade layers, and the names deliberately match Tailwind v4's (`theme, base, components, utilities`). Same-named layers merge across stylesheets, so in a Tailwind consumer app the cascade composes correctly in either import order: Preflight (their `base`) stays below our `components`, and their utility classes stay above (so `className="rounded-full"` overrides work). A private layer name fails one way or the other — declared before Tailwind, Preflight's button reset beats our components; declared after, consumer utilities lose. Verified empirically in both import orders against a stock Tailwind v4 build.
 - Every published variable carries the `--ui-` prefix and every class the `ui-` prefix — the library never collides with consumer theme variables or utility names (see §Tokens).
-- No global reset ships (Preflight-equivalent deliberately absent) — component classes are self-contained (`.ui-btn` resets `appearance/border/margin/font`).
+- No global reset ships (Preflight-equivalent deliberately absent) — component classes are self-contained (`.ui-button` resets `appearance/border/margin/font`).
 - `:where()` zero-specificity token selectors (`:root`, `[data-theme="dark"]`) so consumer overrides win by plain specificity inside the shared `theme` layer, and unlayered consumer CSS wins over everything.
 - Focus-visible shows a real ring on `--ui-color-ring` (outline, so it also survives Forced Colors Mode) plus an elevation step; elevation/motion/type resolve through semantic tokens, not hardcoded values.
 
@@ -140,12 +140,12 @@ Design target: MUI Material Button. When MUI does X, we do X unless the deviatio
 Deliberate deviations with named justifications. Each line names which bar the deviation clears — (a) user-visible UX win, or (b) React 19 / Next.js App Router / RSC alignment.
 
 - (b) `ref` is a plain prop — `Button` is a plain function with `ref?: Ref<HTMLButtonElement>`; no `forwardRef` (removed in React 19). An explicit `ReactElement` return type satisfies `isolatedDeclarations`. The whole library is React 19-only; using the React 19 idiom for ref is the alignment, not a deviation worth re-litigating.
-- Variants are a typed literal-class map (`variants.ts`): `Record<ButtonIntent,string>` and `Record<ButtonSize,string>` resolve to `ui-btn …` strings. The `Record` makes TS enforce one class per variant — add a variant and TS forces its class to exist — and literal strings keep the class ↔ stylesheet pairing searchable in both directions. The pure `buttonClasses()` is unit-testable on its own.
+- Variants are a typed literal-class map (`variants.ts`): `Record<ButtonIntent,string>` and `Record<ButtonSize,string>` resolve to `ui-button …` strings. The `Record` makes TS enforce one class per variant — add a variant and TS forces its class to exist — and literal strings keep the class ↔ stylesheet pairing searchable in both directions. The pure `buttonClasses()` is unit-testable on its own.
 - Native HTML props spread via `...rest`; `className` merges with the variant classes.
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
 - (a) Default `type='button'` (MUI inherits browser default). Prevents accidental form submit when the Button is dropped inside a `<form>`.
 - (a) Explicit `aria-busy={loading || undefined}` (MUI relies on implicit busy semantics). One less semantic gap for screen readers.
-- (a) Hover/active color shift via `oklch(from var(--ui-color-X-bg) calc(l ± N) c h)` instead of MUI's `alpha(palette.main, 0.04)` overlay. Both work; ours is theme-token-portable and lets the same shift formula serve every intent. Marginal — kept because the override contract (point below) needs CSS-var inputs and oklch shifts compose with them.
+- (a) Hover/active color shift via `oklch(from var(--ui-color-X-bg) calc(l ± N) c h)` instead of MUI's `alpha(palette.main, 0.04)` overlay. Both work; ours is theme-token-portable and lets the same shift formula serve every intent. Marginal — kept because the override contract (point below) needs CSS-var inputs and oklch shifts compose with them: one `-bg` override re-derives its own hover/active shifts, where Radix-style hover tokens would turn pair overrides into triples. Browsers without relative-color support drop the shift; the elevation change still signals state.
 - (b) Semantic-token theming (`--ui-color-primary-bg`, `--ui-color-primary-fg`, …) rather than a JS theme object. The whole library targets RSC and Next.js App Router; a JS theme object would require a Provider in every consumer's `layout.tsx` and forfeit server-renderability. CSS-var overrides need no JS, no Provider, and no rebuild.
 - (a) Color-alone warning in `intent` JSDoc: pair `danger` with an explicit destructive label. Concrete a11y improvement codified at the prop type rather than left as Material guidance.
 
