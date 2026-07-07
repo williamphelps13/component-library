@@ -20,7 +20,7 @@ Listed as most important first.
 
 - ✅ Milestone 0 — foundation, tokens, styling and test harness, Button, workflow loop (its Phase 6 comparison was superseded by the swfllive component assessment)
 - Active: foundation-components plan (`docs/superpowers/plans/2026-07-04-foundation-components.md`) — ✅ Phase 0 docs, ✅ Phase 1 default theme, ✅ Phase 2 conventions and skill, ✅ Phase 3 Badge; next: Phase 4 field system
-- 2026-07-06 library review remediation in progress (`docs/reviews/2026-07-06-library-review.md`): batches 1–2 merged, docs and rename batches remain
+- 2026-07-06 library review remediation in progress (`docs/reviews/2026-07-06-library-review.md`): batches 1–4 done; batch 5 (component and token polish) remains
 
 ---
 
@@ -205,7 +205,7 @@ An MCP server (`@storybook/addon-mcp`) exposes the library's real component docs
 
 Changesets (public access) with automatic provenance and `@changesets/changelog-github` changelogs. `release.yml` runs on push to `main`: after the gate suite (typecheck, lint, build, test) passes, `changesets/action` opens a Version Packages PR, and merging it runs `pnpm release` (`changeset publish`; the build and verifications run in `prepublishOnly`). Publishing uses npm OIDC trusted publishing (no stored `NPM_TOKEN`), granted via the workflow's `id-token: write` permission.
 
-The Version Packages PR is App-authored so its required checks run (see [`docs/workflow.md`](./docs/workflow.md) for the why and the full mechanics). The `repository` field in `package.json` is required for OIDC provenance to attach. `prepublishOnly` rebuilds and re-verifies (`verify:pack`, `assert:use-client`) on every publish path, manual or CI.
+The Version Packages PR is App-authored so its required checks run (see [`docs/workflow.md`](./docs/workflow.md) for the why and the full mechanics). The `repository` field in `package.json` is required for OIDC provenance to attach. `prepublishOnly` rebuilds and re-verifies (`verify:pack`, `assert:use-client`, `smoke:dist`) on every publish path, manual or CI.
 
 The full maintainer publish loop, the `pnpm pack` local-test loop, and the consumer update loop are documented in [`docs/workflow.md`](./docs/workflow.md).
 

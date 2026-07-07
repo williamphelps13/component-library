@@ -22,7 +22,7 @@ become a TaskCreate todo on entry.
 
 3. Make the RSC decision explicitly — rule and mechanism in `docs/component-conventions.md` § "Server and client"; record the decision and its reason in the deviation log or PR body
 
-4. Scaffold `src/components/<name>/` — `variants.ts`, `<name>.tsx`, `<name>.css`, `variants.test.ts` per `docs/component-conventions.md` § "API shape" and § "Variants and styling" (single copy of the pattern)
+4. Scaffold `src/components/<name>/` — `variants.ts`, `<name>.tsx`, `<name>.css`, `variants.test.ts` per `docs/component-conventions.md` § "API shape", § "Variants and styling", § "Interaction and accessibility floor", and the unit-test pattern in § "Stories and tests" (single copy of the pattern)
 
 5. Wire the CSS into the entry — one `@import … layer(components)` line in `src/styles/index.css`; `pnpm css` confirms (`assert-css-imports.mjs` fails the build if it is missing)
 
