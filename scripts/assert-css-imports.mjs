@@ -1,4 +1,12 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
+
+// Fresh clones hit this via `pnpm test` (which builds CSS first) before any
+// full build has produced the gitignored token output — say so plainly
+// instead of letting Lightning CSS fail on an unresolvable @import.
+if (!existsSync('build/tokens.light.css')) {
+  console.error('FAIL: build/tokens.light.css is missing — run `pnpm build` first (fresh clone?)')
+  process.exit(1)
+}
 
 // A component CSS file that isn't @imported in src/styles/index.css ships the
 // component unstyled while every gate stays green — unknown ui-* classes are

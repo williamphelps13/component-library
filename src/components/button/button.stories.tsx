@@ -108,6 +108,74 @@ export const DisabledBlocksClicks = meta.story({
   },
 })
 
+// Keyboard focus is programmatic, so the ring (a conventions-floor contract:
+// 2px outline) is asserted behaviorally. Hover/active are covered by the
+// forced-pseudo visual stories below — :hover is a browser trusted event that
+// synthetic pointers cannot activate.
+export const FocusRing = meta.story({
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole('button', { name: 'Button' })
+    await userEvent.tab()
+    await expect(button).toHaveFocus()
+    const focused = getComputedStyle(button)
+    await expect(focused.outlineWidth).toBe('2px')
+    await expect(focused.outlineStyle).toBe('solid')
+  },
+})
+
+// Forced pseudo-states (storybook-addon-pseudo-states) — Chromatic snapshots
+// the hover/active looks in both themes. (Snapshot-only: the addon cannot
+// apply in the vitest harness, so axe sees these stories idle.)
+export const HoverStates = meta.story({
+  tags: ['!autodocs'],
+  parameters: {
+    pseudo: { hover: '.force-hover' },
+    controls: { disable: true },
+    chromatic: { modes: { light: allModes.light, dark: allModes.dark } },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      {intents.map((intent) => (
+        <Button key={intent} intent={intent} className="force-hover">
+          {`${intent} / hover`}
+        </Button>
+      ))}
+      <Button intent="primary">idle control</Button>
+    </div>
+  ),
+  // The snapshot is the addon's no-op guard — a programmatic assertion is
+  // infeasible in both test lanes (vitest lacks #storybook-root, the addon's
+  // anchor; Chromatic runs play before the addon's stylesheet-rewrite event).
+  // The in-frame idle control makes addon death obvious: if every button
+  // matches the control, forcing is broken and the Chromatic diff flags it.
+})
+
+export const ActiveStates = meta.story({
+  tags: ['!autodocs'],
+  parameters: {
+    pseudo: { active: true },
+    controls: { disable: true },
+    // Forced :active also starts the ripple keyframes; pause at the END frame
+    // (ripple at opacity 0) so the snapshot shows the pressed background and
+    // shadow, not a frozen mid-ripple wash.
+    chromatic: {
+      modes: { light: allModes.light, dark: allModes.dark },
+      pauseAnimationAtEnd: true,
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      {intents.map((intent) => (
+        <Button key={intent} intent={intent}>
+          {`${intent} / active`}
+        </Button>
+      ))}
+    </div>
+  ),
+})
+
 // Override token pairs — overriding `--ui-color-primary-bg` alone leaves `--ui-color-primary-fg` sub-AA.
 export const BrandPalette = meta.story({
   render: (args) => (

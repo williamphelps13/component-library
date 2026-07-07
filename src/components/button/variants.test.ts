@@ -24,4 +24,15 @@ describe('buttonClasses', () => {
       expect(css).toContain(`.ui-btn-${size}`)
     }
   })
+
+  test('interaction-state rules are present in the stylesheet source', async () => {
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync('src/components/button/button.css', 'utf8')
+    expect(css).toContain('@media (hover: hover)')
+    expect(css).toContain('.ui-btn:focus-visible')
+    expect(css).toContain('.ui-btn:active')
+    for (const intent of intents) {
+      expect(css).toContain(`.ui-btn-${intent}:hover`)
+    }
+  })
 })

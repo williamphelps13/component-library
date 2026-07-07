@@ -14,6 +14,11 @@ import addonChromatic from '@chromatic-com/storybook'
 import addonA11y from '@storybook/addon-a11y'
 import addonDocs from '@storybook/addon-docs'
 import addonThemes, { withThemeByDataAttribute } from '@storybook/addon-themes'
+// Root export is a definePreviewAddon factory (header rule applies). Its
+// `/preview` subpath is classic annotations — passing that module object into
+// `addons` type-checks but is silently ignored (verified 2026-07-06, caught
+// by HoverStates' differential play assertion). Use the factory.
+import addonPseudoStates from 'storybook-addon-pseudo-states'
 // NOTE: `@storybook/addon-vitest`'s default-export factory is intentionally
 // NOT registered here. Its module imports `vitest` at load time, which is
 // only resolvable inside the vitest run context — placing it in
@@ -66,6 +71,7 @@ export default definePreview({
     addonA11y(), // axe runner — without this, parameters.a11y is ignored
     addonThemes(), // globalTypes.theme + URL/channel propagation
     addonChromatic(), // visual-snapshot capture parameters (foundation for B3)
+    addonPseudoStates(), // forced :hover/:active for visual state stories
     // addonVitest is intentionally absent — see header comment.
   ],
   decorators: [
