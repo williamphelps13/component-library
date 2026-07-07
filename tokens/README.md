@@ -1,51 +1,11 @@
 # Design tokens
 
-Code-first design tokens in **W3C/DTCG** format (`$value` / `$type`), stored as
-a **single `tokens.json`** so Tokens Studio's **free** Git sync can round-trip
-them to/from Figma. This file is the **source of truth**; Figma mirrors it.
-
-## Why single-file + sets (not themes)
-
-Tokens Studio's **multi-file sync** and **themes** features are **Pro**
-(€39/editor/mo). We avoid that cost by using the **free Starter** tier:
-**single-file** sync + plain **token sets**. Light/dark are modelled as sets
-(`light`, `dark`) layered over `core` — not as Pro "themes". On free we forgo
-the in-Figma theme _switcher_ and light/dark as variable _modes_ (you export
-one semantic set at a time) — neither of which our code build needs.
-
-## Structure (`tokens.json`)
-
-Top-level keys are **token sets**:
-
-- `core` — raw palette scales, values verbatim from Radix Colors (`color.slate.6`, `color.blue.11`, …). Never consumed directly.
-- `light` / `dark` — intent tokens (`color.primary`, …) that **reference**
-  `core`. This is the **consumer override surface** and the layer that flips
-  for dark mode.
-- `$metadata.tokenSetOrder` — set order. `$themes` is empty (Pro feature).
-
-References are written `{color.blue.11}` (no set name) — they resolve against
-the merged tree at build time.
-
-## Build
-
-`pnpm tokens` (Style Dictionary v5 + `@tokens-studio/sd-transforms`) reads
-`tokens.json`, merges `core`+`light` and `core`+`dark`, and emits to `build/`:
-
-- `tokens.light.css` — `:root { … }` (primitives raw + semantics as `var()`)
-- `tokens.dark.css` — `[data-theme="dark"] { … }` (semantics re-bound, plus `color-scheme: dark`)
-
-Every emitted variable carries the `--ui-` prefix (a name transform in
-`style-dictionary.config.mjs`) so library tokens never collide with consumer
-theme systems.
+`tokens.json` is the single DTCG-format source (`$value`/`$type`); code is the source of truth and Figma mirrors it. Tiers, naming, palette provenance, and build rationale live in ARCHITECTURE § Tokens. `pnpm tokens` emits `build/tokens.{light,dark}.css`.
 
 ## Figma sync (Tokens Studio, free tier)
 
-- Tokens Studio for Figma → **GitHub** storage provider, **single-file** mode,
-  pointed at `tokens/tokens.json`.
-- **Code is the source of truth.** Designer token changes arrive via a
-  **branch + pull request** — never pushed directly to `main`.
-- Designers work with the **token sets**; the Pro "themes" switcher is not used.
-- In the plugin, set **`core` → "source"** and the active semantic set
-  (`light`/`dark`) → **enabled** — otherwise references show as broken.
-- To create native Figma variables: **Export → Token Sets** (free), _not_
-  Themes (Pro); bind layers to the resulting **variables**, not raw values.
+- Tokens Studio for Figma → GitHub storage provider, single-file mode, pointed at `tokens/tokens.json` — single-file because multi-file sync and themes are Pro features; light/dark are plain token sets layered over `core`
+- Designer token changes arrive via a branch and pull request, never pushed to `main`
+- References are written `{color.blue.11}` (no set name); they resolve against the merged tree at build time
+- In the plugin, set `core` to "source" and the active semantic set (`light`/`dark`) to enabled — otherwise references show as broken
+- To create native Figma variables: Export → Token Sets (free), not Themes (Pro); bind layers to the resulting variables, not raw values

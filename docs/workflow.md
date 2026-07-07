@@ -1,11 +1,11 @@
 # Workflow — publishing and consuming @williamphelps13/ui
 
-The maintainer publish loop and the consumer update loop, plus the local-test loop that verifies a change before it ships. Written from two real change→publish→consume cycles (`fullWidth` → 0.2.0, `success` intent → 0.3.0).
+The maintainer publish loop and the consumer update loop, plus the local-test loop that verifies a change before it ships.
 
 ## Publishing a change
 
 1. Branch off `main`, make the change, add a changeset — `pnpm changeset`, pick the bump (minor for an additive prop or variant, patch for a fix), write a one-line consumer-facing summary
-2. Run the gates locally — `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, then `pnpm assert:use-client` and `grep` the new class in `dist/styles.css`
+2. Run the gate suite locally (CLAUDE.md § "Common commands")
 3. Verify in a real consumer with the local-test loop below
 4. Open a PR — CI runs `correctness` then `chromatic`; accept any new Chromatic snapshots in the Chromatic UI (new stories flag as baseline changes)
 5. Merge the PR to `main` — this triggers `release.yml`, which opens a "Version Packages" PR
@@ -30,11 +30,9 @@ npm run dev
 - iterate by rebuilding: edit → `pnpm build && pnpm pack` → reinstall with `--force`
 - `npm link` is avoided — it symlinks the source tree and pulls in a second copy of React, which breaks a React peer-dependency library; a packed tarball uses the consumer's own React
 
-The spec listed `pnpm pack` as an optional pre-publish check; it is now the standing local-iterate loop.
-
 ## How releases work
 
-- Changesets drives versioning and publishing. `release.yml` runs on every push to `main`: with pending changesets it opens the Version Packages PR; with none it runs `pnpm release` (`pnpm build && changeset publish`)
+- Changesets drives versioning and publishing. `release.yml` runs on every push to `main`: after its gate steps pass, with pending changesets it opens the Version Packages PR; with none it runs `pnpm release` (`changeset publish` — the build and verifications run in `prepublishOnly`)
 - npm publishing uses OIDC trusted publishing — no stored `NPM_TOKEN`. The workflow's `id-token: write` permission lets npm mint a short-lived credential, and provenance attaches automatically (the run logs `using npm trusted publishing`)
 - the Version Packages PR is authored by a GitHub App (`williamphelps13-ui-release`), not `GITHUB_TOKEN`. A `GITHUB_TOKEN`-authored PR cannot trigger workflows (GitHub's anti-recursion rule), so its required checks never run and it can never merge. The App token (minted via `actions/create-github-app-token`) makes the PR App-authored, so CI runs automatically and it merges like any other PR
 
