@@ -41,6 +41,19 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # The Release workflow runs in parallel with CI (separate workflows, no
+      # gating) and prepublishOnly is build-only — without these steps a
+      # merge-skew break on main can publish. Duplicating CI here is deliberate.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test
+
       - name: Create Release PR or publish to npm
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:

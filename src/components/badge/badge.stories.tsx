@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactElement } from 'react'
-import { fn, expect } from 'storybook/test'
+import { fn, expect, waitFor } from 'storybook/test'
 
 import { allModes } from '../../../.storybook/modes'
 import preview from '../../../.storybook/preview'
@@ -60,6 +60,34 @@ export const RemoveInteraction = meta.story({
     await userEvent.click(removeButton)
     await expect(args.onRemove).toHaveBeenCalledTimes(1)
     await expect(args.onRemove).toHaveBeenCalledWith(expect.objectContaining({ type: 'click' }))
+  },
+})
+
+// Guards the remove control's focus CSS — axe doesn't evaluate unfocused
+// focus styles and Chromatic snapshots resting states.
+export const RemoveFocusRing = meta.story({
+  args: { children: 'Removable', onRemove: fn() },
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab()
+    const removeButton = canvas.getByRole('button', { name: 'Remove' })
+    await expect(removeButton).toHaveFocus()
+    await expect(getComputedStyle(removeButton).outlineWidth).toBe('2px')
+    // opacity transitions over --ui-duration-fast — poll past the animation.
+    await waitFor(() => expect(getComputedStyle(removeButton).opacity).toBe('1'))
+  },
+})
+
+// Forced pseudo-state (storybook-addon-pseudo-states) — Chromatic snapshots
+// the remove control's hover look in both themes.
+export const RemoveHover = meta.story({
+  args: { intent: 'primary', children: 'Filter: Live', onRemove: fn() },
+  tags: ['!autodocs'],
+  parameters: {
+    pseudo: { hover: true },
+    controls: { disable: true },
+    chromatic: { modes: { light: allModes.light, dark: allModes.dark } },
   },
 })
 

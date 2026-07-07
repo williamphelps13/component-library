@@ -38,6 +38,7 @@ jobs:
       - run: pnpm format
       - run: pnpm build
       - run: pnpm assert:use-client
+      - run: pnpm smoke:dist
       - run: pnpm test
       - run: pnpm verify:pack
       - run: pnpm verify:types

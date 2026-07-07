@@ -23,4 +23,11 @@ describe('badgeClasses', () => {
       expect(css).toContain(`.ui-badge-${size}`)
     }
   })
+
+  test('interaction-state rules are present in the stylesheet source', async () => {
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync('src/components/badge/badge.css', 'utf8')
+    expect(css).toContain('.ui-badge-remove:hover')
+    expect(css).toContain('.ui-badge-remove:focus-visible')
+  })
 })

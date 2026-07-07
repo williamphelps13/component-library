@@ -52,12 +52,12 @@ Every interactive component ships all of these; none rely on browser defaults si
 The five-story set per component (autodocs pages come free from the global `tags: ['autodocs']` cascade in `.storybook/preview.tsx`):
 
 1. Variant baselines — one one-liner story per public variant (`export const Primary = meta.story({ args: { intent: 'primary' } })`); story names carry the meaning, no description blocks
-2. State baselines — render-only stories for visually distinct states (Disabled, Loading), captured by Chromatic and scanned by axe
+2. State baselines — render-only stories for visually distinct states (Disabled, Loading), captured by Chromatic and scanned by axe; pointer states (hover, active) use forced pseudo-state stories (storybook-addon-pseudo-states) with dual-theme Chromatic modes, since synthetic events cannot activate `:hover`
 3. Interaction tests — one `play` story per interaction the component owns; skip native behavior it does not customize
 4. Override demo — a story wrapping the component in an ancestor that sets `--ui-*` tokens, proving the runtime theming contract; it must override a variable the component actually consumes
 5. `AllVariants` matrix — `tags: ['!autodocs']`, controls disabled, `parameters.chromatic.modes: { light, dark }` as the dual-theme visual baseline
 
-Unit tests cover pure logic (`variants.test.ts` pattern): exhaustive variant enumeration plus a literal-class-presence check against the component's stylesheet. Behavior lives in play functions, not class-name assertions.
+Unit tests cover pure logic (`variants.test.ts` pattern): exhaustive variant enumeration plus literal presence checks against the component's stylesheet — variant classes and interaction-state selectors (`:hover`, `:active`, `:focus-visible`), so deleting a state block fails a test. Behavior lives in play functions, not class-name assertions.
 
 ## Reference discipline (per component build)
 

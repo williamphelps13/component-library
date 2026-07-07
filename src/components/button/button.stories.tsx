@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactElement } from 'react'
-import { fn, expect } from 'storybook/test'
+import { fn, expect, waitFor } from 'storybook/test'
 
 import { allModes } from '../../../.storybook/modes'
 import preview from '../../../.storybook/preview'
@@ -106,6 +106,88 @@ export const DisabledBlocksClicks = meta.story({
     await userEvent.click(button)
     await expect(args.onClick).not.toHaveBeenCalled()
   },
+})
+
+// Keyboard focus is programmatic, so the ring (a conventions-floor contract:
+// 2px outline) is asserted behaviorally. Hover/active are covered by the
+// forced-pseudo visual stories below — :hover is a browser trusted event that
+// synthetic pointers cannot activate.
+export const FocusRing = meta.story({
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole('button', { name: 'Button' })
+    await userEvent.tab()
+    await expect(button).toHaveFocus()
+    const focused = getComputedStyle(button)
+    await expect(focused.outlineWidth).toBe('2px')
+    await expect(focused.outlineStyle).toBe('solid')
+  },
+})
+
+// Forced pseudo-states (storybook-addon-pseudo-states) — Chromatic snapshots
+// the hover/active looks in both themes. (Snapshot-only: the addon cannot
+// apply in the vitest harness, so axe sees these stories idle.)
+export const HoverStates = meta.story({
+  tags: ['!autodocs'],
+  parameters: {
+    pseudo: { hover: '.force-hover' },
+    controls: { disable: true },
+    chromatic: { modes: { light: allModes.light, dark: allModes.dark } },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      {intents.map((intent) => (
+        <Button key={intent} intent={intent} className="force-hover">
+          {`${intent} / hover`}
+        </Button>
+      ))}
+      <Button intent="primary">idle control</Button>
+    </div>
+  ),
+  // Differential assertion proves the addon is actually forcing :hover — its
+  // preview wiring silently no-ops when registration is missing (see
+  // .storybook/preview.tsx header), and a render-only story would stay green.
+  // The addon resolves its root via #storybook-root, which the vitest harness
+  // does not create — so this guard executes in Storybook and Chromatic (which
+  // runs play functions and fails the build on assertion errors), and skips in
+  // vitest. Do not remove the skip: the addon can never apply there.
+  play: async ({ canvas }) => {
+    if (!document.getElementById('storybook-root')) return
+    const hovered = canvas.getByRole('button', { name: 'primary / hover' })
+    const control = canvas.getByRole('button', { name: 'idle control' })
+    // Classes apply in a deferred effect; stylesheet rewrites on STORY_RENDERED.
+    await waitFor(() => expect(hovered.className).toContain('pseudo-hover'))
+    await waitFor(() =>
+      expect(getComputedStyle(hovered).backgroundColor).not.toBe(
+        getComputedStyle(control).backgroundColor,
+      ),
+    )
+  },
+})
+
+export const ActiveStates = meta.story({
+  tags: ['!autodocs'],
+  parameters: {
+    pseudo: { active: true },
+    controls: { disable: true },
+    // Forced :active also starts the ripple keyframes; pause at the END frame
+    // (ripple at opacity 0) so the snapshot shows the pressed background and
+    // shadow, not a frozen mid-ripple wash.
+    chromatic: {
+      modes: { light: allModes.light, dark: allModes.dark },
+      pauseAnimationAtEnd: true,
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      {intents.map((intent) => (
+        <Button key={intent} intent={intent}>
+          {`${intent} / active`}
+        </Button>
+      ))}
+    </div>
+  ),
 })
 
 // Override token pairs — overriding `--ui-color-primary-bg` alone leaves `--ui-color-primary-fg` sub-AA.

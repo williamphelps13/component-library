@@ -11,6 +11,7 @@ const config: StorybookConfig = {
     '@storybook/addon-docs',
     '@storybook/addon-mcp',
     '@storybook/addon-themes',
+    'storybook-addon-pseudo-states',
   ],
   framework: '@storybook/react-vite',
   typescript: {
