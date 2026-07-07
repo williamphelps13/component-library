@@ -1,5 +1,5 @@
 /*
- * Button component styles.
+ * Button component styles. (CSS-only TurboSnap probe — see review C1.)
  *
  * Co-located with `button.tsx`. Imported by `src/styles/index.css` into
  * `layer(components)`, so every rule here — states and media queries
