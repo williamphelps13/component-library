@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import { buttonClasses, type Intent, type Size } from './variants'
+import { buttonClasses, type ButtonIntent, type ButtonSize } from './variants'
 
-const intents: Intent[] = ['primary', 'neutral', 'danger', 'success']
-const sizes: Size[] = ['small', 'medium', 'large']
+const intents: ButtonIntent[] = ['primary', 'neutral', 'danger', 'success']
+const sizes: ButtonSize[] = ['small', 'medium', 'large']
 
 describe('buttonClasses', () => {
   test.each(intents.flatMap((intent) => sizes.map((size) => [intent, size] as const)))(

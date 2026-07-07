@@ -1,11 +1,9 @@
-// Server-renderable: opt out of React Compiler. Its memoization is a hook
-// (useMemoCache) that throws in RSC; the build runs the compiler in infer mode,
-// so this directive is what keeps the Button hook-free. assert-use-client enforces it.
+// Server-renderable: opts out of React Compiler, whose memoization injects hooks that throw in RSC.
 'use no memo'
 
 import type { ButtonHTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
 
-import { buttonClasses, type Intent, type Size } from './variants'
+import { buttonClasses, type ButtonIntent, type ButtonSize } from './variants'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
@@ -13,9 +11,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    * label — color alone is not enough to convey destructive intent to users
    * who can't see color.
    */
-  intent?: Intent
+  intent?: ButtonIntent
   /** Visual size. */
-  size?: Size
+  size?: ButtonSize
   /** When true, the button stretches to fill the width of its container. */
   fullWidth?: boolean
   /** When true, shows a spinner, disables interaction, and sets `aria-busy="true"`. */
