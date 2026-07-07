@@ -121,7 +121,7 @@ Component CSS is plain `.class { … }` rules and the bundle is produced by Ligh
 
 - Everything ships inside named cascade layers, and the names deliberately match Tailwind v4's (`theme, base, components, utilities`). Same-named layers merge across stylesheets, so in a Tailwind consumer app the cascade composes correctly in either import order: Preflight (their `base`) stays below our `components`, and their utility classes stay above (so `className="rounded-full"` overrides work). A private layer name fails one way or the other — declared before Tailwind, Preflight's button reset beats our components; declared after, consumer utilities lose. Verified empirically in both import orders against a stock Tailwind v4 build.
 - Every published variable carries the `--ui-` prefix and every class the `ui-` prefix — the library never collides with consumer theme variables or utility names (see §Tokens).
-- No global reset ships (Preflight-equivalent deliberately absent) — component classes are self-contained (`.ui-btn` resets `appearance/border/margin/font`).
+- No global reset ships (Preflight-equivalent deliberately absent) — component classes are self-contained (`.ui-button` resets `appearance/border/margin/font`).
 - `:where()` zero-specificity token selectors (`:root`, `[data-theme="dark"]`) so consumer overrides win by plain specificity inside the shared `theme` layer, and unlayered consumer CSS wins over everything.
 - Focus-visible shows a real ring on `--ui-color-ring` (outline, so it also survives Forced Colors Mode) plus an elevation step; elevation/motion/type resolve through semantic tokens, not hardcoded values.
 
@@ -140,7 +140,7 @@ Design target: MUI Material Button. When MUI does X, we do X unless the deviatio
 Deliberate deviations with named justifications. Each line names which bar the deviation clears — (a) user-visible UX win, or (b) React 19 / Next.js App Router / RSC alignment.
 
 - (b) `ref` is a plain prop — `Button` is a plain function with `ref?: Ref<HTMLButtonElement>`; no `forwardRef` (removed in React 19). An explicit `ReactElement` return type satisfies `isolatedDeclarations`. The whole library is React 19-only; using the React 19 idiom for ref is the alignment, not a deviation worth re-litigating.
-- Variants are a typed literal-class map (`variants.ts`): `Record<ButtonIntent,string>` and `Record<ButtonSize,string>` resolve to `ui-btn …` strings. The `Record` makes TS enforce one class per variant — add a variant and TS forces its class to exist — and literal strings keep the class ↔ stylesheet pairing searchable in both directions. The pure `buttonClasses()` is unit-testable on its own.
+- Variants are a typed literal-class map (`variants.ts`): `Record<ButtonIntent,string>` and `Record<ButtonSize,string>` resolve to `ui-button …` strings. The `Record` makes TS enforce one class per variant — add a variant and TS forces its class to exist — and literal strings keep the class ↔ stylesheet pairing searchable in both directions. The pure `buttonClasses()` is unit-testable on its own.
 - Native HTML props spread via `...rest`; `className` merges with the variant classes.
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
 - (a) Default `type='button'` (MUI inherits browser default). Prevents accidental form submit when the Button is dropped inside a `<form>`.
