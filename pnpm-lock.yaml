@@ -2216,8 +2216,8 @@ packages:
   '@yuku-toolchain/types@0.8.5':
     resolution: {integrity: sha512-ELNzrhwfi9+VCTaj6QcLCb5MlUK6pmVqPqH8bBmer1FTHvgEITnpwB73L/Wx5KKPPVWAokfeeU9V2rJy/9kMlg==}
 
-  '@zip.js/zip.js@2.8.44':
-    resolution: {integrity: sha512-zO8tDX/UVPWNgsPGcXdl/J33XlhIfF7a4C/TXi3cyZmb4IhL/HIGkPOM9ab9alpOYlXsSkUNt8U8XQsE48H1dg==}
+  '@zip.js/zip.js@2.8.45':
+    resolution: {integrity: sha512-iTbcuW0mAQnlvgZPSDngTwV0wqAkYf4gTied0bsVx/jfxVqYP6xXfOOoDJqHBQZcncLR6gbnWyWlhT8GJgyFvA==}
     engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=18.0.0'}
 
   acorn-jsx@5.3.2:
@@ -6641,7 +6641,7 @@ snapshots:
 
   '@yuku-toolchain/types@0.8.5': {}
 
-  '@zip.js/zip.js@2.8.44': {}
+  '@zip.js/zip.js@2.8.45': {}
 
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:
@@ -8825,7 +8825,7 @@ snapshots:
       '@bundled-es-modules/deepmerge': 4.3.2
       '@bundled-es-modules/glob': 13.0.6
       '@bundled-es-modules/memfs': 4.17.0
-      '@zip.js/zip.js': 2.8.44
+      '@zip.js/zip.js': 2.8.45
       chalk: 5.6.2
       change-case: 5.4.4
       colorjs.io: 0.5.2
