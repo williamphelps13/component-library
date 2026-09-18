@@ -65,7 +65,7 @@ jobs:
       # when chromaui/action runs `build-storybook`. dist/ is gitignored, so
       # this is necessary in CI even though it's already present locally.
       - run: pnpm build
-      - uses: chromaui/action@e9f884eb0e6f75fcd1350e4d9666a9434ff26f2d # v18.7.4
+      - uses: chromaui/action@22b91fb07d2fe5a6e13dd284fc7b11dd162c143a # v18.9.1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           # All other policy (onlyChanged, autoAcceptChanges, exitZeroOnChanges,
