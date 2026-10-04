@@ -3,7 +3,7 @@ import { fn, expect } from 'storybook/test'
 
 import { allModes } from '../../../.storybook/modes'
 import preview from '../../../.storybook/preview'
-import { Button } from './button'
+import { Button, type ButtonLinkComponentProps } from './button'
 
 const meta = preview.meta({
   title: 'Components/Button',
@@ -105,6 +105,35 @@ export const DisabledBlocksClicks = meta.story({
     await expect(button).toBeDisabled()
     await userEvent.click(button)
     await expect(args.onClick).not.toHaveBeenCalled()
+  },
+})
+
+// Link form.
+function RouterLink({ children, ...props }: ButtonLinkComponentProps): ReactElement {
+  return (
+    <a data-router-link="" {...props}>
+      {children}
+    </a>
+  )
+}
+
+export const AsLink = meta.story({
+  args: { href: '#events', children: 'See events' },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: 'See events' })
+    await expect(link).toHaveAttribute('href', '#events')
+    // `type` on an <a> names a MIME type, so the button default must not leak.
+    await expect(link).not.toHaveAttribute('type')
+  },
+})
+
+export const AsRouterLink = meta.story({
+  args: { href: '#venues', component: RouterLink, children: 'See venues' },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: 'See venues' })
+    await expect(link).toHaveAttribute('data-router-link')
+    await expect(link).toHaveAttribute('href', '#venues')
+    await expect(link).toHaveClass('ui-button', 'ui-button-primary')
   },
 })
 
@@ -234,6 +263,13 @@ export const DarkLoading = meta.story({
 })
 export const DarkDisabled = meta.story({
   args: { disabled: true },
+  globals: { theme: 'dark' },
+  tags: ['!autodocs'],
+  parameters: { chromatic: { disable: true } },
+})
+
+export const DarkAsLink = meta.story({
+  args: { href: '#events', intent: 'neutral', children: 'See events' },
   globals: { theme: 'dark' },
   tags: ['!autodocs'],
   parameters: { chromatic: { disable: true } },

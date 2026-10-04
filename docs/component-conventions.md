@@ -8,13 +8,14 @@ Settled by Button and the 2026-07 remediation. Sections note which component set
 
 - Named exports only; the barrel (`src/index.ts`) re-exports the component, its props type, and its variant unions
 - Props extend the relevant DOM attributes and spread `...rest` onto the element; `className` merges after the variant classes so consumer classes win ties
-- `ref` is a plain prop (`ref?: Ref<HTMLButtonElement>`), no `forwardRef` — React 19 idiom
+- `ref` is a plain prop typed to the root element (`ref?: Ref<HTMLButtonElement>`), no `forwardRef` — React 19 idiom
 - Prop grammar: `intent` (color role), `size`, `loading`, `disabled`, `fullWidth` — unprefixed adjectives, not `isX` booleans
 - Variant unions carry per-value JSDoc on the type itself; the prop's JSDoc describes the role, not the values (single source of truth for autodocs)
 - Variant union types export with component-prefixed names (`ButtonIntent`, `BadgeIntent`) so barrel exports cannot collide (settled by Badge)
 - Internal interactive sub-controls (a badge's remove button) are real `<button>` elements with a localizable accessible-name prop (`removeLabel?: string` with an English default), and inherit the parent's foreground via `currentColor` so consumer token overrides reach them for free (settled by Badge)
 - Every exported prop and type carries consumer-grade JSDoc — `react-docgen-typescript` publishes it in autodocs, so it is API surface
 - Convention-based surface, not composition: the component owns its internal parts (`<Button loading>`, not `<Button><Spinner/></Button>`); behavior primitives are wrapped internally, never re-exported
+- Link rendering: `href` switches the root element to a link and `component` accepts a router link; props the link form cannot honor are typed `never` there, so passing them fails type-checking (settled by Button)
 - No test-id props in the public API — consumers pass `data-testid` through `...rest` if they need one
 
 ## Variants and styling
