@@ -28,6 +28,8 @@ npm run dev
 
 - `--force` is required — npm caches tarballs by name, and the tarball name carries the pre-bump `package.json` version (unchanged until the Version PR merges), so a same-name reinstall serves the stale cache without it
 - iterate by rebuilding: edit → `pnpm build && pnpm pack` → reinstall with `--force`
+- pnpm consumers: install from a uniquely named copy of the tarball (for example `cp williamphelps13-ui-<version>.tgz ui-<change>-1.tgz`). With the same path and version, pnpm reuses its earlier extraction and installs stale code
+- Next.js consumers: clear `.next` before rebuilding, or the build keeps serving the previous stylesheet
 - `npm link` is avoided — it symlinks the source tree and pulls in a second copy of React, which breaks a React peer-dependency library; a packed tarball uses the consumer's own React
 
 ## How releases work

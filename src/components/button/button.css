@@ -16,7 +16,13 @@
   appearance: none;
   border: 0;
   margin: 0;
+  box-sizing: border-box;
   font: inherit;
+  /* The link form renders an <a>, which browsers style differently from a
+     <button>: it inherits text styles and is not border-box by default. */
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: normal;
   display: inline-flex;
   align-items: center;
   justify-content: center;

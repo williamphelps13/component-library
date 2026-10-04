@@ -139,7 +139,7 @@ Design target: MUI Material Button. When MUI does X, we do X unless the deviatio
 
 Deliberate deviations with named justifications. Each line names which bar the deviation clears — (a) user-visible UX win, or (b) React 19 / Next.js App Router / RSC alignment.
 
-- (b) `ref` is a plain prop — `Button` is a plain function with `ref?: Ref<HTMLButtonElement>`; no `forwardRef` (removed in React 19). An explicit `ReactElement` return type satisfies `isolatedDeclarations`. The whole library is React 19-only; using the React 19 idiom for ref is the alignment, not a deviation worth re-litigating.
+- (b) `ref` is a plain prop — `Button` is a plain function whose `ref` prop takes the root element's type (`HTMLButtonElement`, or `HTMLAnchorElement` for the link form); no `forwardRef` (removed in React 19). An explicit `ReactElement` return type satisfies `isolatedDeclarations`. The whole library is React 19-only; using the React 19 idiom for ref is the alignment, not a deviation worth re-litigating.
 - Variants are a typed literal-class map (`variants.ts`): `Record<ButtonIntent,string>` and `Record<ButtonSize,string>` resolve to `ui-button …` strings. The `Record` makes TS enforce one class per variant — add a variant and TS forces its class to exist — and literal strings keep the class ↔ stylesheet pairing searchable in both directions. The pure `buttonClasses()` is unit-testable on its own.
 - Native HTML props spread via `...rest`; `className` merges with the variant classes.
 - Stories are CSF Next (`preview.meta()` → `meta.story()`); `play({ canvas, userEvent, args })` with `import { fn, expect } from 'storybook/test'`.
@@ -148,6 +148,10 @@ Deliberate deviations with named justifications. Each line names which bar the d
 - (a) Hover/active color shift via `oklch(from var(--ui-color-X-bg) calc(l ± N) c h)` instead of MUI's `alpha(palette.main, 0.04)` overlay. Both work; ours is theme-token-portable and lets the same shift formula serve every intent. Marginal — kept because the override contract (point below) needs CSS-var inputs and oklch shifts compose with them: one `-bg` override re-derives its own hover/active shifts, where Radix-style hover tokens would turn pair overrides into triples. Browsers without relative-color support drop the shift; the elevation change still signals state.
 - (b) Semantic-token theming (`--ui-color-primary-bg`, `--ui-color-primary-fg`, …) rather than a JS theme object. The whole library targets RSC and Next.js App Router; a JS theme object would require a Provider in every consumer's `layout.tsx` and forfeit server-renderability. CSS-var overrides need no JS, no Provider, and no rebuild.
 - (a) Color-alone warning in `intent` JSDoc: pair `danger` with an explicit destructive label. Concrete a11y improvement codified at the prop type rather than left as Material guidance.
+- Link form matches MUI: `href` renders an `<a>`, and `component` supplies a router link (`component={Link}` for Next.js).
+- (b) Next.js `Link` passes straight through. MUI's Next.js guide needs a `'use client'` re-export of `next/link` because its Button is a client component; this Button is a server component.
+- (a) The link form has no `disabled` or `loading`, where MUI allows both. A link that only looks disabled stays focusable and is still announced as a link, which misleads screen-reader users; a type error is better than a silent no-op. `type` is excluded too, since on an `<a>` it names a MIME type.
+- The `component` prop receives anchor props and `href` only, where MUI passes the link component's own props through. Router-specific props such as Next.js `prefetch` need a small wrapper around `Link`. Trigger to widen the type: a consuming product needs those props on the Button itself.
 
 #### Server-renderable Button — the trade-off
 

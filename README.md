@@ -28,6 +28,22 @@ export default function Page() {
 }
 ```
 
+To give a link the button's look, pass `href`. Add `component` for a router link, such as Next.js `Link`, to keep client-side navigation:
+
+```tsx
+import Link from 'next/link'
+
+export function EventsLink() {
+  return (
+    <Button href="/events" component={Link}>
+      Events
+    </Button>
+  )
+}
+```
+
+A global link rule such as `a { color: inherit }` outside a cascade layer beats the library's styles and repaints link buttons. Put such rules in a layer, or exclude the button with `a:not(.ui-button)`.
+
 ## Theming
 
 Every visual decision resolves through `--ui-*` CSS variables. Override them in your own `:root` (and `[data-theme="dark"]` for dark mode) to re-theme without rebuilding the library. All shipped styles live in cascade layers, so any unlayered CSS you write beats the library's defaults — no `!important` needed.
