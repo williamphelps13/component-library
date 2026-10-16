@@ -7,6 +7,6 @@ allowBuilds:
   esbuild: true
   lightningcss-cli: true
 catalog:
-  react: 19.3.0
-  react-dom: 19.3.0
+  react: 19.3.1
+  react-dom: 19.3.1
   typescript: 6.0.3
