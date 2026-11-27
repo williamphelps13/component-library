@@ -21,7 +21,7 @@ jobs:
       # authored by the App, not GITHUB_TOKEN. GITHUB_TOKEN events don't trigger
       # workflows (anti-recursion), so a GITHUB_TOKEN-authored PR never runs the
       # required CI checks and can't be merged. An App-authored PR does.
-      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+      - uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
         id: app-token
         with:
           client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 0 # changelog-github resolves commits to PRs via full history
           token: ${{ steps.app-token.outputs.token }}
 
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
